@@ -70,15 +70,20 @@ function AgendaPageContent() {
   }, []);
 
   // Convert our Neon objects into the Compromisso format the UI expects
-  const compromissos: Compromisso[] = compromissosData.map(c => ({
-    ...c,
-    // Database dates are already strings or date objects that ISO formatting fixes
-    data: (c.data instanceof Date ? c.data : new Date(c.data)).toISOString(),
-    createdAt: (c.createdAt instanceof Date ? c.createdAt : new Date(c.createdAt)).toISOString(),
-    updatedAt: (c.updatedAt instanceof Date ? c.updatedAt : new Date(c.updatedAt)).toISOString(),
-  })) as any;
+  const compromissos: Compromisso[] = compromissosData.map(c => {
+    // Normalizar fuso horário: datas vindas de servidores SQL (Midnight UTC) viram 21h do dia anterior no Brasil.
+    // Extraindo apenas a data (YYYY-MM-DD) e forçando meio-dia, garantimos que fiquem no dia correto no Frontend.
+    const dateStr = typeof c.data === 'string' ? c.data : new Date(c.data).toISOString();
+    const datePart = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr.slice(0, 10);
+    const safeData = `${datePart}T12:00:00`;
 
-
+    return {
+      ...c,
+      data: safeData,
+      createdAt: c.createdAt ? new Date(c.createdAt).toISOString() : new Date().toISOString(),
+      updatedAt: c.updatedAt ? new Date(c.updatedAt).toISOString() : new Date().toISOString(),
+    };
+  }) as any;
 
   const handleSave = () => {
     setSelectedDate(null);
@@ -86,6 +91,7 @@ function AgendaPageContent() {
     setIsModalOpen(false);
     setIsEditMode(false);
     setSelectedCompromisso(null);
+    fetchAgenda();
   };
 
   const handleSlotClick = (date: Date, hour: number) => {
@@ -111,6 +117,7 @@ function AgendaPageContent() {
   const handleDeleteSuccess = (id: string) => {
     setIsDetailsOpen(false);
     setSelectedCompromisso(null);
+    fetchAgenda();
   };
 
   const handleToday = () => {
