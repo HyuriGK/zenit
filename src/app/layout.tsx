@@ -1,6 +1,6 @@
 import { SessionProvider } from '@/components/providers/SessionProvider';
 import { IntlProvider } from '@/components/providers/IntlProvider';
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { getMessages } from 'next-intl/server';
 import { Toaster } from 'sonner';
@@ -20,7 +20,6 @@ export const metadata: Metadata = {
   title: "Zênit - Gerenciamento Pessoal",
   description: "Sistema completo de gerenciamento pessoal",
   manifest: "/manifest.json",
-  themeColor: "#0a0a0a",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -38,12 +37,14 @@ export const metadata: Metadata = {
       { url: '/images/logo-com-fundo.png', sizes: '180x180' },
     ],
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default async function RootLayout({
