@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/neon';
 
+export const dynamic = 'force-dynamic';
+
 // GET: Retornar todos os compromissos do usuário
 export async function GET() {
     try {
