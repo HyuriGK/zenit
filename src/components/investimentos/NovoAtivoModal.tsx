@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { db } from '@/lib/dexie';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,11 +71,18 @@ export default function NovoAtivoModal({ aberto, onFechar, onSucesso }: NovoAtiv
                 taxas: taxasNum,
                 precoMedio: precoMedioValue,
                 valorAtual: precoNum, // por padrão, inicia igual ao preço da cota
-                dataCompra: new Date(dataCompra),
-                updatedAt: new Date(),
+                dataCompra: new Date(dataCompra).toISOString(),
+                // Hack fallback while NextAuth is offline
+                userId: '12345678-user-mock-abcd',
             };
 
-            await db.ativosInvestimento.add(ativo);
+            const response = await fetch('/api/investimentos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(ativo),
+            });
+
+            if (!response.ok) throw new Error('Falha ao adicionar na Nuvem (Neon)');
 
             limparFormulario();
             toast.success('Ativo adicionado com sucesso!', { id: loadingToast });

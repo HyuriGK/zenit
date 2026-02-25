@@ -68,3 +68,41 @@ export async function POST(request: Request) {
         );
     }
 }
+
+// DELETE: Excluir um hábito 
+export async function DELETE(request: Request) {
+    try {
+        const { searchParams } = new URL(request.url);
+        const id = searchParams.get('id');
+
+        if (!id) return NextResponse.json({ error: 'ID faltante' }, { status: 400 });
+
+        await sql`DELETE FROM "Habito" WHERE id = ${id}`;
+
+        return NextResponse.json({ success: true }, { status: 200 });
+    } catch (error) {
+        console.error('Erro ao deletar Hábito no Neon:', error);
+        return NextResponse.json({ error: 'Erro ao deletar Hábito' }, { status: 500 });
+    }
+}
+
+// PUT: Atualizar os dados de um hábito (ex: sequência)
+export async function PUT(request: Request) {
+    try {
+        const data = await request.json();
+        const id = data.id;
+
+        if (!id) return NextResponse.json({ error: 'ID faltante' }, { status: 400 });
+
+        // Update dinâmico baseado no que foi enviado
+        if (data.sequenciaAtual !== undefined) {
+            const seq = Number(data.sequenciaAtual);
+            await sql`UPDATE "Habito" SET "sequenciaAtual" = ${seq}, "updatedAt" = NOW() WHERE id = ${id}`;
+        }
+
+        return NextResponse.json({ success: true }, { status: 200 });
+    } catch (error) {
+        console.error('Erro ao atualizar Hábito no Neon:', error);
+        return NextResponse.json({ error: 'Erro ao atualizar Hábito' }, { status: 500 });
+    }
+}

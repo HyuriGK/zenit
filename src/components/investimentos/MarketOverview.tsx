@@ -8,7 +8,6 @@ import { useTranslations } from 'next-intl';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { db } from '@/lib/dexie';
 
 export default function MarketOverview() {
     const t = useTranslations('investments');
@@ -91,9 +90,13 @@ export default function MarketOverview() {
     useEffect(() => {
         const loadAssets = async () => {
             try {
-                const ativos = await db.ativosInvestimento.toArray();
-                const uniqueTickers = Array.from(new Set(ativos.map(a => a.nome)));
-                setUserAssets(uniqueTickers);
+                const res = await fetch('/api/investimentos');
+                if (res.ok) {
+                    const json = await res.json();
+                    const ativos = json.data || [];
+                    const uniqueTickers = Array.from(new Set(ativos.map((a: any) => a.nome))) as string[];
+                    setUserAssets(uniqueTickers);
+                }
             } catch (err) {
                 console.error("Erro ao carregar ativos da carteira", err);
             }

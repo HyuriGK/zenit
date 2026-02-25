@@ -383,10 +383,18 @@ export default function HabitosPage() {
         .toArray();
       const totalCompletos = todosRegistros.filter(r => r.concluido).length;
 
-      await db.habitos.update(habito.id, {
-        sequenciaAtual: habito.completadoHoje ? Math.max(0, habito.sequenciaAtual - 1) : habito.sequenciaAtual + 1,
-        updatedAt: new Date()
-      } as any);
+      // Atualizar no banco na nuvem
+      const novaSequencia = habito.completadoHoje ? Math.max(0, habito.sequenciaAtual - 1) : habito.sequenciaAtual + 1;
+      const response = await fetch('/api/habitos', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: habito.id,
+          sequenciaAtual: novaSequencia
+        })
+      });
+
+      if (!response.ok) throw new Error('Falha ao atualizar sequência no Neon');
 
       carregarDados();
     } catch (error) {
@@ -405,9 +413,14 @@ export default function HabitosPage() {
     setExcluindoHabito(true);
     try {
       if (tipo === 'excluir' || escopo === 'todos') {
-        // Remover hábito e todos os registros
+        // Remover todos os registros locais associados
         await db.registrosHabitos.where('habitoId').equals(habitoSelecionado.id).delete();
-        await db.habitos.delete(habitoSelecionado.id);
+
+        // Excluir Hábito da Nuvem
+        const response = await fetch(`/api/habitos?id=${habitoSelecionado.id}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) throw new Error('Falha ao excluir hábito no banco (Neon)');
       } else if (escopo === 'dia') {
         // "Remover do dia" localmente apenas remove o registro se existir
         const dataAlvo = new Date(dataSelecionada);

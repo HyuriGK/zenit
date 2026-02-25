@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/dexie';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { formatarMoeda } from '@/lib/financeiro-helper';
@@ -14,11 +12,27 @@ import { toast } from 'sonner';
 
 export default function PersonalPortfolio() {
     const t = useTranslations('investments');
-    const ativos = useLiveQuery(() => db.ativosInvestimento.toArray(), []);
+    const [ativos, setAtivos] = useState<any[]>([]);
     const [modalAberto, setModalAberto] = useState(false);
     const [ativoSelecionado, setAtivoSelecionado] = useState<string | null>(null);
     const [liveQuotes, setLiveQuotes] = useState<Record<string, number>>({});
     const [isLoadingQuotes, setIsLoadingQuotes] = useState(false);
+
+    const carregarAtivos = async () => {
+        try {
+            const res = await fetch('/api/investimentos');
+            if (res.ok) {
+                const json = await res.json();
+                setAtivos(json.data || []);
+            }
+        } catch (error) {
+            console.error('Erro ao buscar ativos:', error);
+        }
+    };
+
+    useEffect(() => {
+        carregarAtivos();
+    }, []);
 
     // Fetch live quotes from BRAPI
     useEffect(() => {
@@ -84,8 +98,11 @@ export default function PersonalPortfolio() {
         if (confirm(t('deleteConfirmMsg'))) {
             try {
                 const idsToDelete = (ativos || []).filter(a => a.nome === nome).map(a => a.id);
-                await db.ativosInvestimento.bulkDelete(idsToDelete);
+                for (const id of idsToDelete) {
+                    await fetch(`/api/investimentos?id=${id}`, { method: 'DELETE' });
+                }
                 toast.success(`Ativos ${nome} removidos.`, { className: "bg-green-500/10 text-green-400 border border-green-500/20" });
+                carregarAtivos();
             } catch (err) {
                 toast.error('Erro ao remover ativos');
             }
@@ -306,13 +323,16 @@ export default function PersonalPortfolio() {
             <NovoAtivoModal
                 aberto={modalAberto}
                 onFechar={() => setModalAberto(false)}
-                onSucesso={() => { }}
+                onSucesso={() => carregarAtivos()}
             />
 
             <DetalhesAtivoModal
                 aberto={!!ativoSelecionado}
                 nomeAtivo={ativoSelecionado}
-                onFechar={() => setAtivoSelecionado(null)}
+                onFechar={() => {
+                    setAtivoSelecionado(null);
+                    carregarAtivos();
+                }}
             />
         </div>
     );

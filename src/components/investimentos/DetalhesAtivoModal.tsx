@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { db } from '@/lib/dexie';
-import { useLiveQuery } from 'dexie-react-hooks';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -19,10 +17,27 @@ interface DetalhesAtivoModalProps {
 
 export default function DetalhesAtivoModal({ aberto, nomeAtivo, onFechar }: DetalhesAtivoModalProps) {
     const t = useTranslations('investments');
-    const aportes = useLiveQuery(
-        () => nomeAtivo ? db.ativosInvestimento.where('nome').equals(nomeAtivo).toArray() : [],
-        [nomeAtivo]
-    );
+    const [aportes, setAportes] = useState<any[]>([]);
+
+    const carregarAportes = async () => {
+        if (!nomeAtivo) return;
+        try {
+            const res = await fetch('/api/investimentos');
+            if (res.ok) {
+                const json = await res.json();
+                const filtrados = (json.data || []).filter((a: any) => a.nome === nomeAtivo);
+                setAportes(filtrados);
+            }
+        } catch (error) {
+            console.error('Erro ao buscar aportes detalhados:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (aberto && nomeAtivo) {
+            carregarAportes();
+        }
+    }, [aberto, nomeAtivo]);
 
     const [editandoId, setEditandoId] = useState<string | null>(null);
     const [editForm, setEditForm] = useState({
@@ -65,17 +80,26 @@ export default function DetalhesAtivoModal({ aberto, nomeAtivo, onFechar }: Deta
 
             const precoMedioValue = ((qtdNum * precoNum) + taxasNum) / qtdNum;
 
-            await db.ativosInvestimento.update(atual.id, {
+            const bodyPayload = {
+                id: atual.id,
                 quantidade: qtdNum,
                 precoCota: precoNum,
                 taxas: taxasNum,
                 precoMedio: precoMedioValue,
-                dataCompra: new Date(editForm.dataCompra),
-                updatedAt: new Date()
+                dataCompra: new Date(editForm.dataCompra).toISOString()
+            };
+
+            const response = await fetch('/api/investimentos', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bodyPayload)
             });
+
+            if (!response.ok) throw new Error('Falha ao atualizar na Nuvem');
 
             toast.success('Aporte atualizado com sucesso!', { className: "bg-green-500/10 text-green-400 border border-green-500/20" });
             setEditandoId(null);
+            carregarAportes();
         } catch (error) {
             console.error('Erro ao atualizar aporte', error);
             toast.error('Erro ao salvar as edições.');
@@ -85,10 +109,17 @@ export default function DetalhesAtivoModal({ aberto, nomeAtivo, onFechar }: Deta
     const deletarAporte = async (id: string) => {
         if (confirm('Tem certeza que deseja excluir permanentemente este aporte indivual?')) {
             try {
-                await db.ativosInvestimento.delete(id);
+                const res = await fetch(`/api/investimentos?id=${id}`, { method: 'DELETE' });
+                if (!res.ok) throw new Error('Falha na exclusão (Neon)');
+
                 toast.success('Aporte excluído.', { className: "bg-green-500/10 text-green-400 border border-green-500/20" });
-                // Se era o último, fecha o modal
-                if (aportes?.length === 1) {
+
+                // Fetch the new list and check length
+                await carregarAportes();
+                onFechar();
+                // If the local state was updated directly, checking aportes.length === 1 is slightly off 
+                // because state hasn't updated. Alternatively, we just check if it was 1 before deletion.
+                if (aportes.length <= 1) {
                     onFechar();
                 }
             } catch (error) {
