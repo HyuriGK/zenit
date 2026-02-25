@@ -31,6 +31,25 @@ export const authConfig = {
                 token.plano = (user as any).plano
             }
             return token
+        },
+        authorized({ auth, request: { nextUrl } }) {
+            const isLogged = !!auth?.user
+            const isAuthRoute = nextUrl.pathname.startsWith('/login') || nextUrl.pathname.startsWith('/register')
+            const isDashboardRoute = nextUrl.pathname.startsWith('/dashboard') || nextUrl.pathname === '/'
+
+            if (isAuthRoute) {
+                if (isLogged) {
+                    return Response.redirect(new URL('/dashboard', nextUrl))
+                }
+                return true // Permite acesso a não logados
+            }
+
+            if (isDashboardRoute) {
+                if (isLogged) return true
+                return false // Redireciona para SignIn se não logado
+            }
+
+            return true
         }
     },
     session: { strategy: "jwt" },
