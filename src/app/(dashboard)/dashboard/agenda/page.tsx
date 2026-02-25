@@ -46,17 +46,37 @@ function AgendaPageContent() {
   const [selectedHour, setSelectedHour] = useState<number | null>(null);
   const [selectedCompromisso, setSelectedCompromisso] = useState<Compromisso | null>(null);
 
-  const compromissosData = useLiveQuery(() => db.compromissos.toArray(), []);
+  const [compromissosData, setCompromissosData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Convert our Dexie objects into the Compromisso format the UI expects
-  const compromissos: Compromisso[] = (compromissosData || []).map(c => ({
+  // Busca os compromissos da API do Servidor (Neon SQL)
+  const fetchAgenda = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch('/api/agenda');
+      if (res.ok) {
+        const json = await res.json();
+        setCompromissosData(json.data || []);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar agenda:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAgenda();
+  }, []);
+
+  // Convert our Neon objects into the Compromisso format the UI expects
+  const compromissos: Compromisso[] = compromissosData.map(c => ({
     ...c,
+    // Database dates are already strings or date objects that ISO formatting fixes
     data: (c.data instanceof Date ? c.data : new Date(c.data)).toISOString(),
     createdAt: (c.createdAt instanceof Date ? c.createdAt : new Date(c.createdAt)).toISOString(),
     updatedAt: (c.updatedAt instanceof Date ? c.updatedAt : new Date(c.updatedAt)).toISOString(),
   })) as any;
-
-  const loading = compromissosData === undefined;
 
 
 

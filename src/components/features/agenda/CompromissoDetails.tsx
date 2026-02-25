@@ -56,7 +56,11 @@ export function CompromissoDetails({
     setIsDeleting(true);
 
     try {
-      await db.compromissos.delete(compromisso.id);
+      const response = await fetch(`/api/agenda?id=${compromisso.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Falha ao excluir na nuvem');
 
       onDelete(compromisso.id);
       onClose();

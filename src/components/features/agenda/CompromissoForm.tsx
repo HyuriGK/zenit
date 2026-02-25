@@ -110,24 +110,38 @@ export function CompromissoForm({ onClose, onSave, initialDate, initialHour, ini
       };
 
       if (isEditMode && initialData) {
-        await db.compromissos.update(initialData.id, payload);
+        // Modo edição
+        const editPayload = { ...payload, id: initialData.id };
+        const response = await fetch('/api/agenda', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(editPayload)
+        });
+
+        if (!response.ok) throw new Error('Falha ao atualizar na Nuvem');
         onSave({ id: initialData.id, titulo });
       } else {
-        const novoCompromisso = {
+        // Novo
+        const id = crypto.randomUUID();
+        const createPayload = {
           ...payload,
-          id: crypto.randomUUID(),
-          usuarioId: session?.user?.id || 'offline-user',
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          id,
+          userId: session?.user?.id || 'offline-user',
         };
-        await db.compromissos.add(novoCompromisso);
-        onSave({ id: novoCompromisso.id, titulo });
+        const response = await fetch('/api/agenda', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(createPayload)
+        });
+
+        if (!response.ok) throw new Error('Falha ao salvar na Nuvem');
+        onSave({ id, titulo });
       }
 
       onClose();
     } catch (error) {
       console.error('Erro:', error);
-      alert('Erro ao salvar no banco local');
+      alert('Erro ao salvar no banco (Neon)');
     } finally {
       setLoading(false);
     }
