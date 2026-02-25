@@ -1,18 +1,9 @@
-// Mocked Prisma client for offline Zenit usage
-// Removed @prisma/client dependency to allow building completely offline
+import { PrismaClient } from '@prisma/client'
 
-export const prisma = new Proxy({} as any, {
-  get: () => {
-    return new Proxy({} as any, {
-      get: () => {
-        // Return a mock function that returns an empty array / object, etc.
-        return async () => {
-          console.warn('Called mocked prisma instance offline');
-          return null;
-        }
-      }
-    });
-  }
-});
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
+
+export const prisma = globalForPrisma.prisma || new PrismaClient()
+
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
 export default prisma;

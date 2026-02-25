@@ -1,15 +1,22 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/neon';
+import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        // Busca todos os hábitos, trazendo os mais recentes primeiro
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const habitos = await sql`
-      SELECT * FROM "Habito" 
-      ORDER BY "createdAt" DESC
-    `;
+            SELECT * FROM "Habito" 
+            WHERE "userId" = ${userId}
+            ORDER BY "createdAt" DESC
+        `;
 
         return NextResponse.json({ data: habitos });
     } catch (error) {
@@ -23,9 +30,13 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
-        const data = await request.json();
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
 
-        // Como a tabela foi criada pelo Prisma, os Arrays de Int se chamam Int[] e IDs são String UUIDs genéricos
+        const data = await request.json();
         const id = data.id || crypto.randomUUID();
         const nome = data.nome || 'Novo Hábito';
         const descricao = data.descricao || null;
@@ -33,7 +44,6 @@ export async function POST(request: Request) {
         const cor = data.cor || '#ef4444';
         const frequencia = data.frequencia || 'DIARIA';
 
-        // Precisamos formatar o array do JS para a formatação do PostgreSQL {1,2,3}
         let diasSemanaFormatados = '{}';
         if (data.diasSemana && Array.isArray(data.diasSemana)) {
             diasSemanaFormatados = `{${data.diasSemana.join(',')}}`;
@@ -42,24 +52,21 @@ export async function POST(request: Request) {
         const metaVezes = data.metaVezes || null;
         const periodoDia = data.periodoDia || null;
         const status = data.status || 'ATIVO';
-        // Necessitamos de um userId fictício para testes enquanto a auth principal não funciona
-        const userId = '12345678-user-mock-abcd';
 
-        // Inserção usando param tags seguras p/ evitar SQL Injection
         const resultado = await sql`
-      INSERT INTO "Habito" (
-        id, "nome", "descricao", "icone", "cor", "frequencia", 
-        "diasSemana", "metaVezes", "periodoDia", "status", 
-        "dataInicio", "sequenciaAtual", "melhorSequencia", 
-        "userId", "updatedAt"
-      ) VALUES (
-        ${id}, ${nome}, ${descricao}, ${icone}, ${cor}, ${frequencia}, 
-        ${diasSemanaFormatados}, ${metaVezes}, ${periodoDia}, ${status}, 
-        NOW(), 0, 0,
-        ${userId}, NOW()
-      )
-      RETURNING *;
-    `;
+            INSERT INTO "Habito" (
+                id, "nome", "descricao", "icone", "cor", "frequencia", 
+                "diasSemana", "metaVezes", "periodoDia", "status", 
+                "dataInicio", "sequenciaAtual", "melhorSequencia", 
+                "userId", "updatedAt"
+            ) VALUES (
+                ${id}, ${nome}, ${descricao}, ${icone}, ${cor}, ${frequencia}, 
+                ${diasSemanaFormatados}, ${metaVezes}, ${periodoDia}, ${status}, 
+                NOW(), 0, 0,
+                ${userId}, NOW()
+            )
+            RETURNING *;
+        `;
 
         return NextResponse.json({ data: resultado[0] }, { status: 201 });
     } catch (error) {
@@ -71,15 +78,20 @@ export async function POST(request: Request) {
     }
 }
 
-// DELETE: Excluir um hábito 
 export async function DELETE(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 
         if (!id) return NextResponse.json({ error: 'ID faltante' }, { status: 400 });
 
-        await sql`DELETE FROM "Habito" WHERE id = ${id}`;
+        await sql`DELETE FROM "Habito" WHERE id = ${id} AND "userId" = ${userId}`;
 
         return NextResponse.json({ success: true }, { status: 200 });
     } catch (error) {
@@ -88,18 +100,30 @@ export async function DELETE(request: Request) {
     }
 }
 
-// PUT: Atualizar os dados de um hábito (ex: sequência)
 export async function PUT(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const data = await request.json();
         const id = data.id;
 
         if (!id) return NextResponse.json({ error: 'ID faltante' }, { status: 400 });
 
-        // Update dinâmico baseado no que foi enviado
         if (data.sequenciaAtual !== undefined) {
             const seq = Number(data.sequenciaAtual);
-            await sql`UPDATE "Habito" SET "sequenciaAtual" = ${seq}, "updatedAt" = NOW() WHERE id = ${id}`;
+            const result = await sql`
+                UPDATE "Habito" 
+                SET "sequenciaAtual" = ${seq}, "updatedAt" = NOW() 
+                WHERE id = ${id} AND "userId" = ${userId}
+                RETURNING id;
+            `;
+            if (result.length === 0) {
+                return NextResponse.json({ error: 'Hábito não encontrado ou acesso negado' }, { status: 404 });
+            }
         }
 
         return NextResponse.json({ success: true }, { status: 200 });

@@ -1,12 +1,20 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/neon';
+import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const ativos = await sql`
             SELECT * FROM "AtivoInvestimento"
+            WHERE "userId" = ${userId}
             ORDER BY "dataCompra" DESC, "nome" ASC
         `;
         return NextResponse.json({ data: ativos });
@@ -21,6 +29,12 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const data = await request.json();
         const id = data.id || crypto.randomUUID();
         const nome = data.nome || 'ATIVO';
@@ -32,9 +46,6 @@ export async function POST(request: Request) {
         const valorAtual = Number(data.valorAtual || precoCota);
         const setor = data.setor || null;
         const dataCompra = data.dataCompra || new Date().toISOString().split('T')[0];
-
-        // Mock User
-        const userId = '12345678-user-mock-abcd';
 
         const result = await sql`
             INSERT INTO "AtivoInvestimento" (
@@ -61,13 +72,17 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const data = await request.json();
         const id = data.id;
 
         if (!id) return NextResponse.json({ error: 'ID faltante' }, { status: 400 });
 
-        // Build dynamic SET string or update everything we expect.
-        // For simplicity, updating all core fields if present, else keep them.
         const nome = data.nome;
         const tipo = data.tipo;
         const quantidade = Number(data.quantidade);
@@ -90,9 +105,13 @@ export async function PUT(request: Request) {
                 "setor" = COALESCE(${setor}, "setor"),
                 "dataCompra" = COALESCE(${dataCompra}, "dataCompra"),
                 "updatedAt" = NOW()
-            WHERE id = ${id}
+            WHERE id = ${id} AND "userId" = ${userId}
             RETURNING *;
         `;
+
+        if (result.length === 0) {
+            return NextResponse.json({ error: 'Ativo não encontrado ou acesso negado' }, { status: 404 });
+        }
 
         return NextResponse.json({ data: result[0] }, { status: 200 });
     } catch (error) {
@@ -103,12 +122,18 @@ export async function PUT(request: Request) {
 
 export async function DELETE(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 
         if (!id) return NextResponse.json({ error: 'ID faltante' }, { status: 400 });
 
-        await sql`DELETE FROM "AtivoInvestimento" WHERE id = ${id}`;
+        await sql`DELETE FROM "AtivoInvestimento" WHERE id = ${id} AND "userId" = ${userId}`;
 
         return NextResponse.json({ success: true }, { status: 200 });
     } catch (error) {

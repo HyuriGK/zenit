@@ -1,15 +1,23 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/neon';
+import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 
 // GET: Retornar todos os compromissos do usuário
 export async function GET() {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const compromissos = await sql`
-      SELECT * FROM "Compromisso"
-      ORDER BY "data" ASC, "horaInicio" ASC
-    `;
+            SELECT * FROM "Compromisso"
+            WHERE "userId" = ${userId}
+            ORDER BY "data" ASC, "horaInicio" ASC
+        `;
 
         return NextResponse.json({ data: compromissos });
     } catch (error) {
@@ -24,6 +32,12 @@ export async function GET() {
 // POST: Criar um novo compromisso
 export async function POST(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const data = await request.json();
 
         const id = data.id || crypto.randomUUID();
@@ -42,23 +56,20 @@ export async function POST(request: Request) {
         const dataFimRecorrencia = data.dataFimRecorrencia || null;
         const syncWithGoogle = Boolean(data.syncWithGoogle);
 
-        // User Mock até a fase de auth real estar conectada
-        const userId = '12345678-user-mock-abcd';
-
         const resultado = await sql`
-      INSERT INTO "Compromisso" (
-        id, "titulo", "descricao", "data", "horaInicio", "horaFim", 
-        "categoria", "cor", "concluido", "isRecorrente", "tipoRecorrencia", 
-        "intervaloRecorrencia", "dataFimRecorrencia", "syncWithGoogle", 
-        "userId", "updatedAt"
-      ) VALUES (
-        ${id}, ${titulo}, ${descricao}, ${dataCompromisso}, ${horaInicio}, ${horaFim}, 
-        ${categoria}, ${cor}, false, ${isRecorrente}, ${tipoRecorrencia}, 
-        ${intervaloRecorrencia}, ${dataFimRecorrencia}, ${syncWithGoogle}, 
-        ${userId}, NOW()
-      )
-      RETURNING *;
-    `;
+            INSERT INTO "Compromisso" (
+                id, "titulo", "descricao", "data", "horaInicio", "horaFim", 
+                "categoria", "cor", "concluido", "isRecorrente", "tipoRecorrencia", 
+                "intervaloRecorrencia", "dataFimRecorrencia", "syncWithGoogle", 
+                "userId", "updatedAt"
+            ) VALUES (
+                ${id}, ${titulo}, ${descricao}, ${dataCompromisso}, ${horaInicio}, ${horaFim}, 
+                ${categoria}, ${cor}, false, ${isRecorrente}, ${tipoRecorrencia}, 
+                ${intervaloRecorrencia}, ${dataFimRecorrencia}, ${syncWithGoogle}, 
+                ${userId}, NOW()
+            )
+            RETURNING *;
+        `;
 
         return NextResponse.json({ data: resultado[0] }, { status: 201 });
     } catch (error) {
@@ -73,6 +84,12 @@ export async function POST(request: Request) {
 // PUT: Atualizar um compromisso
 export async function PUT(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const data = await request.json();
         const id = data.id;
         if (!id) return NextResponse.json({ error: 'ID faltante' }, { status: 400 });
@@ -93,15 +110,19 @@ export async function PUT(request: Request) {
         const syncWithGoogle = Boolean(data.syncWithGoogle);
 
         const resultado = await sql`
-      UPDATE "Compromisso" SET
-        "titulo" = ${titulo}, "descricao" = ${descricao}, "data" = ${dataCompromisso}, 
-        "horaInicio" = ${horaInicio}, "horaFim" = ${horaFim}, "categoria" = ${categoria},
-        "cor" = ${cor}, "isRecorrente" = ${isRecorrente}, "tipoRecorrencia" = ${tipoRecorrencia},
-        "intervaloRecorrencia" = ${intervaloRecorrencia}, "dataFimRecorrencia" = ${dataFimRecorrencia},
-        "syncWithGoogle" = ${syncWithGoogle}, "updatedAt" = NOW()
-      WHERE id = ${id}
-      RETURNING *;
-    `;
+            UPDATE "Compromisso" SET
+                "titulo" = ${titulo}, "descricao" = ${descricao}, "data" = ${dataCompromisso}, 
+                "horaInicio" = ${horaInicio}, "horaFim" = ${horaFim}, "categoria" = ${categoria},
+                "cor" = ${cor}, "isRecorrente" = ${isRecorrente}, "tipoRecorrencia" = ${tipoRecorrencia},
+                "intervaloRecorrencia" = ${intervaloRecorrencia}, "dataFimRecorrencia" = ${dataFimRecorrencia},
+                "syncWithGoogle" = ${syncWithGoogle}, "updatedAt" = NOW()
+            WHERE id = ${id} AND "userId" = ${userId}
+            RETURNING *;
+        `;
+
+        if (resultado.length === 0) {
+            return NextResponse.json({ error: 'Compromisso não encontrado ou acesso negado' }, { status: 404 });
+        }
 
         return NextResponse.json({ data: resultado[0] }, { status: 200 });
     } catch (error) {
@@ -113,12 +134,18 @@ export async function PUT(request: Request) {
 // DELETE: Deletar um compromisso
 export async function DELETE(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 
         if (!id) return NextResponse.json({ error: 'ID faltante' }, { status: 400 });
 
-        await sql`DELETE FROM "Compromisso" WHERE id = ${id}`;
+        await sql`DELETE FROM "Compromisso" WHERE id = ${id} AND "userId" = ${userId}`;
 
         return NextResponse.json({ success: true }, { status: 200 });
     } catch (error) {

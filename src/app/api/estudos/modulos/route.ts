@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/neon';
+import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const { searchParams } = new URL(request.url);
         const cursoId = searchParams.get('cursoId');
 
@@ -13,9 +20,10 @@ export async function GET(request: Request) {
         }
 
         const modulos = await sql`
-            SELECT * FROM "Modulo"
-            WHERE "cursoId" = ${cursoId}
-            ORDER BY "ordem" ASC
+            SELECT m.* FROM "Modulo" m
+            JOIN "Curso" c ON m."cursoId" = c.id
+            WHERE m."cursoId" = ${cursoId} AND c."userId" = ${userId}
+            ORDER BY m."ordem" ASC
         `;
 
         return NextResponse.json({ data: modulos });
@@ -30,6 +38,12 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const data = await request.json();
         const id = data.id || crypto.randomUUID();
         const nome = data.nome || 'Novo Módulo';
@@ -39,6 +53,15 @@ export async function POST(request: Request) {
 
         if (!cursoId) {
             return NextResponse.json({ error: 'cursoId é obrigatório' }, { status: 400 });
+        }
+
+        // Verificar se o curso pertence ao usuário
+        const cursoResult = await sql`
+            SELECT id FROM "Curso" WHERE id = ${cursoId} AND "userId" = ${userId}
+        `;
+
+        if (cursoResult.length === 0) {
+            return NextResponse.json({ error: 'Curso não encontrado ou não pertence ao usuário' }, { status: 403 });
         }
 
         const result = await sql`
@@ -62,6 +85,12 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 
@@ -69,8 +98,12 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'ID é obrigatório.' }, { status: 400 });
         }
 
+        // Deletar apenas se o modulo pertencer a um curso do usuário
         await sql`
-            DELETE FROM "Modulo" WHERE id = ${id}
+            DELETE FROM "Modulo"
+            WHERE id = ${id} AND "cursoId" IN (
+                SELECT id FROM "Curso" WHERE "userId" = ${userId}
+            )
         `;
 
         return NextResponse.json({ success: true });

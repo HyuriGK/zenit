@@ -1,16 +1,24 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/neon';
+import { auth } from '@/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const cursos = await sql`
             SELECT 
                 c.*,
                 (SELECT COUNT(*) FROM "Modulo" m WHERE m."cursoId" = c.id) as modulos_count,
                 (SELECT COUNT(*) FROM "Anotacao" a WHERE a."cursoId" = c.id) as anotacoes_count
             FROM "Curso" c
+            WHERE c."userId" = ${userId}
             ORDER BY c."createdAt" DESC
         `;
 
@@ -35,15 +43,18 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const data = await request.json();
         const id = data.id || crypto.randomUUID();
         const nome = data.nome || 'Novo Caderno';
         const descricao = data.descricao || null;
         const cor = data.cor || '#10B981';
         const icone = data.icone || 'book-open';
-
-        // Mock User
-        const userId = '12345678-user-mock-abcd';
 
         const result = await sql`
             INSERT INTO "Curso" (
@@ -66,6 +77,12 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         const { searchParams } = new URL(request.url);
         const id = searchParams.get('id');
 
@@ -73,11 +90,10 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'ID é obrigatório.' }, { status: 400 });
         }
 
-        // OnDelete Cascade do DB vai apagar modulos e anotações vinculados automaticamente se a migration tiver criado as fks assim.
-        // Prisma schema says: `onDelete: Cascade` for modulos, anotacoes, and from curso to modulo/anotacoes. 
-        // We will just delete the Curso.
+        // Verificar se o curso pertence ao usuário antes de deletar
         await sql`
-            DELETE FROM "Curso" WHERE id = ${id}
+            DELETE FROM "Curso" 
+            WHERE id = ${id} AND "userId" = ${userId}
         `;
 
         return NextResponse.json({ success: true });

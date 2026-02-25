@@ -8,13 +8,16 @@ datasource db {
 
 // Em um ambiente database persistente, o OfflineUser vira User real
 model User {
-  id        String   @id @default(uuid())
-  name      String
-  email     String   @unique
-  image     String?
-  plano     String   @default("FREE") // FREE ou PREMIUM
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String    @id @default(uuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?   // Para login com Credentials
+  plano         String    @default("FREE") // FREE ou PREMIUM
+  
+  accounts      Account[]
+  sessions      Session[]
 
   // Relacionamentos 
   compromissos         Compromisso[]
@@ -30,6 +33,44 @@ model User {
   midias               Midia[]
   cursos               Curso[]
   ativosInvestimento   AtivoInvestimento[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Account {
+  id                 String  @id @default(uuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
 }
 
 model Compromisso {
