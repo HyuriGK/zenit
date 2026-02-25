@@ -36,6 +36,14 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Google Calendar Integration
+  googleAccessToken             String?
+  googleRefreshToken            String?
+  googleTokenExpiry             DateTime?
+  googleCalendarChannelId       String?
+  googleCalendarResourceId      String?
+  googleCalendarWatchExpiration DateTime?
 }
 
 model Account {
