@@ -1,9 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/dexie';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -62,10 +60,6 @@ export default function CursoDetalhePage() {
   const t = useTranslations('courseDetail');
   const cursoId = params.id as string;
 
-  const cursosData = useLiveQuery(() => db.cursos.where('id').equals(cursoId).first(), [cursoId]);
-  const modulosData = useLiveQuery(() => db.modulos.where('cursoId').equals(cursoId).sortBy('ordem'), [cursoId]);
-  const anotacoesData = useLiveQuery(() => db.anotacoes.where('cursoId').equals(cursoId).toArray(), [cursoId]);
-
   const [curso, setCurso] = useState<Curso | null>(null);
   const [moduloSelecionado, setModuloSelecionado] = useState<Modulo | null>(null);
   const [paginaSelecionada, setPaginaSelecionada] = useState<Pagina | null>(null);
@@ -85,7 +79,6 @@ export default function CursoDetalhePage() {
   const [modalConfirmarSaidaEdicao, setModalConfirmarSaidaEdicao] = useState(false);
   const [navegacaoPendente, setNavegacaoPendente] = useState<{ tipo: 'modulo' | 'pagina'; id: string } | null>(null);
 
-  // Estado para rastrear conteúdo original da página (para detectar mudanças)
   const [conteudoOriginalPagina, setConteudoOriginalPagina] = useState<{ titulo: string; conteudo: string } | null>(null);
 
   const [novoModulo, setNovoModulo] = useState({
@@ -98,7 +91,6 @@ export default function CursoDetalhePage() {
     conteudo: '',
   });
 
-  // Estados de loading para evitar múltiplos cliques (BUG-002)
   const [criandoModulo, setCriandoModulo] = useState(false);
   const [criandoPagina, setCriandoPagina] = useState(false);
   const [salvandoPagina, setSalvandoPagina] = useState(false);
@@ -106,73 +98,102 @@ export default function CursoDetalhePage() {
   const [excluindoPagina, setExcluindoPagina] = useState(false);
   const [excluindoCurso, setExcluindoCurso] = useState(false);
 
-  useEffect(() => {
-    if (cursosData) {
-      // Formata os módulos com suas páginas baseados nos dados live
-      const modulosComPaginas = (modulosData || []).map(modulo => {
-        const paginasDoModulo = (anotacoesData || []).filter(a => a.moduloId === modulo.id);
-        const paginasFormatadas: Pagina[] = paginasDoModulo.map((a, index) => ({
-          id: a.id,
-          titulo: a.titulo,
-          conteudo: a.conteudo,
-          ordem: index
-        }));
+  const carregarDados = useCallback(async () => {
+    try {
+      const [resCursos, resModulos, resAnots] = await Promise.all([
+        fetch('/api/estudos'),
+        fetch(`/api/estudos/modulos?cursoId=${cursoId}`),
+        fetch(`/api/estudos/anotacoes?cursoId=${cursoId}`)
+      ]);
 
-        return {
-          ...modulo,
-          _count: { paginas: paginasFormatadas.length },
-          paginas: paginasFormatadas
-        };
-      });
+      if (resCursos.ok && resModulos.ok && resAnots.ok) {
+        const jsonCursos = await resCursos.json();
+        const jsonModulos = await resModulos.json();
+        const jsonAnots = await resAnots.json();
 
-      setCurso({
-        id: cursosData.id,
-        nome: cursosData.nome,
-        descricao: cursosData.descricao,
-        cor: cursosData.cor,
-        modulos: modulosComPaginas
-      } as Curso);
-
-      if (moduloSelecionado) {
-        const moduloAtualizado = modulosComPaginas.find(m => m.id === moduloSelecionado.id);
-        if (moduloAtualizado) {
-          setModuloSelecionado(moduloAtualizado);
+        const cursoFound = jsonCursos.data.find((c: any) => c.id === cursoId);
+        if (!cursoFound) {
+          setLoading(false);
+          return;
         }
-      }
 
-      if (paginaSelecionada) {
-        const paginaAtualizada = anotacoesData?.find(a => a.id === paginaSelecionada.id);
-        if (paginaAtualizada) {
-          setPaginaSelecionada({
-            id: paginaAtualizada.id,
-            titulo: paginaAtualizada.titulo,
-            conteudo: paginaAtualizada.conteudo,
-            ordem: 0
-          });
+        const mods = jsonModulos.data || [];
+        const anots = jsonAnots.data || [];
+
+        // Formata os módulos com suas páginas
+        const modulosComPaginas = mods.map((modulo: any) => {
+          const paginasDoModulo = anots.filter((a: any) => a.moduloId === modulo.id);
+          const paginasFormatadas: Pagina[] = paginasDoModulo.map((a: any, index: number) => ({
+            id: a.id,
+            titulo: a.titulo,
+            conteudo: a.conteudo,
+            ordem: index
+          }));
+
+          return {
+            ...modulo,
+            _count: { paginas: paginasFormatadas.length },
+            paginas: paginasFormatadas
+          };
+        });
+
+        setCurso({
+          id: cursoFound.id,
+          nome: cursoFound.nome,
+          descricao: cursoFound.descricao,
+          cor: cursoFound.cor,
+          modulos: modulosComPaginas
+        } as Curso);
+
+        if (moduloSelecionado) {
+          const moduloAtualizado = modulosComPaginas.find((m: any) => m.id === moduloSelecionado.id);
+          if (moduloAtualizado) {
+            setModuloSelecionado(moduloAtualizado);
+          }
         }
-      }
 
+        if (paginaSelecionada) {
+          const paginaAtualizada = anots.find((a: any) => a.id === paginaSelecionada.id);
+          if (paginaAtualizada) {
+            setPaginaSelecionada({
+              id: paginaAtualizada.id,
+              titulo: paginaAtualizada.titulo,
+              conteudo: paginaAtualizada.conteudo,
+              ordem: 0
+            });
+          }
+        }
+
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
       setLoading(false);
-    } else if (cursosData === undefined) {
-      // still loading
-    } else {
-      setLoading(false); // not found
     }
-  }, [cursosData, modulosData, anotacoesData]);
+  }, [cursoId, moduloSelecionado?.id, paginaSelecionada?.id]);
+
+  useEffect(() => {
+    carregarDados();
+  }, [carregarDados]);
 
   const criarModulo = async () => {
     if (criandoModulo) return;
 
     setCriandoModulo(true);
     try {
-      await db.modulos.add({
-        id: crypto.randomUUID(),
-        cursoId,
-        ordem: curso?.modulos.length || 0,
-        ...novoModulo,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      const res = await fetch('/api/estudos/modulos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cursoId,
+          ordem: curso?.modulos.length || 0,
+          ...novoModulo
+        })
       });
+
+      if (res.ok) {
+        carregarDados();
+      }
 
       setModalModuloAberto(false);
       setNovoModulo({ nome: '', descricao: '' });
@@ -188,16 +209,21 @@ export default function CursoDetalhePage() {
 
     setCriandoPagina(true);
     try {
-      await db.anotacoes.add({
-        id: crypto.randomUUID(),
-        titulo: novaPagina.titulo,
-        conteudo: novaPagina.conteudo,
-        cor: '#FBBF24', // Default note color
-        moduloId: moduloSelecionado.id,
-        cursoId: cursoId,
-        dataCriacao: new Date(),
-        dataAtualizacao: new Date()
+      const res = await fetch('/api/estudos/anotacoes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          titulo: novaPagina.titulo,
+          conteudo: novaPagina.conteudo,
+          cor: '#FBBF24',
+          moduloId: moduloSelecionado.id,
+          cursoId: cursoId
+        })
       });
+
+      if (res.ok) {
+        carregarDados();
+      }
 
       setModalPaginaAberto(false);
       setNovaPagina({ titulo: '', conteudo: '' });
@@ -304,19 +330,25 @@ export default function CursoDetalhePage() {
 
     setSalvandoPagina(true);
     try {
-      await db.anotacoes.update(paginaSelecionada.id, {
-        titulo: paginaSelecionada.titulo,
-        conteudo: paginaSelecionada.conteudo,
-        dataAtualizacao: new Date(),
+      const res = await fetch('/api/estudos/anotacoes', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: paginaSelecionada.id,
+          titulo: paginaSelecionada.titulo,
+          conteudo: paginaSelecionada.conteudo
+        })
       });
 
-      // Atualiza o conteúdo original para refletir as alterações salvas
+      if (res.ok) {
+        carregarDados();
+      }
+
       setConteudoOriginalPagina({
         titulo: paginaSelecionada.titulo,
         conteudo: paginaSelecionada.conteudo,
       });
       setEditandoPagina(false);
-
     } catch (error) {
       console.error('Erro ao salvar página:', error);
     } finally {
@@ -335,11 +367,11 @@ export default function CursoDetalhePage() {
 
     setExcluindoModulo(true);
     try {
-      // Remover modulo e anotações vinculadas
-      await db.modulos.delete(itemParaExcluir);
-      const anotacoesVinculadas = await db.anotacoes.where('moduloId').equals(itemParaExcluir).toArray();
-      const idsAnotacoes = anotacoesVinculadas.map(a => a.id);
-      await db.anotacoes.bulkDelete(idsAnotacoes);
+      const res = await fetch(`/api/estudos/modulos?id=${itemParaExcluir}`, { method: 'DELETE' });
+
+      if (res.ok) {
+        carregarDados();
+      }
 
       if (moduloSelecionado?.id === itemParaExcluir) {
         setModuloSelecionado(null);
@@ -365,7 +397,11 @@ export default function CursoDetalhePage() {
 
     setExcluindoPagina(true);
     try {
-      await db.anotacoes.delete(itemParaExcluir);
+      const res = await fetch(`/api/estudos/anotacoes?id=${itemParaExcluir}`, { method: 'DELETE' });
+
+      if (res.ok) {
+        carregarDados();
+      }
 
       if (paginaSelecionada?.id === itemParaExcluir) {
         setPaginaSelecionada(null);
@@ -388,13 +424,12 @@ export default function CursoDetalhePage() {
 
     setExcluindoCurso(true);
     try {
-      await db.cursos.delete(cursoId);
-      const modulosVinculados = await db.modulos.where('cursoId').equals(cursoId).toArray();
-      await db.modulos.bulkDelete(modulosVinculados.map(m => m.id));
-      const anotacoesVinculadas = await db.anotacoes.where('cursoId').equals(cursoId).toArray();
-      await db.anotacoes.bulkDelete(anotacoesVinculadas.map(a => a.id));
+      const res = await fetch(`/api/estudos?id=${cursoId}`, { method: 'DELETE' });
 
-      router.push('/dashboard/estudos');
+      if (res.ok) {
+        router.push('/dashboard/estudos');
+      }
+
     } catch (error) {
       console.error('Erro ao excluir curso:', error);
     } finally {
@@ -542,15 +577,15 @@ export default function CursoDetalhePage() {
                   key={modulo.id}
                   onClick={() => handleSelectModulo(modulo.id)}
                   className={`group relative cursor-pointer rounded-xl p-4 transition-all duration-200 ${moduloSelecionado?.id === modulo.id
-                      ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 border-2 border-green-500/30 shadow-lg shadow-green-500/10'
-                      : 'bg-zinc-800/40 hover:bg-zinc-800/60 border-2 border-transparent hover:border-zinc-700/50'
+                    ? 'bg-gradient-to-r from-green-500/20 to-blue-500/20 border-2 border-green-500/30 shadow-lg shadow-green-500/10'
+                    : 'bg-zinc-800/40 hover:bg-zinc-800/60 border-2 border-transparent hover:border-zinc-700/50'
                     }`}
                 >
                   <div className="flex items-start gap-3">
                     <div
                       className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${moduloSelecionado?.id === modulo.id
-                          ? 'bg-green-500/20 text-green-400'
-                          : 'bg-zinc-700/50 text-zinc-400 group-hover:bg-zinc-700 group-hover:text-zinc-300'
+                        ? 'bg-green-500/20 text-green-400'
+                        : 'bg-zinc-700/50 text-zinc-400 group-hover:bg-zinc-700 group-hover:text-zinc-300'
                         }`}
                     >
                       <FolderOpen className="w-5 h-5" />
@@ -627,15 +662,15 @@ export default function CursoDetalhePage() {
                       key={pagina.id}
                       onClick={() => handleSelectPagina(pagina.id)}
                       className={`group relative cursor-pointer rounded-xl p-3 transition-all duration-200 ${paginaSelecionada?.id === pagina.id
-                          ? 'bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-2 border-blue-500/30 shadow-lg shadow-blue-500/10'
-                          : 'bg-zinc-800/30 hover:bg-zinc-800/50 border-2 border-transparent hover:border-zinc-700/50'
+                        ? 'bg-gradient-to-r from-blue-500/20 to-cyan-500/20 border-2 border-blue-500/30 shadow-lg shadow-blue-500/10'
+                        : 'bg-zinc-800/30 hover:bg-zinc-800/50 border-2 border-transparent hover:border-zinc-700/50'
                         }`}
                     >
                       <div className="flex items-center gap-3">
                         <div
                           className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${paginaSelecionada?.id === pagina.id
-                              ? 'bg-blue-500/20 text-blue-400'
-                              : 'bg-zinc-700/50 text-zinc-400 group-hover:bg-zinc-700'
+                            ? 'bg-blue-500/20 text-blue-400'
+                            : 'bg-zinc-700/50 text-zinc-400 group-hover:bg-zinc-700'
                             }`}
                         >
                           <FileText className="w-4 h-4" />

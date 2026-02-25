@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useSession } from '@/lib/auth-mock';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/dexie';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { BookOpen, Plus, Search, StickyNote, FileText, ChevronRight, Edit, Trash2, Sparkles, Loader2, Crown, Mic, FileAudio } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -66,41 +64,46 @@ export default function EstudosPage() {
   const [resultadosBusca, setResultadosBusca] = useState<any>(null);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
 
-  // Load data using Dexie
-  const cursosData = useLiveQuery(() => db.cursos.toArray(), []);
-  const anotacoesData = useLiveQuery(() => db.anotacoes.orderBy('dataCriacao').reverse().toArray(), []);
-  const modulosData = useLiveQuery(() => db.modulos.toArray(), []);
+  const carregarCursosEAnots = async () => {
+    try {
+      setLoading(true);
+      const [resCursos, resAnots] = await Promise.all([
+        fetch('/api/estudos'),
+        fetch('/api/estudos/anotacoes')
+      ]);
 
-  useEffect(() => {
-    if (cursosData && anotacoesData && modulosData) {
-      // Map counts
-      const cursosComCounts = cursosData.map(curso => {
-        const modulosCount = modulosData.filter(m => m.cursoId === curso.id).length;
-        const anotacoesCount = anotacoesData.filter(a => a.cursoId === curso.id).length;
-        return {
-          ...curso,
-          _count: { modulos: modulosCount, anotacoes: anotacoesCount }
-        };
-      });
-      setCursos(cursosComCounts as Curso[]);
+      if (resCursos.ok && resAnots.ok) {
+        const jsonCursos = await resCursos.json();
+        const jsonAnots = await resAnots.json();
+        const apiCursos = jsonCursos.data || [];
+        const apiAnots = jsonAnots.data || [];
 
-      // Map course info to annotations
-      const anotacoesComCurso = anotacoesData.map(anot => {
-        const cursoInfo = anot.cursoId ? cursosData.find(c => c.id === anot.cursoId) : null;
-        return {
-          ...anot,
-          createdAt: anot.dataCriacao.toISOString(),
-          curso: cursoInfo ? {
-            id: cursoInfo.id,
-            nome: cursoInfo.nome,
-            cor: cursoInfo.cor
-          } : undefined
-        };
-      });
-      setAnotacoes(anotacoesComCurso);
+        setCursos(apiCursos);
+
+        const anotacoesComCurso = apiAnots.map((anot: any) => {
+          const cursoInfo = anot.cursoId ? apiCursos.find((c: any) => c.id === anot.cursoId) : null;
+          return {
+            ...anot,
+            createdAt: anot.dataCriacao,
+            curso: cursoInfo ? {
+              id: cursoInfo.id,
+              nome: cursoInfo.nome,
+              cor: cursoInfo.cor
+            } : undefined
+          };
+        });
+        setAnotacoes(anotacoesComCurso);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
       setLoading(false);
     }
-  }, [cursosData, anotacoesData, modulosData]);
+  };
+
+  useEffect(() => {
+    carregarCursosEAnots();
+  }, []);
 
   // Verificar se o usuário é premium
   const plano = (session?.user?.plano as PlanoUsuario) || PlanoUsuario.FREE;
@@ -150,13 +153,15 @@ export default function EstudosPage() {
 
     setCriandoCurso(true);
     try {
-      await db.cursos.add({
-        id: crypto.randomUUID(),
-        ...novoCurso,
-        icone: 'book-open',
-        createdAt: new Date(),
-        updatedAt: new Date(),
+      const res = await fetch('/api/estudos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novoCurso)
       });
+
+      if (res.ok) {
+        carregarCursosEAnots();
+      }
 
       setModalCursoAberto(false);
       setNovoCurso({ nome: '', descricao: '', cor: '#10B981' });
@@ -176,12 +181,15 @@ export default function EstudosPage() {
         ? { titulo: anotacaoGeradaIA.title, conteudo: anotacaoGeradaIA.content, cor: novaAnotacao.cor }
         : novaAnotacao;
 
-      await db.anotacoes.add({
-        id: crypto.randomUUID(),
-        ...dadosAnotacao,
-        dataCriacao: new Date(),
-        dataAtualizacao: new Date(),
+      const res = await fetch('/api/estudos/anotacoes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...dadosAnotacao, cursoId: null, moduloId: null })
       });
+
+      if (res.ok) {
+        carregarCursosEAnots();
+      }
 
       fecharModalAnotacao();
     } catch (error) {
@@ -386,20 +394,21 @@ export default function EstudosPage() {
     try {
       const termoLovercase = query.toLowerCase();
 
-      const cursosEncontrados = await db.cursos
-        .filter(c => c.nome.toLowerCase().includes(termoLovercase) || (c.descricao?.toLowerCase().includes(termoLovercase) ?? false))
-        .toArray();
+      const cursosEncontrados = cursos.filter(c =>
+        c.nome.toLowerCase().includes(termoLovercase) ||
+        (c.descricao?.toLowerCase().includes(termoLovercase) ?? false)
+      );
 
-      const anotacoesEncontradas = await db.anotacoes
-        .filter(a => a.titulo.toLowerCase().includes(termoLovercase) || a.conteudo.toLowerCase().includes(termoLovercase))
-        .toArray();
+      const anotacoesEncontradas = anotacoes.filter(a =>
+        a.titulo.toLowerCase().includes(termoLovercase) ||
+        a.conteudo.toLowerCase().includes(termoLovercase)
+      );
 
       // Mapear anotacoes para o formato esperado pelo frontend (paginas)
-      const paginasMapeadas = await Promise.all(anotacoesEncontradas.map(async (anotacao) => {
+      const paginasMapeadas = anotacoesEncontradas.map((anotacao) => {
         let cursoNome = 'Anotação Avulsa';
-        if (anotacao.cursoId) {
-          const curso = await db.cursos.get(anotacao.cursoId);
-          if (curso) cursoNome = curso.nome;
+        if (anotacao.curso) {
+          cursoNome = anotacao.curso.nome;
         }
 
         return {
@@ -407,7 +416,7 @@ export default function EstudosPage() {
           titulo: anotacao.titulo,
           modulo: { curso: { nome: cursoNome } }
         };
-      }));
+      });
 
       setResultadosBusca({
         cursos: cursosEncontrados,
@@ -431,12 +440,19 @@ export default function EstudosPage() {
 
     setEditandoAnotacaoLoading(true);
     try {
-      await db.anotacoes.update(anotacaoSelecionada.id, {
-        titulo: anotacaoSelecionada.titulo,
-        conteudo: anotacaoSelecionada.conteudo,
-        cor: anotacaoSelecionada.cor,
-        dataAtualizacao: new Date(),
+      const res = await fetch('/api/estudos/anotacoes', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: anotacaoSelecionada.id,
+          titulo: anotacaoSelecionada.titulo,
+          conteudo: anotacaoSelecionada.conteudo
+        })
       });
+
+      if (res.ok) {
+        carregarCursosEAnots();
+      }
 
       setEditandoAnotacao(false);
       setModalVisualizarAnotacao(false);
@@ -458,7 +474,11 @@ export default function EstudosPage() {
 
     setExcluindoAnotacao(true);
     try {
-      await db.anotacoes.delete(anotacaoSelecionada.id);
+      const res = await fetch(`/api/estudos/anotacoes?id=${anotacaoSelecionada.id}`, { method: 'DELETE' });
+
+      if (res.ok) {
+        carregarCursosEAnots();
+      }
 
       setModalVisualizarAnotacao(false);
       setModalExcluirAnotacao(false);
