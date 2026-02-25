@@ -126,7 +126,8 @@ export function CompromissoForm({ onClose, onSave, initialDate, initialHour, ini
         const createPayload = {
           ...payload,
           id,
-          userId: session?.user?.id || 'offline-user',
+          // Hack: forçando o mock ID diretamente no payload para não depender da API caso ela esteja em cache (Next.js server)
+          userId: '12345678-user-mock-abcd',
         };
         const response = await fetch('/api/agenda', {
           method: 'POST',
