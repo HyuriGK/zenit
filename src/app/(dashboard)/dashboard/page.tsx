@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { startOfDay, endOfDay, parseISO, isWithinInterval } from 'date-fns';
 import { AtividadesRecentes } from '@/components/dashboard/AtividadesRecentes';
+import { PremiumModal } from '@/components/dashboard/PremiumModal';
 import { useTranslations } from 'next-intl';
 import { usePlano } from '@/hooks/usePlano';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -245,32 +246,8 @@ export default function DashboardPage() {
       </div>
 
 
-
-      {/* Upgrade Banner - Only show for free plan */}
-      {ehFree && (
-        <Card className="bg-gradient-to-r from-zenit-500/10 via-blue-500/10 to-green-500/10 border-zenit-500/20">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-3 sm:gap-4">
-              <div className="flex-1 text-center md:text-left">
-                <h3 className="text-lg sm:text-xl font-bold text-white mb-1 sm:mb-2">
-                  {t('unlockPotential')}
-                </h3>
-                <p className="text-gray-400 text-xs sm:text-sm">
-                  {t('accessPremiumFeatures')}
-                </p>
-              </div>
-              <Button
-                onClick={() => router.push('/premium')}
-                className="w-full md:w-auto bg-gradient-to-r from-zenit-500 to-blue-500 hover:from-zenit-600 hover:to-blue-600 shadow-lg shadow-zenit-500/25 text-sm sm:text-base h-auto py-2.5 sm:py-2"
-              >
-                <CheckCircle2 className="w-4 h-4 mr-2" />
-                <span className="hidden sm:inline">{t('upgradeToPremium')}</span>
-                <span className="sm:hidden">{t('upgradePremium')}</span>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Premium Upgrade Modal */}
+      <PremiumModal />
     </div>
   );
 }
