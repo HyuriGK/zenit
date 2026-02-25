@@ -164,7 +164,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
 
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-5xl max-h-[95vh] overflow-y-auto sm:overflow-hidden">
+      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-7xl max-h-[95vh] overflow-y-auto sm:overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white">
             Nova Transação
