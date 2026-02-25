@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaNeon } from '@prisma/adapter-neon'
-import { Pool, neonConfig } from '@neondatabase/serverless'
+import { neonConfig } from '@neondatabase/serverless'
 import ws from 'ws'
 
 // Configura o WebSocket para o driver do Neon em ambientes Node.js (necessário para o Pool)
@@ -17,8 +17,7 @@ if (globalForPrisma.prisma) {
     prismaInstance = globalForPrisma.prisma
 } else {
     const connectionString = process.env.DATABASE_URL
-    const pool = new Pool({ connectionString })
-    const adapter = new PrismaNeon(pool)
+    const adapter = new PrismaNeon({ connectionString })
     prismaInstance = new PrismaClient({ adapter })
 }
 
