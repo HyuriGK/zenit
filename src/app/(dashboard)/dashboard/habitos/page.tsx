@@ -182,11 +182,16 @@ export default function HabitosPage() {
         totalHabitos: 0
       })));
 
-      const dbHabitos = await db.habitos.toArray();
+      // Fetch do banco de dados na Nuvem
+      const response = await fetch('/api/habitos');
+      const data = await response.json();
+      const dbHabitos = data.data || [];
+
+      // O histórico continua local por enquanto até migrarmos
       const dbHistorico = await db.registrosHabitos.toArray();
 
       // Construir os hábitos a serem mostrados na UI
-      const habitosCompletos: Habito[] = dbHabitos.map(h => {
+      const habitosCompletos: Habito[] = dbHabitos.map((h: Habito) => {
         const completadoHoje = dbHistorico.some(hist => {
           const histDate = new Date(hist.data);
           return hist.habitoId === h.id &&
@@ -220,7 +225,7 @@ export default function HabitosPage() {
 
       const calcTotalParaData = (data: Date) => {
         const diaSemana = data.getDay();
-        return dbHabitos.filter(h => {
+        return dbHabitos.filter((h: Habito) => {
           if (!h.diasSemana || h.diasSemana.length === 0) return true;
           return h.diasSemana.includes(diaSemana);
         }).length;
@@ -295,23 +300,25 @@ export default function HabitosPage() {
 
     setCriandoHabito(true);
     try {
-      const id = crypto.randomUUID();
-      await db.habitos.add({
-        id,
+      const payload = {
         nome: novoHabito.nome.trim(),
         descricao: novoHabito.descricao?.trim() || undefined,
         icone: 'target',
         cor: novoHabito.cor,
         frequencia: 'DIARIA',
         diasSemana: novoHabito.diasSemana.length > 0 ? novoHabito.diasSemana : undefined,
-        dataInicio: new Date(),
-        sequenciaAtual: 0,
-        melhorSequencia: 0,
-        status: 'ATIVO',
         categoriaId: novoHabito.categoriaId || undefined,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      } as any);
+      };
+
+      const response = await fetch('/api/habitos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro na resposta da API');
+      }
 
       setModalHabitoAberto(false);
       setNovoHabito({
@@ -324,8 +331,8 @@ export default function HabitosPage() {
       });
       carregarDados();
     } catch (error) {
-      console.error('Erro ao criar hábito:', error);
-      alert('Erro ao criar hábito localmente');
+      console.error('Erro ao criar hábito no servidor:', error);
+      alert('Erro ao salvar hábito na nuvem (Neon)');
     } finally {
       setCriandoHabito(false);
     }
