@@ -41,7 +41,7 @@ export async function POST(request: Request) {
         const syncWithGoogle = Boolean(data.syncWithGoogle);
 
         // User Mock até a fase de auth real estar conectada
-        const userId = data.userId || '12345678-user-mock-abcd';
+        const userId = '12345678-user-mock-abcd';
 
         const resultado = await sql`
       INSERT INTO "Compromisso" (
