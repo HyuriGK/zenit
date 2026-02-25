@@ -1,0 +1,483 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Em um ambiente database persistente, o OfflineUser vira User real
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  image     String?
+  plano     String   @default("FREE") // FREE ou PREMIUM
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relacionamentos 
+  compromissos         Compromisso[]
+  atividades           Atividade[]
+  contasBancarias      ContaBancaria[]
+  cartoes              Cartao[]
+  categorias           Categoria[]
+  transacoes           Transacao[]
+  objetivosFinanceiros ObjetivoFinanceiro[]
+  viagens              Viagem[]
+  habitos              Habito[]
+  categoriasHabito     CategoriaHabito[]
+  midias               Midia[]
+  cursos               Curso[]
+  ativosInvestimento   AtivoInvestimento[]
+}
+
+model Compromisso {
+  id                   String    @id @default(uuid())
+  titulo               String
+  descricao            String?
+  data                 DateTime  @db.Date
+  horaInicio           String
+  horaFim              String?
+  categoria            String?
+  cor                  String
+  concluido            Boolean   @default(false)
+  isRecorrente         Boolean   @default(false)
+  tipoRecorrencia      String?
+  intervaloRecorrencia Int?
+  dataFimRecorrencia   DateTime?
+  recorrenciaGrupoId   String?
+  recorrenciaInstancia Int?
+  syncWithGoogle       Boolean   @default(false)
+  googleEventId        String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Atividade {
+  id        String   @id @default(uuid())
+  tipo      String
+  titulo    String
+  descricao String?
+  metadata  Json?
+  icone     String
+  cor       String
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ContaBancaria {
+  id           String      @id @default(uuid())
+  nome         String
+  tipo         String      // CORRENTE, POUPANCA, INVESTIMENTO
+  banco        String?
+  saldoInicial Float
+  saldoAtual   Float
+  cor          String
+  icone        String
+  ativa        Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transacoes Transacao[]
+}
+
+model Cartao {
+  id             String      @id @default(uuid())
+  nome           String
+  bandeira       String?
+  ultimosDigitos String?
+  limite         Float?
+  diaVencimento  Int?
+  diaFechamento  Int?
+  cor            String
+  icone          String
+  ativo          Boolean     @default(true)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transacoes Transacao[]
+}
+
+model Categoria {
+  id             String      @id @default(uuid())
+  nome           String
+  tipo           String      // RECEITA, DESPESA
+  cor            String
+  icone          String
+  categoriaPaiId String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transacoes Transacao[]
+}
+
+model Transacao {
+  id              String   @id @default(uuid())
+  descricao       String
+  valor           Float
+  data            DateTime @db.Date
+  tipo            String   // RECEITA, DESPESA
+  observacoes     String?
+  isFixa          Boolean  @default(false)
+  isParcela       Boolean  @default(false)
+  parcelaNumero   Int?
+  parcelaTotais   Int?
+  grupoParcelaId  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  categoriaId     String?
+  categoria       Categoria? @relation(fields: [categoriaId], references: [id])
+  
+  contaBancariaId String
+  contaBancaria   ContaBancaria @relation(fields: [contaBancariaId], references: [id])
+  
+  cartaoId        String?
+  cartao          Cartao? @relation(fields: [cartaoId], references: [id])
+  
+  objetivoId      String?
+  objetivo        ObjetivoFinanceiro? @relation(fields: [objetivoId], references: [id])
+}
+
+model ObjetivoFinanceiro {
+  id                  String   @id @default(uuid())
+  nome                String
+  descricao           String?
+  valorMeta           Float
+  valorAtual          Float    @default(0)
+  dataInicio          DateTime @db.Date
+  dataMeta            DateTime? @db.Date
+  isReservaEmergencia Boolean  @default(false)
+  cor                 String
+  icone               String
+  status              String   // EM_ANDAMENTO, CONCLUIDO, CANCELADO
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  userId     String
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transacoes Transacao[]
+}
+
+model Viagem {
+  id             String   @id @default(uuid())
+  nome           String
+  descricao      String?
+  proposito      String   // LAZER, TRABALHO, ESTUDO, OUTRO
+  status         String   // PLANEJADA, EM_ANDAMENTO, CONCLUIDA, CANCELADA
+  dataInicio     DateTime @db.Date
+  dataFim        DateTime @db.Date
+  orcamentoTotal Float?
+  notasGerais    String?
+  avaliacaoGeral Float?
+  diario         String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  userId       String
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destinos     DestinoViagem[]
+  despesas     DespesaViagem[]
+  atividades   AtividadeViagem[]
+  hospedagens  HospedagemViagem[]
+  transportes  TransporteViagem[]
+}
+
+model DestinoViagem {
+  id             String   @id @default(uuid())
+  ordem          Int
+  nome           String
+  cidade         String
+  pais           String
+  endereco       String?
+  latitude       Float?
+  longitude      Float?
+  dataChegada    DateTime @db.Date
+  dataSaida      DateTime @db.Date
+  fusoHorario    String?
+  idioma         String?
+  moeda          String?
+  voltagem       String?
+  tomada         String?
+  costumes       String?
+  gorjetas       String?
+  emergencia     String?
+  frasesBasicas  String?
+  temperaturaMed String?
+  previsaoClima  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  viagemId String
+  viagem   Viagem @relation(fields: [viagemId], references: [id], onDelete: Cascade)
+}
+
+model DespesaViagem {
+  id              String   @id @default(uuid())
+  descricao       String
+  valor           Float
+  moeda           String
+  valorConvertido Float?
+  data            DateTime @db.Date
+  categoria       String
+  formaPagamento  String?
+  notas           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  viagemId String
+  viagem   Viagem @relation(fields: [viagemId], references: [id], onDelete: Cascade)
+}
+
+model AtividadeViagem {
+  id            String   @id @default(uuid())
+  titulo        String
+  descricao     String?
+  data          DateTime @db.Date
+  horaInicio    String?
+  horaFim       String?
+  local         String?
+  endereco      String?
+  latitude      Float?
+  longitude     Float?
+  categoria     String   // TURISMO, TRABALHO, LAZER, ALIMENTACAO, OUTRO
+  prioridade    Int      @default(0)
+  concluida     Boolean  @default(false)
+  favorita      Boolean  @default(false)
+  tempoEstimado String?
+  checklist     Json?
+  notas         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  viagemId String
+  viagem   Viagem @relation(fields: [viagemId], references: [id], onDelete: Cascade)
+}
+
+model HospedagemViagem {
+  id               String   @id @default(uuid())
+  tipo             String
+  nome             String
+  checkIn          DateTime @db.Date
+  checkOut         DateTime @db.Date
+  endereco         String?
+  cidade           String?
+  latitude         Float?
+  longitude        Float?
+  telefone         String?
+  email            String?
+  codigoReserva    String?
+  website          String?
+  comprovanteUrl   String?
+  avaliacaoPessoal Float?
+  notas            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  viagemId String
+  viagem   Viagem @relation(fields: [viagemId], references: [id], onDelete: Cascade)
+}
+
+model TransporteViagem {
+  id              String   @id @default(uuid())
+  tipo            String   // AVIAO, CARRO, ONIBUS, TREM, TAXI, UBER, OUTRO
+  descricao       String?
+  dataHora        DateTime // Inclui hora
+  origem          String?
+  destino         String?
+  companhia       String?
+  numeroVoo       String?
+  assento         String?
+  horarioEmbarque DateTime?
+  portaoEmbarque  String?
+  conexao         String?
+  horarioChegada  DateTime?
+  codigoReserva   String?
+  empresa         String?
+  placaVeiculo    String?
+  arquivoUrl      String?
+  rotaUrl         String?
+  tempoEstimado   String?
+  notas           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  viagemId String
+  viagem   Viagem @relation(fields: [viagemId], references: [id], onDelete: Cascade)
+}
+
+model Habito {
+  id              String   @id @default(uuid())
+  nome            String
+  descricao       String?
+  icone           String
+  cor             String
+  frequencia      String   // DIARIA, SEMANAL, MENSAL
+  diasSemana      Int[]    @default([])
+  metaVezes       Int?
+  periodoDia      String?  // MANHA, TARDE, NOITE, QUALQUER
+  status          String   // ATIVO, PAUSADO, CONCLUIDO, ABANDONADO
+  dataInicio      DateTime @db.Date
+  sequenciaAtual  Int      @default(0)
+  melhorSequencia Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  userId          String
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  categoriaId     String?
+  categoria       CategoriaHabito? @relation(fields: [categoriaId], references: [id])
+  registros       RegistroHabito[]
+}
+
+model CategoriaHabito {
+  id        String   @id @default(uuid())
+  nome      String
+  cor       String
+  icone     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habitos   Habito[]
+}
+
+model RegistroHabito {
+  id         String   @id @default(uuid())
+  data       DateTime @db.Date
+  concluido  Boolean  @default(false)
+  notas      String?
+  quantidade Int?
+  humor      Int?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  habitoId   String
+  habito     Habito   @relation(fields: [habitoId], references: [id], onDelete: Cascade)
+}
+
+model Midia {
+  id                     String   @id @default(uuid())
+  tipo                   String   // LIVRO, FILME
+  titulo                 String
+  capa                   String?
+  cor                    String
+  autor                  String?
+  editora                String?
+  genero                 String?
+  fonte                  String?  // EMPRESTADO, FISICO, KINDLE, DIGITAL
+  diretor                String?
+  duracao                Int?
+  anoLancamento          Int?
+  idioma                 String?
+  status                 String   // PROXIMO, EM_ANDAMENTO, PAUSADO, CONCLUIDO
+  nota                   Float?
+  dataInicio             DateTime? @db.Date
+  dataConclusao          DateTime? @db.Date
+  resenhaGeradaIA        String?
+  impressoesIniciais     String?
+  principaisAprendizados String?
+  trechosMemoraveis      String?
+  reflexao               String?
+  aprendizadosPraticos   String?
+  consideracoesFinais    String?
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  userId   String
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  citacoes Citacao[]
+}
+
+model Citacao {
+  id        String   @id @default(uuid())
+  texto     String
+  autor     String?
+  pagina    String?
+  destaque  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  midiaId   String?
+  midia     Midia?   @relation(fields: [midiaId], references: [id], onDelete: Cascade)
+}
+
+model Curso {
+  id        String   @id @default(uuid())
+  nome      String
+  descricao String?
+  cor       String
+  icone     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  modulos   Modulo[]
+  anotacoes Anotacao[]
+}
+
+model Modulo {
+  id        String   @id @default(uuid())
+  nome      String
+  ordem     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cursoId   String
+  curso     Curso      @relation(fields: [cursoId], references: [id], onDelete: Cascade)
+  anotacoes Anotacao[]
+}
+
+model Anotacao {
+  id                  String   @id @default(uuid())
+  titulo              String
+  conteudo            String
+  cor                 String
+  tipoOrigem          String?
+  audioUrl            String?
+  audioDuracao        Int?
+  transcricaoOriginal String?
+  dataCriacao         DateTime @default(now()) // Manteve o nome antigo
+  dataAtualizacao     DateTime @updatedAt      // Manteve o nome antigo
+
+  moduloId String?
+  modulo   Modulo? @relation(fields: [moduloId], references: [id])
+
+  cursoId  String?
+  curso    Curso?  @relation(fields: [cursoId], references: [id])
+}
+
+model AtivoInvestimento {
+  id         String   @id @default(uuid())
+  nome       String
+  tipo       String   // ACAO, FII, RENDA_FIXA, CRIPTO, OUTRO
+  quantidade Float
+  precoCota  Float
+  taxas      Float    @default(0)
+  precoMedio Float
+  valorAtual Float
+  setor      String?
+  dataCompra DateTime @db.Date
+  updatedAt  DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
