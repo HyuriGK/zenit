@@ -437,6 +437,7 @@ model Curso {
 model Modulo {
   id        String   @id @default(uuid())
   nome      String
+  descricao String?
   ordem     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
