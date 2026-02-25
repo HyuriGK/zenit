@@ -78,15 +78,18 @@ export default function PersonalPortfolio() {
 
     // Calcula patrimônio total e custo total usando os fatores exatos quando disponíveis
     const patrimonioTotal = (ativos || []).reduce(
-        (acc, ativo) => acc + ativo.quantidade * getValorAtual(ativo), 0
+        (acc, ativo) => acc + Number(ativo.quantidade) * getValorAtual(ativo), 0
     );
 
     const custoTotal = (ativos || []).reduce(
         (acc, ativo) => {
-            if (ativo.precoCota !== undefined) {
-                return acc + (ativo.quantidade * ativo.precoCota); // Rentabilidade baseada apenas no valor do papel, excluindo taxas
+            const qtd = Number(ativo.quantidade || 0);
+            if (ativo.precoCota !== undefined && ativo.precoCota !== null) {
+                const pc = Number(ativo.precoCota);
+                return acc + (qtd * pc); // Rentabilidade baseada apenas no valor do papel, excluindo taxas
             }
-            return acc + (ativo.quantidade * ativo.precoMedio);
+            const pm = Number(ativo.precoMedio || 0);
+            return acc + (qtd * pm);
         }, 0
     );
 
@@ -111,6 +114,13 @@ export default function PersonalPortfolio() {
 
     const ativosFormatados = Object.values((ativos || []).reduce((acc, ativo) => {
         const key = ativo.nome;
+
+        // Convert Postgres strings to JS numbers
+        const qtd = Number(ativo.quantidade || 0);
+        const precoCota = ativo.precoCota ? Number(ativo.precoCota) : undefined;
+        const precoMedio = Number(ativo.precoMedio || 0);
+        const taxas = Number(ativo.taxas || 0);
+
         if (!acc[key]) {
             acc[key] = {
                 id: ativo.id,
@@ -121,15 +131,18 @@ export default function PersonalPortfolio() {
                 valorSemTaxa: 0,
             };
         }
-        acc[key].quantidade += ativo.quantidade;
+
+        acc[key].quantidade += qtd;
+
         // Usa precoCota e taxas separadamente para evitar imprecisão de ponto flutuante do precoMedio guardado
-        if (ativo.precoCota !== undefined) {
-            acc[key].custoTotalOriginal += (ativo.quantidade * ativo.precoCota) + (ativo.taxas || 0);
-            acc[key].valorSemTaxa += (ativo.quantidade * ativo.precoCota);
+        if (precoCota !== undefined) {
+            acc[key].custoTotalOriginal += (qtd * precoCota) + taxas;
+            acc[key].valorSemTaxa += (qtd * precoCota);
         } else {
-            acc[key].custoTotalOriginal += (ativo.quantidade * ativo.precoMedio);
-            acc[key].valorSemTaxa += (ativo.quantidade * ativo.precoMedio);
+            acc[key].custoTotalOriginal += (qtd * precoMedio);
+            acc[key].valorSemTaxa += (qtd * precoMedio);
         }
+
         return acc;
     }, {} as Record<string, any>)).map((grupo: any) => {
         return {
