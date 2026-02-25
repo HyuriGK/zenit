@@ -8,17 +8,24 @@ export default auth((req) => {
     const isLogged = !!req.auth
     const { nextUrl } = req
 
+    console.log(`[Middleware] Path: ${nextUrl.pathname}, isLogged: ${isLogged}`)
+    if (isLogged) {
+        console.log(`[Middleware] Auth payload:`, req.auth?.user?.email || 'No email')
+    }
+
     const isAuthRoute = nextUrl.pathname.startsWith('/login') || nextUrl.pathname.startsWith('/register')
     const isDashboardRoute = nextUrl.pathname.startsWith('/dashboard') || nextUrl.pathname === '/'
 
     if (isAuthRoute) {
         if (isLogged) {
+            console.log(`[Middleware] Redirecting from ${nextUrl.pathname} to /dashboard because user is logged in.`)
             return NextResponse.redirect(new URL('/dashboard', nextUrl))
         }
         return null
     }
 
     if (isDashboardRoute && !isLogged) {
+        console.log(`[Middleware] Redirecting from ${nextUrl.pathname} to /login because user is NOT logged in.`)
         return NextResponse.redirect(new URL('/login', nextUrl))
     }
 
