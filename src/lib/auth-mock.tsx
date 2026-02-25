@@ -29,3 +29,15 @@ export async function getServerSession() {
 
 export type NextAuthConfig = any;
 
+const NextAuth = (options: any) => ({
+    handlers: {
+        GET: () => new Response('Mocked NextAuth GET'),
+        POST: () => new Response('Mocked NextAuth POST'),
+    },
+    auth: getServerSession,
+    signIn,
+    signOut,
+});
+
+export default NextAuth;
+
