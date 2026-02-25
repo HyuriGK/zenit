@@ -14,7 +14,10 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?   // Para login com Credentials
+  username      String?   @unique
+  usernameChangedAt DateTime?
   plano         String    @default("FREE") // FREE ou PREMIUM
+  planoExpiraEm DateTime?
   
   accounts      Account[]
   sessions      Session[]
