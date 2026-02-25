@@ -12,13 +12,13 @@ export async function generateVerificationToken(email: string) {
 
   // Remove tokens antigos para este email
   await prisma.verificationToken.deleteMany({
-    where: { email }
+    where: { identifier: email }
   });
 
   // Cria novo token
   const verificationToken = await prisma.verificationToken.create({
     data: {
-      email,
+      identifier: email,
       token,
       expires,
     }

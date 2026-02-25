@@ -77,11 +77,21 @@ model Session {
 }
 
 model VerificationToken {
+  id         String   @id @default(uuid())
   identifier String
   token      String   @unique
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model PasswordResetToken {
+  id      String   @id @default(uuid())
+  email   String
+  token   String   @unique
+  expires DateTime
+
+  @@unique([email, token])
 }
 
 model Compromisso {
