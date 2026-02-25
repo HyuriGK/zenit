@@ -7,7 +7,7 @@ export async function GET() {
     try {
         const ativos = await sql`
             SELECT * FROM "AtivoInvestimento"
-            ORDER BY "createdAt" DESC, "nome" ASC
+            ORDER BY "dataCompra" DESC, "nome" ASC
         `;
         return NextResponse.json({ data: ativos });
     } catch (error) {
