@@ -81,7 +81,7 @@ export default function NovoObjetivoModal({ aberto, onFechar, onSucesso }: NovoO
 
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-md">
+      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white flex items-center gap-2">
             {isReservaEmergencia ? (
@@ -119,7 +119,7 @@ export default function NovoObjetivoModal({ aberto, onFechar, onSucesso }: NovoO
               onChange={(e) => setNome(e.target.value)}
               placeholder={isReservaEmergencia ? "Ex: Fundo de Emergência" : "Ex: Viagem para Paris"}
               required
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+              className="bg-zinc-900/50 border-zinc-800 text-white"
             />
           </div>
 
@@ -131,7 +131,7 @@ export default function NovoObjetivoModal({ aberto, onFechar, onSucesso }: NovoO
               onChange={(e) => setDescricao(e.target.value)}
               placeholder="Descreva seu objetivo..."
               rows={3}
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white resize-none"
+              className="bg-zinc-900/50 border-zinc-800 text-white resize-none"
             />
           </div>
 
@@ -145,7 +145,7 @@ export default function NovoObjetivoModal({ aberto, onFechar, onSucesso }: NovoO
               onChange={(e) => setValorMeta(e.target.value)}
               placeholder="0,00"
               required
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+              className="bg-zinc-900/50 border-zinc-800 text-white"
             />
             {isReservaEmergencia && valorMeta && (
               <p className="text-xs text-zinc-500 mt-1">
@@ -161,7 +161,7 @@ export default function NovoObjetivoModal({ aberto, onFechar, onSucesso }: NovoO
               type="date"
               value={dataMeta}
               onChange={(e) => setDataMeta(e.target.value)}
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+              className="bg-zinc-900/50 border-zinc-800 text-white"
             />
           </div>
 

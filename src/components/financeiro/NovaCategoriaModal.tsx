@@ -90,8 +90,8 @@ export default function NovaCategoriaModal({ aberto, onFechar, onSucesso }: Nova
                 type="button"
                 onClick={() => setTipo('RECEITA')}
                 className={`p-4 rounded-lg border-2 transition-all ${tipo === 'RECEITA'
-                    ? 'border-green-500 bg-green-500/10'
-                    : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
+                  ? 'border-green-500 bg-green-500/10'
+                  : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
                   }`}
               >
                 <TrendingUp className={`w-6 h-6 mx-auto mb-2 ${tipo === 'RECEITA' ? 'text-green-400' : 'text-zinc-500'}`} />
@@ -103,8 +103,8 @@ export default function NovaCategoriaModal({ aberto, onFechar, onSucesso }: Nova
                 type="button"
                 onClick={() => setTipo('DESPESA')}
                 className={`p-4 rounded-lg border-2 transition-all ${tipo === 'DESPESA'
-                    ? 'border-red-500 bg-red-500/10'
-                    : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
+                  ? 'border-red-500 bg-red-500/10'
+                  : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
                   }`}
               >
                 <TrendingDown className={`w-6 h-6 mx-auto mb-2 ${tipo === 'DESPESA' ? 'text-red-400' : 'text-zinc-500'}`} />
@@ -123,7 +123,7 @@ export default function NovaCategoriaModal({ aberto, onFechar, onSucesso }: Nova
               onChange={(e) => setNome(e.target.value)}
               placeholder="Ex: Assinaturas, Lazer, Freelance"
               required
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+              className="bg-zinc-900/50 border-zinc-800 text-white"
             />
             <p className="text-xs text-zinc-500 mt-1">
               Escolha um nome descritivo e fácil de identificar
@@ -184,8 +184,8 @@ export default function NovaCategoriaModal({ aberto, onFechar, onSucesso }: Nova
               type="submit"
               disabled={carregando}
               className={`flex-1 ${tipo === 'RECEITA'
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-red-600 hover:bg-red-700'
+                ? 'bg-green-600 hover:bg-green-700'
+                : 'bg-red-600 hover:bg-red-700'
                 }`}
             >
               {carregando ? (

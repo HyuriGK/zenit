@@ -185,7 +185,7 @@ export default function ContribuirObjetivoModal({
               onChange={(e) => setValor(e.target.value)}
               placeholder="0,00"
               required
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white text-lg font-semibold"
+              className="bg-zinc-900/50 border-zinc-800 text-white text-lg font-semibold"
             />
             {valorNumerico > 0 && (
               <div className="mt-2 p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
@@ -227,7 +227,7 @@ export default function ContribuirObjetivoModal({
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
               placeholder="Ex: Contribuição mensal"
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+              className="bg-zinc-900/50 border-zinc-800 text-white"
             />
           </div>
 

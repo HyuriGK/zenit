@@ -82,7 +82,7 @@ export default function NovaContaModal({ aberto, onFechar, onSucesso }: NovaCont
 
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-md">
+      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white">
             Nova Conta Bancária
@@ -98,7 +98,7 @@ export default function NovaContaModal({ aberto, onFechar, onSucesso }: NovaCont
               onChange={(e) => setNome(e.target.value)}
               placeholder="Ex: Nubank, Banco do Brasil"
               required
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+              className="bg-zinc-900/50 border-zinc-800 text-white"
             />
           </div>
 
@@ -130,7 +130,7 @@ export default function NovaContaModal({ aberto, onFechar, onSucesso }: NovaCont
               value={banco}
               onChange={(e) => setBanco(e.target.value)}
               placeholder="Ex: Nubank, Itaú"
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+              className="bg-zinc-900/50 border-zinc-800 text-white"
             />
           </div>
 
@@ -143,7 +143,7 @@ export default function NovaContaModal({ aberto, onFechar, onSucesso }: NovaCont
               value={saldoInicial}
               onChange={(e) => setSaldoInicial(e.target.value)}
               placeholder="0,00"
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+              className="bg-zinc-900/50 border-zinc-800 text-white"
             />
           </div>
 
