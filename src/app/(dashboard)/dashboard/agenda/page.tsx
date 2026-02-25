@@ -31,12 +31,12 @@ function AgendaPageContent() {
   const t = useTranslations('agenda');
   const tCommon = useTranslations('common');
 
-  // Detectar se é dispositivo móvel e definir view padrão
+  // Detectar se é dispositivo móvel e definir view padrão como mês
   const [view, setView] = useState<ViewType>(() => {
     if (typeof window !== 'undefined') {
-      return window.innerWidth < 768 ? 'day' : 'week';
+      return window.innerWidth < 768 ? 'day' : 'month';
     }
-    return 'week';
+    return 'month';
   });
   const [currentDate, setCurrentDate] = useState(new Date());
   const [isModalOpen, setIsModalOpen] = useState(false);
