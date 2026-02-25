@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx prisma migrate:*)",
+      "Bash(ls:*)",
+      "Bash(diff:*)",
+      "Bash(grep:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npx prisma generate)",
+      "Bash(taskkill //F //PID 67768)",
+      "Bash(taskkill:*)",
+      "Bash(npx prisma db push:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)",
+      "Bash(tail:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$\\(cat <<''EOF''\nAdiciona script postinstall para gerar Prisma Client no Vercel\n\n- Adiciona script ''postinstall'' que roda ''prisma generate''\n- Corrige erro de build no Vercel onde o Prisma Client não era gerado\n- Necessário porque o Vercel cacheia dependências\n\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push:*)",
+      "Bash(find:*)",
+      "Bash(netstat:*)",
+      "Bash(findstr:*)",
+      "Bash(node test-email.js:*)",
+      "Bash(wc:*)",
+      "Bash(timeout /t 2 /nobreak)",
+      "Bash(dir:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(where:*)",
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(npm ls:*)"
+    ]
+  }
+}

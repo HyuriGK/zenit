@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Logo - Preview</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: linear-gradient(135deg, #0f0f0f 0%, #0a0a0a 50%, #0f0f0f 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 40px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .logo-text {
+      font-size: 96px;
+      font-weight: bold;
+      background: linear-gradient(to right, #c084fc, #e879f9, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -2px;
+      filter: drop-shadow(0 0 20px rgba(192, 132, 252, 0.5));
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .instructions {
+      color: #9ca3af;
+      text-align: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 600px;
+    }
+
+    .instructions h2 {
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .instructions p {
+      margin: 5px 0;
+      font-size: 14px;
+    }
+
+    .logo-variations {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 800px;
+    }
+
+    .variation {
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .variation h3 {
+      color: #9ca3af;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .logo-large {
+      font-size: 64px;
+      font-weight: bold;
+      background: linear-gradient(to right, #c084fc, #e879f9, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -2px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .logo-medium {
+      font-size: 48px;
+      font-weight: bold;
+      background: linear-gradient(to right, #c084fc, #e879f9, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -2px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .logo-small {
+      font-size: 32px;
+      font-weight: bold;
+      background: linear-gradient(to right, #c084fc, #e879f9, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: -1px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .logo-icon {
+      font-size: 64px;
+      font-weight: bold;
+      background: linear-gradient(to right, #c084fc, #e879f9, #60a5fa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div class="logo-container">
+    <div class="logo-text">Aura</div>
+  </div>
+
+  <div class="instructions">
+    <h2>Como converter para PNG</h2>
+    <p><strong>Opção 1:</strong> Tire um screenshot desta página (use Windows + Shift + S)</p>
+    <p><strong>Opção 2:</strong> Use o arquivo aura-logo.svg criado na pasta public e converta online em sites como cloudconvert.com ou ezgif.com</p>
+    <p><strong>Opção 3:</strong> Use comandos no terminal (se tiver ImageMagick ou Inkscape instalado)</p>
+  </div>
+
+  <div class="logo-variations">
+    <div class="variation">
+      <h3>Grande</h3>
+      <div class="logo-large">Aura</div>
+    </div>
+
+    <div class="variation">
+      <h3>Médio</h3>
+      <div class="logo-medium">Aura</div>
+    </div>
+
+    <div class="variation">
+      <h3>Pequeno</h3>
+      <div class="logo-small">Aura</div>
+    </div>
+
+    <div class="variation">
+      <h3>Ícone (A)</h3>
+      <div class="logo-icon">A</div>
+    </div>
+  </div>
+</body>
+</html>
