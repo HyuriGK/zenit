@@ -107,7 +107,7 @@ export default function NovoAtivoModal({ aberto, onFechar, onSucesso }: NovoAtiv
 
     return (
         <Dialog open={aberto} onOpenChange={onFechar}>
-            <DialogContent className="bg-zinc-900 border-zinc-800 max-w-lg">
+            <DialogContent className="bg-zinc-900 border-zinc-800 max-w-xl">
                 <DialogHeader>
                     <DialogTitle className="text-2xl font-bold text-white flex items-center gap-2">
                         <Plus className="w-6 h-6 text-green-500" />

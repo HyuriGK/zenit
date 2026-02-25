@@ -60,7 +60,7 @@ export function ConfirmModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[480px] bg-zinc-900 border-zinc-800 rounded-2xl">
+      <DialogContent className="sm:max-w-xl bg-zinc-900 border-zinc-800 rounded-2xl">
         <DialogHeader>
           <div className="flex items-start gap-4 mb-2">
             <div className={`w-12 h-12 rounded-xl ${styles.iconBg} flex items-center justify-center shadow-lg shrink-0`}>

@@ -174,21 +174,21 @@ export function CompromissoForm({ onClose, onSave, initialDate, initialHour, ini
               value={data}
               onChange={(e) => setData(e.target.value)}
               required
-              className="bg-zinc-800/50 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white focus:border-green-500 focus:outline-none"
+              className="bg-zinc-800/50 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white focus:outline-none"
             />
             <input
               type="time"
               value={horaInicio}
               onChange={(e) => setHoraInicio(e.target.value)}
               required
-              className="bg-zinc-800/50 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white focus:border-green-500 focus:outline-none w-24"
+              className="bg-zinc-800/50 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white focus:outline-none w-24"
             />
             <span className="text-gray-500">-</span>
             <input
               type="time"
               value={horaFim}
               onChange={(e) => setHoraFim(e.target.value)}
-              className="bg-zinc-800/50 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white focus:border-green-500 focus:outline-none w-24"
+              className="bg-zinc-800/50 border border-zinc-700 rounded-md px-2 py-1 text-sm text-white focus:outline-none w-24"
             />
           </div>
         </div>
@@ -284,7 +284,7 @@ export function CompromissoForm({ onClose, onSave, initialDate, initialHour, ini
                     max="365"
                     value={intervaloRecorrencia}
                     onChange={(e) => setIntervaloRecorrencia(parseInt(e.target.value) || 1)}
-                    className="w-14 bg-zinc-800/50 border border-zinc-700 rounded-md px-2 py-1 text-white text-center focus:border-green-500 focus:outline-none"
+                    className="w-14 bg-zinc-800/50 border border-zinc-700 rounded-md px-2 py-1 text-white text-center focus:outline-none"
                   />
                   <span className="text-gray-400">
                     {tipoRecorrencia === 'diario' && t('daily').toLowerCase()}
@@ -300,7 +300,7 @@ export function CompromissoForm({ onClose, onSave, initialDate, initialHour, ini
                     type="date"
                     value={dataFimRecorrencia}
                     onChange={(e) => setDataFimRecorrencia(e.target.value)}
-                    className="bg-zinc-800/50 border border-zinc-700 rounded-md px-2 py-1 text-white focus:border-green-500 focus:outline-none"
+                    className="bg-zinc-800/50 border border-zinc-700 rounded-md px-2 py-1 text-white focus:outline-none"
                   />
                 </div>
               </div>

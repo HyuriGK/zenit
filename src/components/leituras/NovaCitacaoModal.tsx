@@ -164,7 +164,7 @@ export function NovaCitacaoModal({
 
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-xl p-6">
+      <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-2xl p-6">
         <DialogHeader>
           <DialogTitle>Nova Citação</DialogTitle>
         </DialogHeader>

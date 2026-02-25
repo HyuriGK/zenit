@@ -29,7 +29,7 @@ export function UpgradeToPremiumModal({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] bg-zinc-900 border-zinc-800">
+      <DialogContent className="sm:max-w-xl bg-zinc-900 border-zinc-800">
         <DialogHeader>
           <div className="flex items-center gap-3 mb-2">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-teal-500 flex items-center justify-center">

@@ -171,7 +171,7 @@ export function NovaMidiaModal({ aberto, onFechar, onSucesso }: NovaMidiaModalPr
 
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-md p-0 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-lg p-0 max-h-[90vh] overflow-y-auto">
         <DialogHeader className="px-5 pt-4 pb-3">
           <DialogTitle className="text-white text-base flex items-center gap-2">
             {formData.tipo === TipoMidia.LIVRO ? (

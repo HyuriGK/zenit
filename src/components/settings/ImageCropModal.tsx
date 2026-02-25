@@ -138,7 +138,7 @@ export function ImageCropModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-xl">
+      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-zinc-100">Ajustar Foto</DialogTitle>
         </DialogHeader>

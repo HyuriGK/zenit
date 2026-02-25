@@ -19,7 +19,7 @@ type Format = 'POST' | 'STORY'
 export function ShareMidiaModal({ midia, open, onClose }: Props) {
   const [generating, setGenerating] = useState(false)
   const [format, setFormat] = useState<Format>('POST')
-  
+
   const fullSizeRef = useRef<HTMLDivElement>(null)
 
   const handleDownload = async () => {
@@ -27,10 +27,10 @@ export function ShareMidiaModal({ midia, open, onClose }: Props) {
 
     try {
       setGenerating(true)
-      
+
       const dataUrl = await toPng(fullSizeRef.current, {
         quality: 1.0,
-        pixelRatio: 1, 
+        pixelRatio: 1,
         cacheBust: true,
       })
 
@@ -58,7 +58,7 @@ export function ShareMidiaModal({ midia, open, onClose }: Props) {
   return (
     <>
       <Dialog open={open} onOpenChange={onClose}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white sm:max-w-xl w-[95vw] max-h-[95vh] overflow-y-auto flex flex-col p-4 sm:p-6">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white sm:max-w-2xl w-[95vw] max-h-[95vh] overflow-y-auto flex flex-col p-4 sm:p-6">
           <DialogHeader className="space-y-3 sm:space-y-4">
             <div>
               <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -74,11 +74,10 @@ export function ShareMidiaModal({ midia, open, onClose }: Props) {
             <div className="flex p-1 bg-zinc-950 rounded-lg border border-zinc-800">
               <button
                 onClick={() => setFormat('POST')}
-                className={`flex-1 flex items-center justify-center gap-1 sm:gap-2 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-all ${
-                  format === 'POST'
+                className={`flex-1 flex items-center justify-center gap-1 sm:gap-2 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-all ${format === 'POST'
                     ? 'bg-zinc-800 text-white shadow-sm'
                     : 'text-zinc-400 hover:text-zinc-200'
-                }`}
+                  }`}
               >
                 <LayoutGrid className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden xs:inline">Post (4:5)</span>
@@ -86,11 +85,10 @@ export function ShareMidiaModal({ midia, open, onClose }: Props) {
               </button>
               <button
                 onClick={() => setFormat('STORY')}
-                className={`flex-1 flex items-center justify-center gap-1 sm:gap-2 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-all ${
-                  format === 'STORY'
+                className={`flex-1 flex items-center justify-center gap-1 sm:gap-2 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-all ${format === 'STORY'
                     ? 'bg-zinc-800 text-white shadow-sm'
                     : 'text-zinc-400 hover:text-zinc-200'
-                }`}
+                  }`}
               >
                 <Smartphone className="w-3 h-3 sm:w-4 sm:h-4" />
                 <span className="hidden xs:inline">Story (9:16)</span>

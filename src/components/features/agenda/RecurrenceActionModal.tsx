@@ -28,10 +28,10 @@ export function RecurrenceActionModal({
 }: RecurrenceActionModalProps) {
   const t = useTranslations('agenda');
   const isEdit = action === 'edit';
-  
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 text-white sm:max-w-md">
+      <DialogContent className="bg-zinc-900 border-zinc-800 text-white sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <RefreshCw className="w-5 h-5 text-zenit-400" />

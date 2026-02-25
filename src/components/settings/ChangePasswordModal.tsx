@@ -79,7 +79,7 @@ export function ChangePasswordModal({ isOpen, onClose }: ChangePasswordModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-md">
+      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-zinc-100 flex items-center gap-2">
             <Lock className="w-5 h-5 text-zenit-400" />

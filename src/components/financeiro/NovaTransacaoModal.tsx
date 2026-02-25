@@ -164,7 +164,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
 
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white">
             Nova Transação
@@ -181,8 +181,8 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
               type="button"
               onClick={() => setTipo('RECEITA')}
               className={`p-4 rounded-lg border-2 transition-all ${tipo === 'RECEITA'
-                  ? 'border-green-500 bg-green-500/10'
-                  : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
+                ? 'border-green-500 bg-green-500/10'
+                : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
                 }`}
             >
               <TrendingUp className={`w-6 h-6 mx-auto mb-2 ${tipo === 'RECEITA' ? 'text-green-400' : 'text-zinc-500'}`} />
@@ -194,8 +194,8 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
               type="button"
               onClick={() => setTipo('DESPESA')}
               className={`p-4 rounded-lg border-2 transition-all ${tipo === 'DESPESA'
-                  ? 'border-red-500 bg-red-500/10'
-                  : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
+                ? 'border-red-500 bg-red-500/10'
+                : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
                 }`}
             >
               <TrendingDown className={`w-6 h-6 mx-auto mb-2 ${tipo === 'DESPESA' ? 'text-red-400' : 'text-zinc-500'}`} />
@@ -213,7 +213,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
               onChange={(e) => setDescricao(e.target.value)}
               placeholder="Ex: Compra no mercado"
               required
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+              className="bg-zinc-900/50 border-zinc-800 text-white"
             />
           </div>
 
@@ -351,7 +351,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
                     max="48"
                     value={parcelaTotais}
                     onChange={(e) => setParcelaTotais(e.target.value)}
-                    className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+                    className="bg-zinc-900/50 border-zinc-800 text-white"
                   />
                   {valor && (
                     <p className="text-xs text-zinc-500 mt-1">
@@ -371,7 +371,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
               onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setObservacoes(e.target.value)}
               placeholder="Informações adicionais..."
               rows={3}
-              className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white resize-none"
+              className="bg-zinc-900/50 border-zinc-800 text-white resize-none"
             />
           </div>
 
@@ -390,8 +390,8 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
               type="submit"
               disabled={carregando || !contaBancariaId}
               className={`flex-1 ${tipo === 'RECEITA'
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-red-600 hover:bg-red-700'
+                ? 'bg-green-600 hover:bg-green-700'
+                : 'bg-red-600 hover:bg-red-700'
                 } disabled:opacity-50`}
             >
               {carregando ? (
