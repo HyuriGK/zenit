@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/dexie';
 import { Card } from '@/components/ui/card';
@@ -22,10 +22,11 @@ import {
   ArrowUpDown,
 } from 'lucide-react';
 import { formatarMoeda } from '@/lib/financeiro-helper';
-import { format } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, addMonths, isSameMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import NovaTransacaoModal from '@/components/financeiro/NovaTransacaoModal';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Transacao {
   id: string;
@@ -61,8 +62,12 @@ export default function TransacoesPage() {
   const [modalAberto, setModalAberto] = useState(false);
   const [transacaoParaEditar, setTransacaoParaEditar] = useState<any>(null);
   const [menuAberto, setMenuAberto] = useState<string | null>(null);
+  const [dataReferencia, setDataReferencia] = useState(() => startOfMonth(new Date()));
 
-  const transacoes: Transacao[] = (transacoesData || []).map(t => {
+  const transacoes: Transacao[] = (transacoesData || []).filter(t => {
+    const dataTransacao = new Date(t.data);
+    return isSameMonth(dataTransacao, dataReferencia);
+  }).map(t => {
     const categoria = categoriasData?.find(c => c.id === t.categoriaId);
     const contaBancaria = contasData?.find(c => c.id === t.contaBancariaId);
     const cartao = cartoesData?.find(c => c.id === t.cartaoId);
@@ -75,6 +80,13 @@ export default function TransacoesPage() {
       cartao: cartao ? { nome: cartao.nome } : undefined,
     };
   }).filter(t => filtroTipo === 'TODOS' || t.tipo === filtroTipo);
+
+  // Gerar lista de meses (6 antes e 6 depois)
+  const meses = useMemo(() => {
+    const inicio = subMonths(dataReferencia, 5);
+    const fim = addMonths(dataReferencia, 6);
+    return eachMonthOfInterval({ start: inicio, end: fim });
+  }, [dataReferencia]);
 
   const loading = transacoesData === undefined || categoriasData === undefined || contasData === undefined || cartoesData === undefined;
 
@@ -205,6 +217,50 @@ export default function TransacoesPage() {
             </Card>
           </div>
         </div>
+      </div>
+
+      {/* Seletor de Mês Horizontal */}
+      <div className="mb-6 flex items-center gap-4 bg-zinc-900/50 p-2 rounded-xl border border-zinc-800">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setDataReferencia(prev => subMonths(prev, 1))}
+          className="text-zinc-400 hover:text-white"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </Button>
+
+        <div className="flex-1 flex items-center justify-between overflow-x-auto scrollbar-none gap-2 px-2">
+          {meses.map((mes) => {
+            const selecionado = isSameMonth(mes, dataReferencia);
+            return (
+              <button
+                key={mes.toISOString()}
+                onClick={() => setDataReferencia(mes)}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${selecionado
+                  ? 'bg-green-600 text-white shadow-lg shadow-green-500/20'
+                  : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'
+                  }`}
+              >
+                <span className="capitalize">
+                  {format(mes, 'MMM', { locale: ptBR }).replace('.', '')}
+                </span>
+                <span className="ml-1 text-[10px] opacity-50">
+                  {format(mes, 'yyyy')}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setDataReferencia(prev => addMonths(prev, 1))}
+          className="text-zinc-400 hover:text-white"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </Button>
       </div>
 
       {/* Filtros e Busca */}
