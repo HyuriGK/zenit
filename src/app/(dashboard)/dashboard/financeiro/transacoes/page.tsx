@@ -61,7 +61,6 @@ export default function TransacoesPage() {
   const [busca, setBusca] = useState('');
   const [modalAberto, setModalAberto] = useState(false);
   const [transacaoParaEditar, setTransacaoParaEditar] = useState<any>(null);
-  const [menuAberto, setMenuAberto] = useState<string | null>(null);
   const [dataReferencia, setDataReferencia] = useState(() => startOfMonth(new Date()));
 
   const transacoes: Transacao[] = (transacoesData || []).filter(t => {
@@ -100,7 +99,6 @@ export default function TransacoesPage() {
     if (original) {
       setTransacaoParaEditar(original);
       setModalAberto(true);
-      setMenuAberto(null);
     }
   };
 
@@ -417,35 +415,26 @@ export default function TransacoesPage() {
                   </div>
                 </div>
 
-                {/* Menu de Ações */}
-                <div className="relative">
+                {/* Ações Diretas */}
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Button
                     variant="ghost"
-                    size="sm"
-                    className="opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => setMenuAberto(menuAberto === transacao.id ? null : transacao.id)}
+                    size="icon"
+                    onClick={() => handleEditar(transacao)}
+                    className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-zinc-800"
+                    title="Editar"
                   >
-                    <MoreVertical className="w-4 h-4" />
+                    <Edit className="w-4 h-4" />
                   </Button>
-
-                  {menuAberto === transacao.id && (
-                    <div className="absolute right-0 mt-2 w-48 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-10">
-                      <button
-                        onClick={() => handleEditar(transacao)}
-                        className="w-full px-4 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800 flex items-center gap-2"
-                      >
-                        <Edit className="w-4 h-4" />
-                        Editar
-                      </button>
-                      <button
-                        onClick={() => handleExcluir(transacao.id)}
-                        className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-zinc-800 flex items-center gap-2"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                        Excluir
-                      </button>
-                    </div>
-                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleExcluir(transacao.id)}
+                    className="h-8 w-8 text-zinc-400 hover:text-red-400 hover:bg-red-500/10"
+                    title="Excluir"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             </Card>
