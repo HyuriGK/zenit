@@ -24,6 +24,7 @@ import {
 import { formatarMoeda } from '@/lib/financeiro-helper';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { toast } from 'sonner';
 import NovaTransacaoModal from '@/components/financeiro/NovaTransacaoModal';
 
 interface Transacao {
@@ -58,6 +59,7 @@ export default function TransacoesPage() {
   const [filtroTipo, setFiltroTipo] = useState<string>('TODOS');
   const [busca, setBusca] = useState('');
   const [modalAberto, setModalAberto] = useState(false);
+  const [transacaoParaEditar, setTransacaoParaEditar] = useState<any>(null);
   const [menuAberto, setMenuAberto] = useState<string | null>(null);
 
   const transacoes: Transacao[] = (transacoesData || []).map(t => {
@@ -79,6 +81,39 @@ export default function TransacoesPage() {
   const transacoesFiltradas = transacoes.filter((t) =>
     t.descricao.toLowerCase().includes(busca.toLowerCase())
   );
+
+  const handleEditar = (transacao: any) => {
+    // Pegar o objeto original do Dexie sem as transformações de string
+    const original = transacoesData?.find(t => t.id === transacao.id);
+    if (original) {
+      setTransacaoParaEditar(original);
+      setModalAberto(true);
+      setMenuAberto(null);
+    }
+  };
+
+  const handleExcluir = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta transação?')) return;
+
+    try {
+      const transacao = await db.transacoes.get(id);
+      if (transacao) {
+        // Estornar saldo da conta se não for Caixa Geral
+        if (transacao.contaBancariaId && transacao.contaBancariaId !== 'caixa-geral') {
+          const conta = await db.contasBancarias.get(transacao.contaBancariaId);
+          if (conta) {
+            const estorno = transacao.tipo === 'RECEITA' ? -Number(transacao.valor) : Number(transacao.valor);
+            await db.contasBancarias.update(transacao.contaBancariaId, { saldoAtual: Number(conta.saldoAtual) + estorno });
+          }
+        }
+        await db.transacoes.delete(id);
+        toast.success('Transação excluída!');
+      }
+    } catch (error) {
+      console.error('Erro ao excluir:', error);
+      toast.error('Erro ao excluir transação.');
+    }
+  };
 
   const totalReceitas = transacoes
     .filter((t) => t.tipo === 'RECEITA')
@@ -102,7 +137,10 @@ export default function TransacoesPage() {
               <p className="text-zinc-400 mt-2">Gerencie suas receitas e despesas</p>
             </div>
             <Button
-              onClick={() => setModalAberto(true)}
+              onClick={() => {
+                setTransacaoParaEditar(null);
+                setModalAberto(true);
+              }}
               className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white shadow-lg shadow-green-500/50 transition-all hover:shadow-xl hover:shadow-green-500/60"
               size="lg"
             >
@@ -235,7 +273,10 @@ export default function TransacoesPage() {
               Comece criando sua primeira transação
             </p>
             <Button
-              onClick={() => setModalAberto(true)}
+              onClick={() => {
+                setTransacaoParaEditar(null);
+                setModalAberto(true);
+              }}
               className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -333,11 +374,17 @@ export default function TransacoesPage() {
 
                   {menuAberto === transacao.id && (
                     <div className="absolute right-0 mt-2 w-48 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-10">
-                      <button className="w-full px-4 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800 flex items-center gap-2">
+                      <button
+                        onClick={() => handleEditar(transacao)}
+                        className="w-full px-4 py-2 text-left text-sm text-zinc-300 hover:bg-zinc-800 flex items-center gap-2"
+                      >
                         <Edit className="w-4 h-4" />
                         Editar
                       </button>
-                      <button className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-zinc-800 flex items-center gap-2">
+                      <button
+                        onClick={() => handleExcluir(transacao.id)}
+                        className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-zinc-800 flex items-center gap-2"
+                      >
                         <Trash2 className="w-4 h-4" />
                         Excluir
                       </button>
@@ -353,7 +400,11 @@ export default function TransacoesPage() {
       {/* Modal de Nova Transação */}
       <NovaTransacaoModal
         aberto={modalAberto}
-        onFechar={() => setModalAberto(false)}
+        onFechar={() => {
+          setModalAberto(false);
+          setTransacaoParaEditar(null);
+        }}
+        transacaoParaEditar={transacaoParaEditar}
         onSucesso={() => {
           // Live query updates automatically
         }}

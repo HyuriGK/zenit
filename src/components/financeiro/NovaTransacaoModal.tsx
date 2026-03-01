@@ -23,6 +23,7 @@ interface NovaTransacaoModalProps {
   aberto: boolean;
   onFechar: () => void;
   onSucesso: () => void;
+  transacaoParaEditar?: any;
 }
 
 interface Categoria {
@@ -42,7 +43,7 @@ interface Cartao {
   nome: string;
 }
 
-export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: NovaTransacaoModalProps) {
+export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transacaoParaEditar }: NovaTransacaoModalProps) {
   const [carregando, setCarregando] = useState(false);
   const [tipo, setTipo] = useState<'RECEITA' | 'DESPESA'>('DESPESA');
 
@@ -70,10 +71,27 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
   const cartoes = cartoesRaw || [];
 
   useEffect(() => {
-    if (aberto && contas.length > 0 && !contaBancariaId) {
-      setContaBancariaId(contas[0].id);
+    if (aberto) {
+      if (transacaoParaEditar) {
+        setTipo(transacaoParaEditar.tipo);
+        setDescricao(transacaoParaEditar.descricao);
+        setValor(String(transacaoParaEditar.valor));
+        setData(new Date(transacaoParaEditar.data).toISOString().split('T')[0]);
+        setObservacoes(transacaoParaEditar.observacoes || '');
+        setCategoriaId(transacaoParaEditar.categoriaId || '');
+        setContaBancariaId(transacaoParaEditar.contaBancariaId || '');
+        setCartaoId(transacaoParaEditar.cartaoId || '');
+        setIsFixa(transacaoParaEditar.isFixa || false);
+        setIsParcela(false); // Não editamos parcelamento de uma transação já existente individualmente
+        setParcelaTotais('1');
+      } else {
+        limparFormulario();
+        if (contas.length > 0 && !contaBancariaId) {
+          setContaBancariaId(contas[0].id);
+        }
+      }
     }
-  }, [aberto, contas, contaBancariaId]);
+  }, [aberto, transacaoParaEditar, contas]);
 
   // Handlers para conta e cartão (agora podem ter ambos)
   const handleContaChange = (value: string) => {
@@ -94,51 +112,106 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
     }
 
     setCarregando(true);
-    const loadingToast = toast.loading('Criando transação...');
+    const loadingToast = toast.loading(transacaoParaEditar ? 'Atualizando transação...' : 'Criando transação...');
 
     try {
       const valorNumerico = parseFloat(valor.replace(',', '.'));
-      const idGrupo = crypto.randomUUID();
-      const numParcelas = isParcela ? parseInt(parcelaTotais) : 1;
 
-      for (let i = 0; i < numParcelas; i++) {
-        // Calcular data para cada parcela (adiciona i meses)
-        const dt = new Date(data);
-        dt.setMonth(dt.getMonth() + i);
-
-        const transacao = {
-          id: crypto.randomUUID(),
-          descricao: isParcela ? `${descricao} (${i + 1}/${numParcelas})` : descricao,
-          valor: isParcela ? valorNumerico / numParcelas : valorNumerico,
-          data: dt,
+      if (transacaoParaEditar) {
+        // Lógica de Edição
+        const transacaoAtualizada = {
+          ...transacaoParaEditar,
+          descricao,
+          valor: valorNumerico,
+          data: new Date(data),
           tipo,
           observacoes: observacoes || undefined,
           categoriaId: categoriaId || undefined,
           contaBancariaId,
           cartaoId: cartaoId || undefined,
           isFixa,
-          isParcela,
-          parcelaNumero: isParcela ? i + 1 : undefined,
-          parcelaTotais: isParcela ? numParcelas : undefined,
-          grupoParcelaId: isParcela ? idGrupo : undefined,
-          createdAt: new Date(),
           updatedAt: new Date(),
         };
 
-        await db.transacoes.add(transacao);
+        await db.transacoes.put(transacaoAtualizada);
 
-        // Atualizar saldo da conta
-        if (contaBancariaId !== 'caixa-geral' && (!isParcela || i === 0)) { // Na vida real, talvez só abata do saldo na data certa
-          const conta = await db.contasBancarias.get(contaBancariaId);
-          if (conta) {
-            const saldoDiff = tipo === 'RECEITA' ? transacao.valor : -transacao.valor;
-            await db.contasBancarias.update(contaBancariaId, { saldoAtual: Number(conta.saldoAtual) + saldoDiff });
+        // Ajustar saldo da conta se necessário
+        if (contaBancariaId !== 'caixa-geral') {
+          const valorAntigo = Number(transacaoParaEditar.valor);
+          const tipoAntigo = transacaoParaEditar.tipo;
+
+          // Se mudou de conta, precisamos estornar da antiga e aplicar na nova
+          if (transacaoParaEditar.contaBancariaId !== contaBancariaId && transacaoParaEditar.contaBancariaId !== 'caixa-geral') {
+            const contaAntiga = await db.contasBancarias.get(transacaoParaEditar.contaBancariaId);
+            if (contaAntiga) {
+              const estorno = tipoAntigo === 'RECEITA' ? -valorAntigo : valorAntigo;
+              await db.contasBancarias.update(transacaoParaEditar.contaBancariaId, { saldoAtual: Number(contaAntiga.saldoAtual) + estorno });
+            }
+
+            const contaNova = await db.contasBancarias.get(contaBancariaId);
+            if (contaNova) {
+              const aplicacao = tipo === 'RECEITA' ? valorNumerico : -valorNumerico;
+              await db.contasBancarias.update(contaBancariaId, { saldoAtual: Number(contaNova.saldoAtual) + aplicacao });
+            }
+          } else {
+            // Mesma conta, apenas ajuste de valor/tipo
+            const conta = await db.contasBancarias.get(contaBancariaId);
+            if (conta) {
+              const estornoAntigo = tipoAntigo === 'RECEITA' ? -valorAntigo : valorAntigo;
+              const aplicacaoNova = tipo === 'RECEITA' ? valorNumerico : -valorNumerico;
+              await db.contasBancarias.update(contaBancariaId, { saldoAtual: Number(conta.saldoAtual) + estornoAntigo + aplicacaoNova });
+            }
+          }
+        } else if (transacaoParaEditar.contaBancariaId !== 'caixa-geral') {
+          // Mudou de uma conta real para Caixa Geral, estornar da antiga
+          const contaAntiga = await db.contasBancarias.get(transacaoParaEditar.contaBancariaId);
+          if (contaAntiga) {
+            const estorno = transacaoParaEditar.tipo === 'RECEITA' ? -Number(transacaoParaEditar.valor) : Number(transacaoParaEditar.valor);
+            await db.contasBancarias.update(transacaoParaEditar.contaBancariaId, { saldoAtual: Number(contaAntiga.saldoAtual) + estorno });
+          }
+        }
+      } else {
+        // Lógica de Criação
+        const idGrupo = crypto.randomUUID();
+        const numParcelas = isParcela ? parseInt(parcelaTotais) : 1;
+
+        for (let i = 0; i < numParcelas; i++) {
+          const dt = new Date(data);
+          dt.setMonth(dt.getMonth() + i);
+
+          const transacao = {
+            id: crypto.randomUUID(),
+            descricao: isParcela ? `${descricao} (${i + 1}/${numParcelas})` : descricao,
+            valor: valorNumerico, // Agora o valor é por parcela, sem divisão
+            data: dt,
+            tipo,
+            observacoes: observacoes || undefined,
+            categoriaId: categoriaId || undefined,
+            contaBancariaId,
+            cartaoId: cartaoId || undefined,
+            isFixa,
+            isParcela,
+            parcelaNumero: isParcela ? i + 1 : undefined,
+            parcelaTotais: isParcela ? numParcelas : undefined,
+            grupoParcelaId: isParcela ? idGrupo : undefined,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+
+          await db.transacoes.add(transacao);
+
+          if (contaBancariaId !== 'caixa-geral' && (!isParcela || i === 0)) {
+            const conta = await db.contasBancarias.get(contaBancariaId);
+            if (conta) {
+              const saldoDiff = tipo === 'RECEITA' ? transacao.valor : -transacao.valor;
+              await db.contasBancarias.update(contaBancariaId, { saldoAtual: Number(conta.saldoAtual) + saldoDiff });
+            }
           }
         }
       }
 
       limparFormulario();
-      toast.success('Transação criada com sucesso!', { id: loadingToast });
+      toast.success(transacaoParaEditar ? 'Transação atualizada!' : 'Transação criada!', { id: loadingToast });
       onSucesso();
       onFechar();
     } catch (error) {
@@ -167,10 +240,10 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
       <DialogContent className="bg-zinc-900 border-zinc-800 max-w-7xl max-h-[95vh] overflow-y-auto sm:overflow-hidden">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-white">
-            Nova Transação
+            {transacaoParaEditar ? 'Editar Transação' : 'Nova Transação'}
           </DialogTitle>
           <DialogDescription className="text-zinc-400">
-            Registre uma nova receita ou despesa de forma rápida
+            {transacaoParaEditar ? 'Altere os dados da transação selecionada' : 'Registre uma nova receita ou despesa de forma rápida'}
           </DialogDescription>
         </DialogHeader>
 
@@ -223,7 +296,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
               {/* Valor e Data */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label className="text-zinc-300">Valor *</Label>
+                  <Label className="text-zinc-300">Valor (Unidade) *</Label>
                   <Input
                     type="number"
                     step="0.01"
@@ -335,21 +408,26 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
                   <div className="flex items-center justify-between gap-2">
                     <div>
                       <Label className="text-zinc-300">Parcelar</Label>
+                      <p className="text-xs text-zinc-500">Repetir valor</p>
                     </div>
                     <Switch
                       checked={isParcela}
                       onCheckedChange={setIsParcela}
+                      disabled={!!transacaoParaEditar}
                     />
                   </div>
                   {isParcela && (
-                    <Input
-                      type="number"
-                      min="2"
-                      max="48"
-                      value={parcelaTotais}
-                      onChange={(e) => setParcelaTotais(e.target.value)}
-                      className="bg-zinc-900/50 border-zinc-800 text-white h-8 mt-1"
-                    />
+                    <div className="space-y-2">
+                      <Label className="text-xs text-zinc-400">Quant. de Parcelas</Label>
+                      <Input
+                        type="number"
+                        min="2"
+                        max="48"
+                        value={parcelaTotais}
+                        onChange={(e) => setParcelaTotais(e.target.value)}
+                        className="bg-zinc-900/50 border-zinc-800 text-white h-8 mt-1"
+                      />
+                    </div>
                   )}
                 </div>
               </div>
