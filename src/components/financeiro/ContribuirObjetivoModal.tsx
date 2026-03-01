@@ -93,7 +93,7 @@ export default function ContribuirObjetivoModal({
         });
 
         // Deduct from Account Balance
-        if (contaBancariaId) {
+        if (contaBancariaId && contaBancariaId !== 'caixa-geral') {
           const conta = await db.contasBancarias.get(contaBancariaId);
           if (conta) {
             await db.contasBancarias.update(contaBancariaId, {
@@ -239,6 +239,9 @@ export default function ContribuirObjetivoModal({
                 <SelectValue placeholder="Selecionar conta (opcional)" />
               </SelectTrigger>
               <SelectContent className="bg-zinc-900 border-zinc-800">
+                <SelectItem value="caixa-geral" className="text-white hover:bg-zinc-800">
+                  🏦 Caixa Geral
+                </SelectItem>
                 {contas.map((conta) => (
                   <SelectItem key={conta.id} value={conta.id} className="text-white hover:bg-zinc-800">
                     {conta.nome}

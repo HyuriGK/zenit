@@ -207,8 +207,8 @@ model Transacao {
   categoriaId     String?
   categoria       Categoria? @relation(fields: [categoriaId], references: [id])
   
-  contaBancariaId String
-  contaBancaria   ContaBancaria @relation(fields: [contaBancariaId], references: [id])
+  contaBancariaId String?
+  contaBancaria   ContaBancaria? @relation(fields: [contaBancariaId], references: [id])
   
   cartaoId        String?
   cartao          Cartao? @relation(fields: [cartaoId], references: [id])

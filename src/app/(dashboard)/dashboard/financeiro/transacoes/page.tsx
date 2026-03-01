@@ -69,7 +69,7 @@ export default function TransacoesPage() {
       ...t,
       data: (t.data instanceof Date ? t.data : new Date(t.data)).toISOString(),
       categoria: categoria ? { nome: categoria.nome, cor: categoria.cor, icone: categoria.icone } : undefined,
-      contaBancaria: contaBancaria ? { nome: contaBancaria.nome } : undefined,
+      contaBancaria: t.contaBancariaId === 'caixa-geral' ? { nome: 'Caixa Geral' } : (contaBancaria ? { nome: contaBancaria.nome } : undefined),
       cartao: cartao ? { nome: cartao.nome } : undefined,
     };
   }).filter(t => filtroTipo === 'TODOS' || t.tipo === filtroTipo);

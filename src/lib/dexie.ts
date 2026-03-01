@@ -99,7 +99,7 @@ export interface Transacao {
     parcelaTotais?: number;
     grupoParcelaId?: string;
     categoriaId?: string;
-    contaBancariaId: string;
+    contaBancariaId?: string;
     cartaoId?: string;
     objetivoId?: string;
     createdAt: Date;

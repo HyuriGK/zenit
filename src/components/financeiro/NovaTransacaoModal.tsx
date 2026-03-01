@@ -128,7 +128,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
         await db.transacoes.add(transacao);
 
         // Atualizar saldo da conta
-        if (!isParcela || i === 0) { // Na vida real, talvez só abata do saldo na data certa
+        if (contaBancariaId !== 'caixa-geral' && (!isParcela || i === 0)) { // Na vida real, talvez só abata do saldo na data certa
           const conta = await db.contasBancarias.get(contaBancariaId);
           if (conta) {
             const saldoDiff = tipo === 'RECEITA' ? transacao.valor : -transacao.valor;
@@ -273,7 +273,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
               <div className="space-y-3">
                 <div className="flex items-center gap-2 text-sm text-zinc-400 bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
                   <AlertCircle className="w-4 h-4 text-blue-400 shrink-0" />
-                  <p>Toda transação deve estar vinculada a uma <strong>conta bancária</strong>.</p>
+                  <p>Toda transação deve estar vinculada a uma <strong>conta bancária</strong> ou ao <strong>Caixa Geral</strong>.</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -284,6 +284,9 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso }: Nova
                         <SelectValue placeholder="Selecionar conta" />
                       </SelectTrigger>
                       <SelectContent className="bg-zinc-900 border-zinc-800">
+                        <SelectItem value="caixa-geral" className="text-white hover:bg-zinc-800 font-medium">
+                          🏦 Caixa Geral
+                        </SelectItem>
                         {contas.map((conta) => (
                           <SelectItem key={conta.id} value={conta.id} className="text-white hover:bg-zinc-800">
                             {conta.nome}

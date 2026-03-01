@@ -34,7 +34,7 @@ export const transacaoSchema = z.object({
     .optional()
     .nullable(),
   categoriaId: z.string().uuid('ID de categoria inválido').optional().nullable(),
-  contaBancariaId: z.string().uuid('ID de conta bancária inválido'),
+  contaBancariaId: z.string().min(1, 'ID de conta bancária inválido'),
   cartaoId: z.string().uuid('ID de cartão inválido').optional().nullable(),
   objetivoId: z.string().uuid('ID de objetivo inválido').optional().nullable(),
 });
@@ -72,7 +72,7 @@ export const transacaoUpdateSchema = z.object({
     .optional()
     .nullable(),
   categoriaId: z.string().uuid('ID de categoria inválido').optional().nullable(),
-  contaBancariaId: z.string().uuid('ID de conta bancária inválido'),
+  contaBancariaId: z.string().min(1, 'ID de conta bancária inválido'),
   cartaoId: z.string().uuid('ID de cartão inválido').optional().nullable(),
 });
 
