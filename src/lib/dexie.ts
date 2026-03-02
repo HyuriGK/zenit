@@ -407,13 +407,13 @@ export class ZenitDB extends Dexie {
 
     constructor() {
         super('ZenitDB');
-        this.version(2).stores({
+        this.version(3).stores({
             users: 'id',
             compromissos: 'id, data, recorrenciaGrupoId',
             atividades: 'id, createdAt',
             contasBancarias: 'id, ativa',
             cartoes: 'id, ativo',
-            categorias: 'id, tipo',
+            categorias: 'id, tipo, nome',
             transacoes: 'id, data, tipo, categoriaId, contaBancariaId, grupoParcelaId, descricao',
             objetivosFinanceiros: 'id, status',
             viagens: 'id, status, dataInicio',
