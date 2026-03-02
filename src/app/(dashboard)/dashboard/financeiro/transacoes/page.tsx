@@ -22,7 +22,7 @@ import {
   ArrowUpDown,
 } from 'lucide-react';
 import { formatarMoeda } from '@/lib/financeiro-helper';
-import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, addMonths, isSameMonth } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, addMonths, isSameMonth, differenceInDays, startOfDay } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import NovaTransacaoModal from '@/components/financeiro/NovaTransacaoModal';
@@ -201,6 +201,33 @@ export default function TransacoesPage() {
     .reduce((acc, t) => acc + t.valor, 0);
 
   const saldo = totalReceitas - totalDespesas;
+
+  const getDiasStatus = (dataTransacao: Date) => {
+    const hoje = startOfDay(new Date());
+    const dataT = startOfDay(dataTransacao);
+    const dias = differenceInDays(dataT, hoje);
+
+    if (dias === 0) {
+      return {
+        label: 'Vence hoje',
+        className: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20'
+      };
+    }
+
+    if (dias < 0) {
+      const atraso = Math.abs(dias);
+      return {
+        label: `Atrasado ${atraso} ${atraso === 1 ? 'dia' : 'dias'}`,
+        className: 'bg-red-500/10 text-red-500 border-red-500/20'
+      };
+    }
+
+    return {
+      label: `Faltam ${dias} ${dias === 1 ? 'dia' : 'dias'}`,
+      className: 'bg-zinc-500/10 text-zinc-400 border-zinc-800'
+    };
+  };
+
 
   return (
     <div className="bg-zinc-950 p-4 lg:p-6 space-y-4 sm:space-y-6">
@@ -447,6 +474,9 @@ export default function TransacoesPage() {
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
                       {format(new Date(transacao.data), "dd 'de' MMM", { locale: ptBR })}
+                      <span className={`ml-2 px-2 py-0.5 rounded text-[10px] border font-medium ${getDiasStatus(new Date(transacao.data)).className}`}>
+                        {getDiasStatus(new Date(transacao.data)).label}
+                      </span>
                     </div>
                     {transacao.categoria && (
                       <div className="flex items-center gap-1">
