@@ -156,19 +156,34 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
 
         await db.transacoes.put(transacaoAtualizada);
 
-        // Atualizar data das próximas parcelas/fixas se a data mudou
-        if (transacaoParaEditar.grupoParcelaId && dataSelecionadaLocal.getTime() !== new Date(transacaoParaEditar.data).getTime()) {
-          const proximas = await db.transacoes
-            .where('grupoParcelaId')
-            .equals(transacaoParaEditar.grupoParcelaId)
-            .filter(t => new Date(t.data).getTime() > new Date(transacaoParaEditar.data).getTime())
-            .toArray();
+        // Atualizar data e categoria das próximas parcelas/fixas se houve mudança
+        if (transacaoParaEditar.grupoParcelaId) {
+          const dataMudou = dataSelecionadaLocal.getTime() !== new Date(transacaoParaEditar.data).getTime();
+          const categoriaMudou = categoriaId !== transacaoParaEditar.categoriaId;
 
-          for (const t of proximas) {
-            const dtT = new Date(t.data);
-            // Manter o mês e ano original daquela parcela, mas mudar para o novo dia
-            const novaData = new Date(dtT.getFullYear(), dtT.getMonth(), day);
-            await db.transacoes.update(t.id, { data: novaData });
+          if (dataMudou || categoriaMudou) {
+            const proximas = await db.transacoes
+              .where('grupoParcelaId')
+              .equals(transacaoParaEditar.grupoParcelaId)
+              .filter(t => new Date(t.data).getTime() > new Date(transacaoParaEditar.data).getTime())
+              .toArray();
+
+            for (const t of proximas) {
+              const updates: any = {};
+
+              if (dataMudou) {
+                const dtT = new Date(t.data);
+                updates.data = new Date(dtT.getFullYear(), dtT.getMonth(), day);
+              }
+
+              if (categoriaMudou) {
+                updates.categoriaId = categoriaId;
+              }
+
+              if (Object.keys(updates).length > 0) {
+                await db.transacoes.update(t.id, updates);
+              }
+            }
           }
         }
 
