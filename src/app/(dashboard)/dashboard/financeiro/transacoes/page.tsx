@@ -150,43 +150,45 @@ export default function TransacoesPage() {
         transacoesParaExcluir = await db.transacoes
           .where('grupoParcelaId')
           .equals(selectedForDelete.grupoParcelaId)
-          .filter(t => new Date(t.data) >= new Date(selectedForDelete.data))
+          .filter(t => new Date(t.data).getTime() >= new Date(selectedForDelete.data).getTime())
           .toArray();
       } else if (selectedForDelete.isFixa) {
         // Buscar transações fixas com mesma descrição e categoria a partir desta data
         transacoesParaExcluir = await db.transacoes
           .where('descricao')
           .equals(selectedForDelete.descricao)
-          .and(t =>
+          .filter(t =>
             t.isFixa === true &&
             t.categoriaId === selectedForDelete.categoriaId &&
-            new Date(t.data) >= new Date(selectedForDelete.data)
+            new Date(t.data).getTime() >= new Date(selectedForDelete.data).getTime()
           )
           .toArray();
       }
 
-      for (const t of transacoesParaExcluir) {
-        // Estornar saldo de cada uma
-        if (t.contaBancariaId && t.contaBancariaId !== 'caixa-geral') {
-          const conta = await db.contasBancarias.get(t.contaBancariaId);
-          if (conta) {
-            const estorno = t.tipo === 'RECEITA' ? -Number(t.valor) : Number(t.valor);
-            await db.contasBancarias.update(t.contaBancariaId, {
-              saldoAtual: Number(conta.saldoAtual) + estorno
-            });
+      await db.transaction('rw', db.transacoes, db.contasBancarias, async () => {
+        for (const t of transacoesParaExcluir) {
+          // Estornar saldo de cada uma
+          if (t.contaBancariaId && t.contaBancariaId !== 'caixa-geral') {
+            const conta = await db.contasBancarias.get(t.contaBancariaId);
+            if (conta) {
+              const estorno = t.tipo === 'RECEITA' ? -Number(t.valor) : Number(t.valor);
+              await db.contasBancarias.update(t.contaBancariaId, {
+                saldoAtual: Number(conta.saldoAtual) + estorno
+              });
+            }
           }
+          await db.transacoes.delete(t.id);
         }
-        await db.transacoes.delete(t.id);
-      }
+      });
 
       toast.dismiss(loadingToast);
       toast.success(`${transacoesParaExcluir.length} transações excluídas!`);
       setDeleteGroupModalOpen(false);
       setSelectedForDelete(null);
-    } catch (error) {
+    } catch (error: any) {
       toast.dismiss(loadingToast);
-      console.error('Erro ao excluir série:', error);
-      toast.error('Erro ao excluir série de transações.');
+      console.error('Erro detalhado ao excluir série:', error);
+      toast.error(`Erro ao excluir série: ${error.message || 'Erro desconhecido'}`);
     }
   };
 
