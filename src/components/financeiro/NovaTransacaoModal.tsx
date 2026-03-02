@@ -173,16 +173,17 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
       } else {
         // Lógica de Criação
         const idGrupo = crypto.randomUUID();
-        const numParcelas = isParcela ? parseInt(parcelaTotais) : 1;
+        // Se for fixa, geramos 24 meses. Se for parcela, usamos o total informado.
+        const numParcelasTotal = isParcela ? parseInt(parcelaTotais) : (isFixa ? 24 : 1);
 
-        for (let i = 0; i < numParcelas; i++) {
+        for (let i = 0; i < numParcelasTotal; i++) {
           const dt = new Date(data);
           dt.setMonth(dt.getMonth() + i);
 
           const transacao = {
             id: crypto.randomUUID(),
-            descricao: isParcela ? `${descricao} (${i + 1}/${numParcelas})` : descricao,
-            valor: valorNumerico, // Agora o valor é por parcela, sem divisão
+            descricao: isParcela ? `${descricao} (${i + 1}/${numParcelasTotal})` : descricao,
+            valor: valorNumerico,
             data: dt,
             tipo,
             observacoes: observacoes || undefined,
@@ -192,15 +193,16 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
             isFixa,
             isParcela,
             parcelaNumero: isParcela ? i + 1 : undefined,
-            parcelaTotais: isParcela ? numParcelas : undefined,
-            grupoParcelaId: isParcela ? idGrupo : undefined,
+            parcelaTotais: isParcela ? numParcelasTotal : undefined,
+            grupoParcelaId: (isParcela || isFixa) ? idGrupo : undefined,
             createdAt: new Date(),
             updatedAt: new Date(),
           };
 
           await db.transacoes.add(transacao);
 
-          if (contaBancariaId !== 'caixa-geral' && (!isParcela || i === 0)) {
+          // Atualizar saldo apenas para a primeira ocorrência (mês atual da transação)
+          if (contaBancariaId !== 'caixa-geral' && i === 0) {
             const conta = await db.contasBancarias.get(contaBancariaId);
             if (conta) {
               const saldoDiff = tipo === 'RECEITA' ? transacao.valor : -transacao.valor;
@@ -388,17 +390,16 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
 
               {/* Opções Especiais */}
               <div className="grid grid-cols-2 gap-4">
-                {/* Despesa Fixa */}
+                {/* Transação Fixa */}
                 <div className="space-y-4 p-4 bg-zinc-900/30 rounded-lg border border-zinc-800">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-zinc-300">Despesa Fixa</Label>
+                      <Label className="text-zinc-300">Transação Fixa</Label>
                       <p className="text-xs text-zinc-500">Repete mensalmente</p>
                     </div>
                     <Switch
                       checked={isFixa}
                       onCheckedChange={setIsFixa}
-                      disabled={tipo === 'RECEITA'}
                     />
                   </div>
                 </div>
