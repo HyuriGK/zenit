@@ -117,13 +117,17 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
     try {
       const valorNumerico = parseFloat(valor.replace(',', '.'));
 
+      // FIX: Parse date as LOCAL instead of UTC to avoid timezone shift
+      const [year, month, day] = data.split('-').map(Number);
+      const dataSelecionadaLocal = new Date(year, month - 1, day);
+
       if (transacaoParaEditar) {
         // Lógica de Edição
         const transacaoAtualizada = {
           ...transacaoParaEditar,
           descricao,
           valor: valorNumerico,
-          data: new Date(data),
+          data: dataSelecionadaLocal,
           tipo,
           observacoes: observacoes || undefined,
           categoriaId: categoriaId || undefined,
@@ -132,6 +136,22 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
           isFixa,
           updatedAt: new Date(),
         };
+
+        // Se era individual e agora é fixa, gerar as próximas 23 (total 24)
+        if (!transacaoParaEditar.isFixa && isFixa) {
+          const idGrupo = crypto.randomUUID();
+          transacaoAtualizada.grupoParcelaId = idGrupo;
+
+          for (let i = 1; i < 24; i++) {
+            const dt = new Date(year, month - 1 + i, day);
+            await db.transacoes.add({
+              ...transacaoAtualizada,
+              id: crypto.randomUUID(),
+              data: dt,
+              createdAt: new Date(),
+            });
+          }
+        }
 
         await db.transacoes.put(transacaoAtualizada);
 
@@ -177,8 +197,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
         const numParcelasTotal = isParcela ? parseInt(parcelaTotais) : (isFixa ? 24 : 1);
 
         for (let i = 0; i < numParcelasTotal; i++) {
-          const dt = new Date(data);
-          dt.setMonth(dt.getMonth() + i);
+          const dt = new Date(year, month - 1 + i, day);
 
           const transacao = {
             id: crypto.randomUUID(),
