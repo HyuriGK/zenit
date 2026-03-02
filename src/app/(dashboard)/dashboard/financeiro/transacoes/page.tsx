@@ -6,6 +6,7 @@ import { db, initCategoriasPadrao } from '@/lib/dexie';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Plus,
   TrendingUp,
@@ -21,6 +22,7 @@ import {
   Trash2,
   ArrowUpDown,
   ArrowLeft,
+  Check,
 } from 'lucide-react';
 import { formatarMoeda } from '@/lib/financeiro-helper';
 import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, addMonths, isSameMonth, differenceInDays, startOfDay } from 'date-fns';
@@ -51,6 +53,7 @@ interface Transacao {
   cartao?: {
     nome: string;
   };
+  paga?: boolean;
 }
 
 export default function TransacoesPage() {
@@ -231,6 +234,16 @@ export default function TransacoesPage() {
       label: `Faltam ${dias} ${dias === 1 ? 'dia' : 'dias'}`,
       className: 'bg-zinc-500/10 text-zinc-400 border-zinc-800'
     };
+  };
+
+  const handleTogglePaga = async (id: string, atual: boolean) => {
+    try {
+      await db.transacoes.update(id, { paga: !atual });
+      toast.success(!atual ? 'Transação marcada como paga!' : 'Transação marcada como pendente.');
+    } catch (error) {
+      console.error('Erro ao atualizar status:', error);
+      toast.error('Erro ao atualizar status de pagamento.');
+    }
   };
 
 
@@ -452,46 +465,62 @@ export default function TransacoesPage() {
           {transacoesFiltradas.map((transacao) => (
             <Card
               key={transacao.id}
-              className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 transition-all group hover:shadow-lg"
+              className={`bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 transition-all group hover:shadow-lg ${transacao.paga ? 'opacity-60 grayscale-[0.5]' : ''}`}
             >
               <div className="p-4 flex items-center gap-4">
+                {/* Checkbox de Pagamento */}
+                <div className="flex items-center justify-center p-1">
+                  <Checkbox
+                    checked={transacao.paga || false}
+                    onCheckedChange={() => handleTogglePaga(transacao.id, transacao.paga || false)}
+                    className={`h-6 w-6 border-2 transition-all ${transacao.paga
+                        ? 'bg-green-600 border-green-600 text-white'
+                        : 'border-zinc-700 hover:border-green-500'
+                      }`}
+                  />
+                </div>
+
                 <div
-                  className={`relative p-3 rounded-xl ${transacao.tipo === 'RECEITA'
+                  className={`relative p-3 rounded-xl flex-shrink-0 ${transacao.tipo === 'RECEITA'
                     ? 'bg-green-500/10'
                     : 'bg-red-500/10'
                     }`}
                 >
                   {transacao.tipo === 'RECEITA' ? (
-                    <TrendingUp className="w-6 h-6 text-green-400" />
+                    <TrendingUp className="w-5 h-5 text-green-400" />
                   ) : (
-                    <TrendingDown className="w-6 h-6 text-red-400" />
+                    <TrendingDown className="w-5 h-5 text-red-400" />
+                  )}
+                  {transacao.paga && (
+                    <div className="absolute -top-1 -right-1 bg-green-500 rounded-full p-0.5 border-2 border-zinc-950">
+                      <Check className="w-3 h-3 text-white" />
+                    </div>
                   )}
                 </div>
 
                 {/* Informações */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-semibold text-white truncate">
+                    <h3 className={`font-bold text-base leading-none ${transacao.paga ? 'text-zinc-400 line-through' : 'text-white'}`}>
                       {transacao.descricao}
                     </h3>
-                    {transacao.isFixa && (
-                      <span className="px-2 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded-full">
-                        Fixa
-                      </span>
-                    )}
-                    {transacao.isParcela && (
-                      <span className="px-2 py-0.5 bg-green-500/20 text-green-400 text-xs rounded-full">
-                        {transacao.parcelaNumero}/{transacao.parcelaTotais}
-                      </span>
-                    )}
+                    <div className="flex gap-1">
+                      {transacao.isFixa && (
+                        <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400 text-[10px] font-bold rounded uppercase">
+                          Fixa
+                        </span>
+                      )}
+                      {transacao.isParcela && (
+                        <span className="px-1.5 py-0.5 bg-purple-500/10 text-purple-400 text-[10px] font-bold rounded uppercase">
+                          {transacao.parcelaNumero}/{transacao.parcelaTotais}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-3 text-sm text-zinc-400">
+                  <div className="flex items-center gap-3 text-[12px] text-zinc-500">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
                       {format(new Date(transacao.data), "dd 'de' MMM", { locale: ptBR })}
-                      <span className={`ml-2 px-2 py-0.5 rounded text-[10px] border font-medium ${getDiasStatus(new Date(transacao.data)).className}`}>
-                        {getDiasStatus(new Date(transacao.data)).label}
-                      </span>
                     </div>
                     {transacao.categoria && (
                       <div className="flex items-center gap-1">
@@ -499,42 +528,45 @@ export default function TransacoesPage() {
                           className="w-2 h-2 rounded-full"
                           style={{ backgroundColor: transacao.categoria.cor }}
                         />
-                        {transacao.categoria.nome}
+                        <span className="text-zinc-400">{transacao.categoria.nome}</span>
                       </div>
                     )}
                     {transacao.contaBancaria && (
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-1 border-l border-zinc-800 pl-3">
                         <Wallet className="w-3.5 h-3.5" />
                         {transacao.contaBancaria.nome}
                       </div>
                     )}
-                    {transacao.cartao && (
-                      <div className="flex items-center gap-1">
-                        <CreditCard className="w-3.5 h-3.5" />
-                        {transacao.cartao.nome}
-                      </div>
-                    )}
                   </div>
                 </div>
 
-                {/* Valor */}
-                <div className="text-right">
+                {/* Valor e Status de Vencimento */}
+                <div className="text-right flex flex-col items-end gap-1.5 min-w-[120px]">
                   <div
-                    className={`text-xl font-bold ${transacao.tipo === 'RECEITA' ? 'text-green-400' : 'text-red-400'
-                      }`}
+                    className={`text-lg font-black tracking-tight ${transacao.tipo === 'RECEITA' ? 'text-green-400' : 'text-red-400'
+                      } ${transacao.paga ? 'opacity-40' : ''}`}
                   >
                     {transacao.tipo === 'RECEITA' ? '+' : '-'} {formatarMoeda(transacao.valor)}
                   </div>
+                  {!transacao.paga && (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] border font-bold uppercase tracking-wider ${getDiasStatus(new Date(transacao.data)).className}`}>
+                      {getDiasStatus(new Date(transacao.data)).label}
+                    </span>
+                  )}
+                  {transacao.paga && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] border border-green-500/20 bg-green-500/10 text-green-500 font-bold uppercase tracking-wider">
+                      Pago
+                    </span>
+                  )}
                 </div>
 
-                {/* Ações Diretas */}
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Ações */}
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
                   <Button
                     variant="ghost"
                     size="icon"
                     onClick={() => handleEditar(transacao)}
-                    className="h-8 w-8 text-zinc-400 hover:text-white hover:bg-zinc-800"
-                    title="Editar"
+                    className="h-8 w-8 text-zinc-500 hover:text-white hover:bg-zinc-800"
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
@@ -542,8 +574,7 @@ export default function TransacoesPage() {
                     variant="ghost"
                     size="icon"
                     onClick={() => handleExcluir(transacao.id)}
-                    className="h-8 w-8 text-zinc-400 hover:text-red-400 hover:bg-red-500/10"
-                    title="Excluir"
+                    className="h-8 w-8 text-zinc-500 hover:text-red-400 hover:bg-red-500/10"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

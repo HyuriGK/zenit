@@ -59,6 +59,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
   // Flags especiais
   const [isFixa, setIsFixa] = useState(false);
   const [isParcela, setIsParcela] = useState(false);
+  const [paga, setPaga] = useState(false);
   const [parcelaTotais, setParcelaTotais] = useState('1');
 
   // Listas do Dexie
@@ -83,7 +84,8 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
         setContaBancariaId(transacaoParaEditar.contaBancariaId || '');
         setCartaoId(transacaoParaEditar.cartaoId || '');
         setIsFixa(transacaoParaEditar.isFixa || false);
-        setIsParcela(false); // Não editamos parcelamento de uma transação já existente individualmente
+        setIsParcela(false);
+        setPaga(transacaoParaEditar.paga || false);
         setParcelaTotais('1');
       } else {
         limparFormulario();
@@ -135,6 +137,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
           contaBancariaId,
           cartaoId: cartaoId || undefined,
           isFixa,
+          paga,
           updatedAt: new Date(),
         };
 
@@ -243,6 +246,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
             cartaoId: cartaoId || undefined,
             isFixa,
             isParcela,
+            paga,
             parcelaNumero: isParcela ? i + 1 : undefined,
             parcelaTotais: isParcela ? numParcelasTotal : undefined,
             grupoParcelaId: (isParcela || isFixa) ? idGrupo : undefined,
@@ -285,6 +289,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
     setCartaoId('');
     setIsFixa(false);
     setIsParcela(false);
+    setPaga(false);
     setParcelaTotais('1');
   };
 
@@ -439,8 +444,23 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                 </div>
               </div>
 
-              {/* Opções Especiais */}
-              <div className="grid grid-cols-2 gap-4">
+              {/* Pagamento e Opções Especiais */}
+              <div className="grid grid-cols-3 gap-4">
+                {/* Status de Pagamento */}
+                <div className="space-y-4 p-4 bg-zinc-900/30 rounded-lg border border-zinc-700/50 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-zinc-300 font-bold">Status de Pagamento</Label>
+                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Paga / Recebida</p>
+                    </div>
+                    <Switch
+                      checked={paga}
+                      onCheckedChange={setPaga}
+                      className="data-[state=checked]:bg-green-600"
+                    />
+                  </div>
+                </div>
+
                 {/* Transação Fixa */}
                 <div className="space-y-4 p-4 bg-zinc-900/30 rounded-lg border border-zinc-800">
                   <div className="flex items-center justify-between">

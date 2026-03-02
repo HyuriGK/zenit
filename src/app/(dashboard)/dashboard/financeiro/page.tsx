@@ -162,13 +162,13 @@ export default function FinanceiroDashboardPage() {
           {/* Saldo Total */}
           <Card className="bg-zinc-900 border-zinc-800">
             <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3">
-              <CardTitle className="text-[10px] uppercase tracking-wider font-semibold text-zinc-500">
+              <CardTitle className="text-[12px] uppercase tracking-wider font-bold text-zinc-400">
                 Saldo Total
               </CardTitle>
-              <Wallet className="w-3 h-3 text-green-500" />
+              <Wallet className="w-4 h-4 text-green-500" />
             </CardHeader>
             <CardContent className="pb-3 px-3">
-              <div className="text-lg font-bold text-white leading-none">
+              <div className="text-xl sm:text-2xl font-black text-white leading-none">
                 {formatarMoeda(dashboard.saldoContas)}
               </div>
             </CardContent>
@@ -177,13 +177,13 @@ export default function FinanceiroDashboardPage() {
           {/* Receitas do Mês */}
           <Card className="bg-zinc-900 border-zinc-800">
             <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3">
-              <CardTitle className="text-[10px] uppercase tracking-wider font-semibold text-zinc-500">
+              <CardTitle className="text-[12px] uppercase tracking-wider font-bold text-zinc-400">
                 Receitas
               </CardTitle>
-              <TrendingUp className="w-3 h-3 text-green-500" />
+              <TrendingUp className="w-4 h-4 text-green-500" />
             </CardHeader>
             <CardContent className="pb-3 px-3">
-              <div className="text-lg font-bold text-green-500 leading-none">
+              <div className="text-xl sm:text-2xl font-black text-green-500 leading-none">
                 {formatarMoeda(dashboard.resumoMensal.receitas)}
               </div>
             </CardContent>
@@ -192,13 +192,13 @@ export default function FinanceiroDashboardPage() {
           {/* Despesas do Mês */}
           <Card className="bg-zinc-900 border-zinc-800">
             <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3">
-              <CardTitle className="text-[10px] uppercase tracking-wider font-semibold text-zinc-500">
+              <CardTitle className="text-[12px] uppercase tracking-wider font-bold text-zinc-400">
                 Despesas
               </CardTitle>
-              <TrendingDown className="w-3 h-3 text-red-500" />
+              <TrendingDown className="w-4 h-4 text-red-500" />
             </CardHeader>
             <CardContent className="pb-3 px-3">
-              <div className="text-lg font-bold text-red-500 leading-none">
+              <div className="text-xl sm:text-2xl font-black text-red-500 leading-none">
                 {formatarMoeda(dashboard.resumoMensal.despesas)}
               </div>
             </CardContent>
@@ -207,13 +207,13 @@ export default function FinanceiroDashboardPage() {
           {/* Sobra Mensal */}
           <Card className="bg-zinc-900 border-zinc-800">
             <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3">
-              <CardTitle className="text-[10px] uppercase tracking-wider font-semibold text-zinc-500">
+              <CardTitle className="text-[12px] uppercase tracking-wider font-bold text-zinc-400">
                 Sobra
               </CardTitle>
-              <Target className="w-3 h-3 text-green-500" />
+              <Target className="w-4 h-4 text-green-500" />
             </CardHeader>
             <CardContent className="pb-3 px-3">
-              <div className="text-lg font-bold text-white leading-none">
+              <div className="text-xl sm:text-2xl font-black text-white leading-none">
                 {formatarMoeda(dashboard.resumoMensal.sobra)}
               </div>
             </CardContent>
@@ -225,7 +225,7 @@ export default function FinanceiroDashboardPage() {
           {/* Gastos por Categoria */}
           <Card className="bg-zinc-900 border-zinc-800 flex flex-col min-h-0">
             <CardHeader className="py-3 px-4 flex-shrink-0">
-              <CardTitle className="text-sm text-white">Gastos por Categoria</CardTitle>
+              <CardTitle className="text-sm font-bold text-white uppercase tracking-tight">Gastos por Categoria</CardTitle>
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto px-4 pb-4 scrollbar-thin scrollbar-thumb-zinc-800">
               {dashboard.gastosPorCategoria.length === 0 ? (
@@ -239,20 +239,20 @@ export default function FinanceiroDashboardPage() {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div
-                            className="w-2 h-2 rounded-full"
+                            className="w-2.5 h-2.5 rounded-full"
                             style={{ backgroundColor: cat.cor }}
                           />
-                          <span className="text-xs text-zinc-300 truncate max-w-[120px]">
+                          <span className="text-[13px] text-zinc-300 truncate max-w-[150px] font-medium">
                             {cat.categoriaNome}
                           </span>
                         </div>
-                        <span className="text-xs font-medium text-white">
+                        <span className="text-[13px] font-bold text-white">
                           {formatarMoeda(cat.total)}
                         </span>
                       </div>
-                      <div className="w-full bg-zinc-800 rounded-full h-1.5">
+                      <div className="w-full bg-zinc-800 rounded-full h-2">
                         <div
-                          className="h-1.5 rounded-full transition-all"
+                          className="h-2 rounded-full transition-all"
                           style={{
                             width: `${cat.porcentagem}%`,
                             backgroundColor: cat.cor,
@@ -269,36 +269,36 @@ export default function FinanceiroDashboardPage() {
           {/* Resumo Financeiro */}
           <Card className="bg-zinc-900 border-zinc-800 flex flex-col min-h-0">
             <CardHeader className="py-3 px-4 flex-shrink-0">
-              <CardTitle className="text-sm text-white">Resumo Financeiro</CardTitle>
+              <CardTitle className="text-sm font-bold text-white uppercase tracking-tight">Resumo Mensal</CardTitle>
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto px-4 pb-4 space-y-2 text-xs scrollbar-thin scrollbar-thumb-zinc-800">
-              <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
-                <span className="text-zinc-400">Receitas</span>
-                <span className="text-green-500 font-medium">
+              <div className="flex justify-between items-center py-2.5 border-b border-zinc-800/50">
+                <span className="text-zinc-400 font-medium">Receitas</span>
+                <span className="text-green-500 font-bold text-sm">
                   {formatarMoeda(dashboard.resumoMensal.receitas)}
                 </span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
-                <span className="text-zinc-400">Despesas Fixas</span>
-                <span className="text-red-500 font-medium">
+              <div className="flex justify-between items-center py-2.5 border-b border-zinc-800/50">
+                <span className="text-zinc-400 font-medium">Despesas Fixas</span>
+                <span className="text-red-500 font-bold text-sm">
                   {formatarMoeda(dashboard.resumoMensal.despesasFixas)}
                 </span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
-                <span className="text-zinc-400">Despesas Variáveis</span>
-                <span className="text-red-500 font-medium">
+              <div className="flex justify-between items-center py-2.5 border-b border-zinc-800/50">
+                <span className="text-zinc-400 font-medium">Despesas Variáveis</span>
+                <span className="text-red-500 font-bold text-sm">
                   {formatarMoeda(dashboard.resumoMensal.despesasVariaveis)}
                 </span>
               </div>
-              <div className="flex justify-between items-center py-2 border-b border-zinc-800/50">
-                <span className="text-zinc-400">Objetivos</span>
-                <span className="text-blue-500 font-medium">
+              <div className="flex justify-between items-center py-2.5 border-b border-zinc-800/50">
+                <span className="text-zinc-400 font-medium">Objetivos</span>
+                <span className="text-blue-500 font-bold text-sm">
                   {formatarMoeda(dashboard.totalObjetivos)}
                 </span>
               </div>
-              <div className="flex justify-between items-center pt-2">
-                <span className="text-white font-semibold">Saldo Livre</span>
-                <span className="text-base font-bold text-white">
+              <div className="flex justify-between items-center pt-3">
+                <span className="text-white font-bold uppercase text-[11px]">Saldo Disponível</span>
+                <span className="text-xl font-black text-white">
                   {formatarMoeda(dashboard.saldoLivre)}
                 </span>
               </div>
@@ -307,34 +307,24 @@ export default function FinanceiroDashboardPage() {
         </div>
 
         {/* Links Rápidos */}
-        <div className="grid grid-cols-3 gap-2 flex-shrink-0 pb-2">
+        <div className="grid grid-cols-2 gap-2 flex-shrink-0 pb-2">
           <Button
-            className="h-12 bg-zinc-900 border-zinc-800 hover:bg-zinc-800 px-2"
-            onClick={() => window.location.href = '/dashboard/financeiro/contas'}
-          >
-            <div className="flex items-center gap-2">
-              <Wallet className="w-4 h-4 text-green-500" />
-              <div className="text-[10px] text-zinc-300 font-medium">Contas</div>
-            </div>
-          </Button>
-
-          <Button
-            className="h-12 bg-zinc-900 border-zinc-800 hover:bg-zinc-800 px-2"
+            className="h-14 bg-zinc-900 border-zinc-800 hover:bg-zinc-800 px-4 group transition-all hover:border-blue-500/50"
             onClick={() => window.location.href = '/dashboard/financeiro/transacoes'}
           >
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-blue-500" />
-              <div className="text-[10px] text-zinc-300 font-medium">Transações</div>
+            <div className="flex items-center gap-3">
+              <TrendingUp className="w-5 h-5 text-blue-500 group-hover:scale-110 transition-transform" />
+              <div className="text-sm text-zinc-300 font-bold uppercase tracking-tight">Minhas Transações</div>
             </div>
           </Button>
 
           <Button
-            className="h-12 bg-zinc-900 border-zinc-800 hover:bg-zinc-800 px-2"
+            className="h-14 bg-zinc-900 border-zinc-800 hover:bg-zinc-800 px-4 group transition-all hover:border-orange-500/50"
             onClick={() => window.location.href = '/dashboard/financeiro/objetivos'}
           >
-            <div className="flex items-center gap-2">
-              <Target className="w-4 h-4 text-orange-500" />
-              <div className="text-[10px] text-zinc-300 font-medium">Objetivos</div>
+            <div className="flex items-center gap-3">
+              <Target className="w-5 h-5 text-orange-500 group-hover:scale-110 transition-transform" />
+              <div className="text-sm text-zinc-300 font-bold uppercase tracking-tight">Meus Objetivos</div>
             </div>
           </Button>
         </div>

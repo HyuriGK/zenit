@@ -102,6 +102,7 @@ export interface Transacao {
     contaBancariaId?: string;
     cartaoId?: string;
     objetivoId?: string;
+    paga?: boolean;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -407,14 +408,14 @@ export class ZenitDB extends Dexie {
 
     constructor() {
         super('ZenitDB');
-        this.version(3).stores({
+        this.version(4).stores({
             users: 'id',
             compromissos: 'id, data, recorrenciaGrupoId',
             atividades: 'id, createdAt',
             contasBancarias: 'id, ativa',
             cartoes: 'id, ativo',
             categorias: 'id, tipo, nome',
-            transacoes: 'id, data, tipo, categoriaId, contaBancariaId, grupoParcelaId, descricao',
+            transacoes: 'id, data, tipo, categoriaId, contaBancariaId, grupoParcelaId, descricao, paga',
             objetivosFinanceiros: 'id, status',
             viagens: 'id, status, dataInicio',
             destinosViagem: 'id, viagemId',
