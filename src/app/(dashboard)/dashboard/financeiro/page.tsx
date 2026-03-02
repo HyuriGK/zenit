@@ -84,7 +84,8 @@ export default function FinanceiroDashboardPage() {
       }
     });
 
-    const saldoContas = contasData.reduce((acc, c) => acc + Number(c.saldoAtual), 0);
+    // Saldo do Mês (Receitas - Despesas)
+    const saldoMensal = receitas - despesas;
     const totalObjetivos = objetivosData.reduce((acc, o) => acc + Number(o.valorAtual), 0);
 
     // Preparar array de gastos por categoria
@@ -105,15 +106,15 @@ export default function FinanceiroDashboardPage() {
       resumoMensal: {
         receitas,
         despesas,
-        saldo: receitas - despesas,
+        saldo: saldoMensal,
         despesasFixas,
         despesasVariaveis,
-        sobra: receitas - despesasFixas
+        sobra: receitas - despesasFixas // Sobra após fixas
       },
       gastosPorCategoria: gastosPorCategoriaInfo,
-      saldoContas,
+      saldoContas: saldoMensal, // Agora reflete o saldo do mês
       totalObjetivos,
-      saldoLivre: saldoContas - totalObjetivos, // simplification
+      saldoLivre: saldoMensal - totalObjetivos,
       estatisticas: {
         totalContas: contasData.length,
         totalCategorias: categoriasData.length,
@@ -157,67 +158,51 @@ export default function FinanceiroDashboardPage() {
       </div>
 
       <div className="flex-1 flex flex-col min-h-0 space-y-3">
-        {/* Cards de Resumo */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 flex-shrink-0">
-          {/* Saldo Total */}
-          <Card className="bg-zinc-900 border-zinc-800">
-            <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3">
-              <CardTitle className="text-[12px] uppercase tracking-wider font-bold text-zinc-400">
-                Saldo Total
-              </CardTitle>
-              <Wallet className="w-4 h-4 text-green-500" />
-            </CardHeader>
-            <CardContent className="pb-3 px-3">
-              <div className="text-xl sm:text-2xl font-black text-white leading-none">
-                {formatarMoeda(dashboard.saldoContas)}
-              </div>
-            </CardContent>
-          </Card>
+        {/* Cards de Resumo Minimalistas (Sem fundo/borda) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 flex-shrink-0 px-2 py-4">
+          {/* Saldo Mensal */}
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Wallet className="w-3.5 h-3.5 text-zinc-500" />
+              <span className="text-[12px] uppercase tracking-wider font-bold text-zinc-500">Saldo Mensal</span>
+            </div>
+            <div className="text-xl sm:text-3xl font-black text-white leading-none">
+              {formatarMoeda(dashboard.resumoMensal.saldo)}
+            </div>
+          </div>
 
           {/* Receitas do Mês */}
-          <Card className="bg-zinc-900 border-zinc-800">
-            <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3">
-              <CardTitle className="text-[12px] uppercase tracking-wider font-bold text-zinc-400">
-                Receitas
-              </CardTitle>
-              <TrendingUp className="w-4 h-4 text-green-500" />
-            </CardHeader>
-            <CardContent className="pb-3 px-3">
-              <div className="text-xl sm:text-2xl font-black text-green-500 leading-none">
-                {formatarMoeda(dashboard.resumoMensal.receitas)}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <TrendingUp className="w-3.5 h-3.5 text-green-500/50" />
+              <span className="text-[12px] uppercase tracking-wider font-bold text-zinc-500">Receitas</span>
+            </div>
+            <div className="text-xl sm:text-3xl font-black text-green-500 leading-none">
+              {formatarMoeda(dashboard.resumoMensal.receitas)}
+            </div>
+          </div>
 
           {/* Despesas do Mês */}
-          <Card className="bg-zinc-900 border-zinc-800">
-            <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3">
-              <CardTitle className="text-[12px] uppercase tracking-wider font-bold text-zinc-400">
-                Despesas
-              </CardTitle>
-              <TrendingDown className="w-4 h-4 text-red-500" />
-            </CardHeader>
-            <CardContent className="pb-3 px-3">
-              <div className="text-xl sm:text-2xl font-black text-red-500 leading-none">
-                {formatarMoeda(dashboard.resumoMensal.despesas)}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <TrendingDown className="w-3.5 h-3.5 text-red-500/50" />
+              <span className="text-[12px] uppercase tracking-wider font-bold text-zinc-500">Despesas</span>
+            </div>
+            <div className="text-xl sm:text-3xl font-black text-red-500 leading-none">
+              {formatarMoeda(dashboard.resumoMensal.despesas)}
+            </div>
+          </div>
 
           {/* Sobra Mensal */}
-          <Card className="bg-zinc-900 border-zinc-800">
-            <CardHeader className="flex flex-row items-center justify-between pb-1 pt-3 px-3">
-              <CardTitle className="text-[12px] uppercase tracking-wider font-bold text-zinc-400">
-                Sobra
-              </CardTitle>
-              <Target className="w-4 h-4 text-green-500" />
-            </CardHeader>
-            <CardContent className="pb-3 px-3">
-              <div className="text-xl sm:text-2xl font-black text-white leading-none">
-                {formatarMoeda(dashboard.resumoMensal.sobra)}
-              </div>
-            </CardContent>
-          </Card>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <Target className="w-3.5 h-3.5 text-zinc-500" />
+              <span className="text-[12px] uppercase tracking-wider font-bold text-zinc-500">Sobra</span>
+            </div>
+            <div className="text-xl sm:text-3xl font-black text-white leading-none">
+              {formatarMoeda(dashboard.resumoMensal.sobra)}
+            </div>
+          </div>
         </div>
 
         {/* Grid Principal */}
