@@ -16,6 +16,7 @@ import {
   Sparkles,
   Zap,
   Shield,
+  ArrowLeft,
 } from 'lucide-react';
 import { formatarMoeda } from '@/lib/financeiro-helper';
 import { format } from 'date-fns';
@@ -76,9 +77,19 @@ export default function ObjetivosPage() {
                   <Target className="w-8 h-8 text-green-400" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 via-teal-400 to-orange-400 bg-clip-text text-transparent">
-                    Objetivos Financeiros
-                  </h1>
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all"
+                      onClick={() => window.location.href = '/dashboard/financeiro'}
+                    >
+                      <ArrowLeft className="w-5 h-5" />
+                    </Button>
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 via-teal-400 to-orange-400 bg-clip-text text-transparent">
+                      Objetivos Financeiros
+                    </h1>
+                  </div>
                   <p className="text-zinc-400">Transforme seus sonhos em realidade</p>
                 </div>
               </div>

@@ -18,6 +18,7 @@ import {
   Edit,
   Trash2,
   Archive,
+  ArrowLeft,
 } from 'lucide-react';
 import { formatarMoeda } from '@/lib/financeiro-helper';
 import NovaContaModal from '@/components/financeiro/NovaContaModal';
@@ -84,9 +85,19 @@ export default function ContasPage() {
         <div className="relative">
           <div className="flex justify-between items-start mb-6">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                Contas e Cartões
-              </h1>
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all"
+                  onClick={() => window.location.href = '/dashboard/financeiro'}
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </Button>
+                <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                  Contas e Cartões
+                </h1>
+              </div>
               <p className="text-zinc-400 mt-2">Gerencie seus recursos financeiros</p>
             </div>
             <div className="flex gap-3">
