@@ -26,6 +26,7 @@ import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, addMo
 import { ptBR } from 'date-fns/locale';
 import { toast } from 'sonner';
 import NovaTransacaoModal from '@/components/financeiro/NovaTransacaoModal';
+import { DeleteGroupModal } from '@/components/financeiro/DeleteGroupModal';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Transacao {
@@ -62,6 +63,8 @@ export default function TransacoesPage() {
   const [modalAberto, setModalAberto] = useState(false);
   const [transacaoParaEditar, setTransacaoParaEditar] = useState<any>(null);
   const [dataReferencia, setDataReferencia] = useState(() => startOfMonth(new Date()));
+  const [deleteGroupModalOpen, setDeleteGroupModalOpen] = useState(false);
+  const [selectedForDelete, setSelectedForDelete] = useState<any>(null);
 
   const transacoes: Transacao[] = (transacoesData || []).filter(t => {
     const dataTransacao = new Date(t.data);
@@ -103,25 +106,87 @@ export default function TransacoesPage() {
   };
 
   const handleExcluir = async (id: string) => {
-    if (!confirm('Tem certeza que deseja excluir esta transação?')) return;
-
     try {
       const transacao = await db.transacoes.get(id);
-      if (transacao) {
-        // Estornar saldo da conta se não for Caixa Geral
-        if (transacao.contaBancariaId && transacao.contaBancariaId !== 'caixa-geral') {
-          const conta = await db.contasBancarias.get(transacao.contaBancariaId);
-          if (conta) {
-            const estorno = transacao.tipo === 'RECEITA' ? -Number(transacao.valor) : Number(transacao.valor);
-            await db.contasBancarias.update(transacao.contaBancariaId, { saldoAtual: Number(conta.saldoAtual) + estorno });
-          }
-        }
-        await db.transacoes.delete(id);
-        toast.success('Transação excluída!');
+      if (!transacao) return;
+
+      if (transacao.isParcela || transacao.isFixa) {
+        setSelectedForDelete(transacao);
+        setDeleteGroupModalOpen(true);
+      } else {
+        if (!confirm('Tem certeza que deseja excluir esta transação?')) return;
+        await excluirTransacaoIndividual(transacao);
       }
     } catch (error) {
       console.error('Erro ao excluir:', error);
       toast.error('Erro ao excluir transação.');
+    }
+  };
+
+  const excluirTransacaoIndividual = async (transacao: any) => {
+    // Estornar saldo da conta se não for Caixa Geral
+    if (transacao.contaBancariaId && transacao.contaBancariaId !== 'caixa-geral') {
+      const conta = await db.contasBancarias.get(transacao.contaBancariaId);
+      if (conta) {
+        const estorno = transacao.tipo === 'RECEITA' ? -Number(transacao.valor) : Number(transacao.valor);
+        await db.contasBancarias.update(transacao.contaBancariaId, {
+          saldoAtual: Number(conta.saldoAtual) + estorno
+        });
+      }
+    }
+    await db.transacoes.delete(transacao.id);
+    toast.success('Transação excluída!');
+  };
+
+  const handleConfirmDeleteSeries = async () => {
+    if (!selectedForDelete) return;
+    const loadingToast = toast.loading('Excluindo série...');
+
+    try {
+      let transacoesParaExcluir: any[] = [];
+
+      if (selectedForDelete.isParcela && selectedForDelete.grupoParcelaId) {
+        // Buscar parcelas do mesmo grupo a partir desta data
+        transacoesParaExcluir = await db.transacoes
+          .where('grupoParcelaId')
+          .equals(selectedForDelete.grupoParcelaId)
+          .filter(t => new Date(t.data) >= new Date(selectedForDelete.data))
+          .toArray();
+      } else if (selectedForDelete.isFixa) {
+        // Buscar transações fixas com mesma descrição e categoria a partir desta data
+        transacoesParaExcluir = await db.transacoes
+          .where('descricao')
+          .equals(selectedForDelete.descricao)
+          .and(t =>
+            t.isFixa === true &&
+            t.categoriaId === selectedForDelete.categoriaId &&
+            new Date(t.data) >= new Date(selectedForDelete.data)
+          )
+          .toArray();
+      }
+
+      for (const t of transacoesParaExcluir) {
+        // Estornar saldo de cada uma
+        if (t.contaBancariaId && t.contaBancariaId !== 'caixa-geral') {
+          const conta = await db.contasBancarias.get(t.contaBancariaId);
+          if (conta) {
+            const estorno = t.tipo === 'RECEITA' ? -Number(t.valor) : Number(t.valor);
+            await db.contasBancarias.update(t.contaBancariaId, {
+              saldoAtual: Number(conta.saldoAtual) + estorno
+            });
+          }
+        }
+        await db.transacoes.delete(t.id);
+      }
+
+      toast.dismiss(loadingToast);
+      toast.success(`${transacoesParaExcluir.length} transações excluídas!`);
+      setDeleteGroupModalOpen(false);
+      setSelectedForDelete(null);
+    } catch (error) {
+      toast.dismiss(loadingToast);
+      console.error('Erro ao excluir série:', error);
+      toast.error('Erro ao excluir série de transações.');
     }
   };
 
@@ -453,6 +518,28 @@ export default function TransacoesPage() {
         onSucesso={() => {
           // Live query updates automatically
         }}
+      />
+      <DeleteGroupModal
+        open={deleteGroupModalOpen}
+        onClose={() => {
+          setDeleteGroupModalOpen(false);
+          setSelectedForDelete(null);
+        }}
+        onConfirmSingle={() => {
+          if (selectedForDelete) {
+            excluirTransacaoIndividual(selectedForDelete);
+            setDeleteGroupModalOpen(false);
+            setSelectedForDelete(null);
+          }
+        }}
+        onConfirmSeries={handleConfirmDeleteSeries}
+        title={selectedForDelete?.isParcela ? 'Excluir Parcelas' : 'Excluir Transações Fixas'}
+        description={
+          selectedForDelete?.isParcela
+            ? 'Esta transação faz parte de um parcelamento. Deseja excluir apenas este mês ou todas as parcelas restantes?'
+            : 'Esta é uma transação fixa. Deseja excluir apenas este mês ou todas as recorrências futuras?'
+        }
+        isParcela={selectedForDelete?.isParcela}
       />
     </div>
   );
