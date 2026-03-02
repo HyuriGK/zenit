@@ -81,29 +81,45 @@ export default function FinanceiroDashboardPage() {
     if (!contasData || !transacoesData || !categoriasData || !objetivosData) return null;
 
     const hoje = new Date();
-    const inicioMes = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-    const fimMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0, 23, 59, 59);
+    const inicioMes = startOfMonth(hoje);
+    const fimMes = endOfMonth(hoje);
 
     const transacoesMes = transacoesData.filter(t => {
       const d = t.data instanceof Date ? t.data : new Date(t.data);
       return d >= inicioMes && d <= fimMes;
     });
 
+    const inicioMesAnterior = startOfMonth(subMonths(hoje, 1));
+    const fimMesAnterior = endOfMonth(subMonths(hoje, 1));
+    const transacoesMesAnterior = transacoesData.filter(t => {
+      const d = t.data instanceof Date ? t.data : new Date(t.data);
+      return d >= inicioMesAnterior && d <= fimMesAnterior;
+    });
+
     let receitas = 0;
     let despesas = 0;
     let despesasFixas = 0;
     let despesasVariaveis = 0;
+    let gastoCartao = 0;
+
+    let receitasAnterior = 0;
+    let despesasAnterior = 0;
 
     const gastosPorCatMap: Record<string, number> = {};
+    const receitasPorCatMap: Record<string, number> = {};
 
     transacoesMes.forEach(t => {
       const valor = Number(t.valor);
       if (t.tipo === 'RECEITA') {
         receitas += valor;
+        if (t.categoriaId) {
+          receitasPorCatMap[t.categoriaId] = (receitasPorCatMap[t.categoriaId] || 0) + valor;
+        }
       } else {
         despesas += valor;
         if (t.isFixa) despesasFixas += valor;
         else despesasVariaveis += valor;
+        if (t.cartaoId) gastoCartao += valor;
 
         if (t.categoriaId) {
           gastosPorCatMap[t.categoriaId] = (gastosPorCatMap[t.categoriaId] || 0) + valor;
@@ -111,43 +127,79 @@ export default function FinanceiroDashboardPage() {
       }
     });
 
-    // Saldo do Mês (Receitas - Despesas)
-    const saldoMensal = receitas - despesas;
-    const totalObjetivos = objetivosData.reduce((acc, o) => acc + Number(o.valorAtual), 0);
+    transacoesMesAnterior.forEach(t => {
+      if (t.tipo === 'RECEITA') receitasAnterior += Number(t.valor);
+      else despesasAnterior += Number(t.valor);
+    });
 
-    // Preparar array de gastos por categoria
-    const gastosPorCategoriaInfo = Object.keys(gastosPorCatMap).map(catId => {
-      const cat = categoriasData.find(c => c.id === catId);
-      const total = gastosPorCatMap[catId];
-      return {
-        categoriaId: catId,
-        categoriaNome: cat?.nome || 'Outros',
-        cor: cat?.cor || '#6B7280',
-        total,
-        porcentagem: despesas > 0 ? (total / despesas) * 100 : 0
-      };
-    }).sort((a, b) => b.total - a.total);
+    const calcDiff = (atual: number, anterior: number) => {
+      if (anterior === 0) return atual > 0 ? 100 : 0;
+      return ((atual - anterior) / anterior) * 100;
+    };
+
+    const percentSobra = receitas > 0 ? ((receitas - despesas) / receitas) * 100 : 0;
+    const score = Math.max(0, Math.min(100, Math.round(percentSobra * 2)));
+    let statusSaude = 'EXCELENTE';
+    if (score < 30) statusSaude = 'CRITICA';
+    else if (score < 60) statusSaude = 'ALERTA';
+
+    const em7Dias = new Date(hoje.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const proximas = transacoesData.filter(t => {
+      const d = t.data instanceof Date ? t.data : new Date(t.data);
+      return d > hoje && d <= em7Dias && t.tipo === 'DESPESA' && !t.paga;
+    }).sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
+
+    const diasMes = fimMes.getDate();
+    const fluxoCaixa = Array.from({ length: diasMes }, (_, i) => {
+      const dia = i + 1;
+      let rDia = 0;
+      let dDia = 0;
+      transacoesMes.forEach(t => {
+        if (new Date(t.data).getDate() === dia) {
+          if (t.tipo === 'RECEITA') rDia += Number(t.valor);
+          else dDia += Number(t.valor);
+        }
+      });
+      return { dia: String(dia), receita: rDia, despesa: dDia };
+    });
+
+    const parseCategorias = (map: Record<string, number>, totalBase: number) => {
+      return Object.keys(map).map(catId => {
+        const cat = categoriasData.find(c => c.id === catId);
+        const total = map[catId];
+        return {
+          categoriaId: catId,
+          categoriaNome: cat?.nome || 'Outros',
+          cor: cat?.cor || '#6B7280',
+          total,
+          porcentagem: totalBase > 0 ? (total / totalBase) * 100 : 0
+        };
+      }).sort((a, b) => b.total - a.total);
+    };
 
     return {
-      mes: `${hoje.getMonth() + 1}/${hoje.getFullYear()}`,
+      mes: format(hoje, 'MMMM yyyy', { locale: ptBR }),
       resumoMensal: {
         receitas,
         despesas,
-        saldo: saldoMensal,
+        saldo: receitas - despesas,
         despesasFixas,
         despesasVariaveis,
-        sobra: receitas - despesasFixas // Sobra após fixas
+        sobra: receitas - despesasFixas,
+        gastoCartao
       },
-      gastosPorCategoria: gastosPorCategoriaInfo,
-      saldoContas: saldoMensal, // Agora reflete o saldo do mês
-      totalObjetivos,
-      saldoLivre: saldoMensal - totalObjetivos,
-      estatisticas: {
-        totalContas: contasData.length,
-        totalCategorias: categoriasData.length,
-        totalObjetivosAtivos: objetivosData.filter(o => o.status === 'EM_ANDAMENTO').length,
-        totalTransacoesMes: transacoesMes.length
-      }
+      gastosPorCategoria: parseCategorias(gastosPorCatMap, despesas),
+      receitasPorCategoria: parseCategorias(receitasPorCatMap, receitas),
+      comparativo: {
+        receitasPercent: calcDiff(receitas, receitasAnterior),
+        despesasPercent: calcDiff(despesas, despesasAnterior)
+      },
+      saudeFinanceira: { score, status: statusSaude },
+      proximos7Dias: proximas,
+      fluxoCaixa,
+      totalObjetivos: objetivosData.reduce((acc, o) => acc + Number(o.valorAtual), 0),
+      saldoContas: receitas - despesas,
+      saldoLivre: (receitas - despesas) - objetivosData.reduce((acc, o) => acc + Number(o.valorAtual), 0)
     };
   }, [contasData, transacoesData, categoriasData, objetivosData]);
 
@@ -510,25 +562,25 @@ export default function FinanceiroDashboardPage() {
               <div className="text-[10px] text-zinc-600">Comercial</div>
             </div>
           </div>
-      </div>
-      <Card className="bg-zinc-900 border-zinc-800 p-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-purple-500/10 rounded-lg"><DollarSign className="w-4 h-4 text-purple-500" /></div>
-          <div>
-            <div className="text-[10px] font-bold text-zinc-500 uppercase leading-none mb-1">Euro (EUR)</div>
-            <div className="text-base font-black text-white">R$ 6.04</div>
-            <div className="text-[10px] text-zinc-600">Comercial</div>
+        </Card>
+        <Card className="bg-zinc-900 border-zinc-800 p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-500/10 rounded-lg"><DollarSign className="w-4 h-4 text-purple-500" /></div>
+            <div>
+              <div className="text-[10px] font-bold text-zinc-500 uppercase leading-none mb-1">Euro (EUR)</div>
+              <div className="text-base font-black text-white">R$ 6.04</div>
+              <div className="text-[10px] text-zinc-600">Comercial</div>
+            </div>
           </div>
-        </div>
-      </Card>
-    </div>
+        </Card>
+      </div>
 
-      {/* Modal de Nova Transação */ }
-  <NovaTransacaoModal
-    aberto={modalTransacaoAberto}
-    onFechar={() => setModalTransacaoAberto(false)}
-    onSucesso={() => { }}
-  />
+      {/* Modal de Nova Transação */}
+      <NovaTransacaoModal
+        aberto={modalTransacaoAberto}
+        onFechar={() => setModalTransacaoAberto(false)}
+        onSucesso={() => { }}
+      />
     </div >
   );
 }
