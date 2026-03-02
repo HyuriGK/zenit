@@ -72,9 +72,61 @@ export default function FinanceiroDashboardPage() {
   const objetivosData = useLiveQuery(() => db.objetivosFinanceiros.toArray(), []);
 
   const [modalTransacaoAberto, setModalTransacaoAberto] = useState(false);
+  const [indicadores, setIndicadores] = useState<{
+    selic: string;
+    ipca: string;
+    usd: string;
+    eur: string;
+    loading: boolean;
+  }>({
+    selic: '...',
+    ipca: '...',
+    usd: '...',
+    eur: '...',
+    loading: true
+  });
 
   useEffect(() => {
     initCategoriasPadrao();
+  }, []);
+
+  // Buscar Indicadores Econômicos (Brapi)
+  useEffect(() => {
+    const fetchIndicadores = async () => {
+      try {
+        const token = 'u6eKiojA48yU4cMkdLqT8V';
+
+        // 1. Buscar Moedas
+        const resMoedas = await fetch(`https://brapi.dev/api/quote/USDBRL=X,EURBRL=X?token=${token}`);
+        const dataMoedas = await resMoedas.json();
+
+        // 2. Buscar Índices (SELIC/IPCA)
+        const resIndices = await fetch(`https://brapi.dev/api/v2/prime-rate?country=brazil&token=${token}`);
+        const dataIndices = await resIndices.json();
+
+        const usd = dataMoedas.results?.find((r: any) => r.symbol === 'USDBRL=X')?.regularMarketPrice;
+        const eur = dataMoedas.results?.find((r: any) => r.symbol === 'EURBRL=X')?.regularMarketPrice;
+
+        const selic = dataIndices['prime-rate']?.find((i: any) => i.name === 'Selic')?.value;
+        const ipca = dataIndices['prime-rate']?.find((i: any) => i.name === 'IPCA')?.value;
+
+        setIndicadores({
+          usd: usd ? formatarMoeda(usd) : 'N/A',
+          eur: eur ? formatarMoeda(eur) : 'N/A',
+          selic: selic ? `${selic}%` : 'N/A',
+          ipca: ipca ? `${ipca}%` : 'N/A',
+          loading: false
+        });
+      } catch (error) {
+        console.error('Erro ao buscar indicadores Brapi:', error);
+        setIndicadores(prev => ({ ...prev, loading: false }));
+      }
+    };
+
+    fetchIndicadores();
+    // Atualizar a cada 1 hora
+    const interval = setInterval(fetchIndicadores, 3600000);
+    return () => clearInterval(interval);
   }, []);
 
   const dashboard: DashboardData | null = useMemo(() => {
@@ -538,7 +590,9 @@ export default function FinanceiroDashboardPage() {
             <div className="p-2 bg-blue-500/10 rounded-lg"><TrendingUp className="w-4 h-4 text-blue-500" /></div>
             <div>
               <div className="text-[10px] font-bold text-zinc-500 uppercase leading-none mb-1">Taxa Selic</div>
-              <div className="text-base font-black text-white">10.75%</div>
+              <div className="text-base font-black text-white">
+                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-600" /> : indicadores.selic}
+              </div>
               <div className="text-[10px] text-zinc-600">Meta Atual</div>
             </div>
           </div>
@@ -548,7 +602,9 @@ export default function FinanceiroDashboardPage() {
             <div className="p-2 bg-green-500/10 rounded-lg"><TrendingDown className="w-4 h-4 text-green-500" /></div>
             <div>
               <div className="text-[10px] font-bold text-zinc-500 uppercase leading-none mb-1">IPCA (Inflação)</div>
-              <div className="text-base font-black text-white">4.44%</div>
+              <div className="text-base font-black text-white">
+                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-600" /> : indicadores.ipca}
+              </div>
               <div className="text-[10px] text-zinc-600">Acumulado</div>
             </div>
           </div>
@@ -558,7 +614,9 @@ export default function FinanceiroDashboardPage() {
             <div className="p-2 bg-orange-500/10 rounded-lg"><DollarSign className="w-4 h-4 text-orange-500" /></div>
             <div>
               <div className="text-[10px] font-bold text-zinc-500 uppercase leading-none mb-1">Dólar (USD)</div>
-              <div className="text-base font-black text-white">R$ 5.13</div>
+              <div className="text-base font-black text-white">
+                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-600" /> : indicadores.usd}
+              </div>
               <div className="text-[10px] text-zinc-600">Comercial</div>
             </div>
           </div>
@@ -568,7 +626,9 @@ export default function FinanceiroDashboardPage() {
             <div className="p-2 bg-purple-500/10 rounded-lg"><DollarSign className="w-4 h-4 text-purple-500" /></div>
             <div>
               <div className="text-[10px] font-bold text-zinc-500 uppercase leading-none mb-1">Euro (EUR)</div>
-              <div className="text-base font-black text-white">R$ 6.04</div>
+              <div className="text-base font-black text-white">
+                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-600" /> : indicadores.eur}
+              </div>
               <div className="text-[10px] text-zinc-600">Comercial</div>
             </div>
           </div>
