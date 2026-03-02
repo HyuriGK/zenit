@@ -435,4 +435,38 @@ export class ZenitDB extends Dexie {
     }
 }
 
+
 export const db = new ZenitDB();
+
+/**
+ * Inicializa categorias padrão se não existirem
+ */
+export async function initCategoriasPadrao() {
+    try {
+        const defaultCategorias: Array<{ nome: string; tipo: 'RECEITA' | 'DESPESA'; cor: string; icone: string }> = [
+            { nome: 'Alimentação', tipo: 'DESPESA', cor: '#EF4444', icone: 'utensils' },
+            { nome: 'Moradia', tipo: 'DESPESA', cor: '#3B82F6', icone: 'home' },
+            { nome: 'Transporte', tipo: 'DESPESA', cor: '#F59E0B', icone: 'car' },
+            { nome: 'Saúde', tipo: 'DESPESA', cor: '#10B981', icone: 'heart' },
+            { nome: 'Lazer', tipo: 'DESPESA', cor: '#10B981', icone: 'smile' },
+            { nome: 'Uso Pessoal', tipo: 'DESPESA', cor: '#EC4899', icone: 'user' },
+            { nome: 'Outros Gastos', tipo: 'DESPESA', cor: '#6B7280', icone: 'archive' },
+            { nome: 'Salário', tipo: 'RECEITA', cor: '#10B981', icone: 'dollar-sign' },
+            { nome: 'Investimentos', tipo: 'RECEITA', cor: '#3B82F6', icone: 'trending-up' }
+        ];
+
+        for (const cat of defaultCategorias) {
+            const existe = await db.categorias.where('nome').equalsIgnoreCase(cat.nome).first();
+            if (!existe) {
+                await db.categorias.add({
+                    id: crypto.randomUUID(),
+                    ...cat,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                });
+            }
+        }
+    } catch (err) {
+        console.error('Failed to init categories', err);
+    }
+}

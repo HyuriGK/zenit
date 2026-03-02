@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/dexie';
+import { db, initCategoriasPadrao } from '@/lib/dexie';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -72,6 +72,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
 
   useEffect(() => {
     if (aberto) {
+      initCategoriasPadrao();
       if (transacaoParaEditar) {
         setTipo(transacaoParaEditar.tipo);
         setDescricao(transacaoParaEditar.descricao);

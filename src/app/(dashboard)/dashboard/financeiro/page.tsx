@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/dexie';
+import { db, initCategoriasPadrao } from '@/lib/dexie';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wallet, TrendingUp, TrendingDown, Target, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -46,46 +46,8 @@ export default function FinanceiroDashboardPage() {
 
   const [modalTransacaoAberto, setModalTransacaoAberto] = useState(false);
 
-  // Set default categories if none exist
   useEffect(() => {
-    const initCategorias = async () => {
-      try {
-        const count = await db.categorias.count();
-        if (count === 0) {
-          await db.categorias.bulkAdd([
-            { id: crypto.randomUUID(), nome: 'Alimentação', tipo: 'DESPESA', cor: '#EF4444', icone: 'utensils', createdAt: new Date(), updatedAt: new Date() },
-            { id: crypto.randomUUID(), nome: 'Moradia', tipo: 'DESPESA', cor: '#3B82F6', icone: 'home', createdAt: new Date(), updatedAt: new Date() },
-            { id: crypto.randomUUID(), nome: 'Transporte', tipo: 'DESPESA', cor: '#F59E0B', icone: 'car', createdAt: new Date(), updatedAt: new Date() },
-            { id: crypto.randomUUID(), nome: 'Saúde', tipo: 'DESPESA', cor: '#10B981', icone: 'heart', createdAt: new Date(), updatedAt: new Date() },
-            { id: crypto.randomUUID(), nome: 'Lazer', tipo: 'DESPESA', cor: '#10B981', icone: 'smile', createdAt: new Date(), updatedAt: new Date() },
-            { id: crypto.randomUUID(), nome: 'Uso Pessoal', tipo: 'DESPESA', cor: '#EC4899', icone: 'user', createdAt: new Date(), updatedAt: new Date() },
-            { id: crypto.randomUUID(), nome: 'Outros Gastos', tipo: 'DESPESA', cor: '#6B7280', icone: 'archive', createdAt: new Date(), updatedAt: new Date() },
-            { id: crypto.randomUUID(), nome: 'Salário', tipo: 'RECEITA', cor: '#10B981', icone: 'dollar-sign', createdAt: new Date(), updatedAt: new Date() },
-            { id: crypto.randomUUID(), nome: 'Investimentos', tipo: 'RECEITA', cor: '#3B82F6', icone: 'trending-up', createdAt: new Date(), updatedAt: new Date() }
-          ]);
-        } else {
-          // Garantir que as novas categorias sejam adicionadas para usuários existentes
-          const novas = ['Uso Pessoal', 'Outros Gastos'];
-          for (const nome of novas) {
-            const existe = await db.categorias.where('nome').equals(nome).first();
-            if (!existe) {
-              await db.categorias.add({
-                id: crypto.randomUUID(),
-                nome,
-                tipo: 'DESPESA',
-                cor: nome === 'Uso Pessoal' ? '#EC4899' : '#6B7280',
-                icone: nome === 'Uso Pessoal' ? 'user' : 'archive',
-                createdAt: new Date(),
-                updatedAt: new Date()
-              });
-            }
-          }
-        }
-      } catch (err) {
-        console.error('Failed to init categories', err);
-      }
-    };
-    initCategorias();
+    initCategoriasPadrao();
   }, []);
 
   const dashboard: DashboardData | null = useMemo(() => {

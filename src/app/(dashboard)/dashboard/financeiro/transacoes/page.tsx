@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/dexie';
+import { db, initCategoriasPadrao } from '@/lib/dexie';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,6 +57,10 @@ export default function TransacoesPage() {
   const categoriasData = useLiveQuery(() => db.categorias.toArray(), []);
   const contasData = useLiveQuery(() => db.contasBancarias.toArray(), []);
   const cartoesData = useLiveQuery(() => db.cartoes.toArray(), []);
+
+  useEffect(() => {
+    initCategoriasPadrao();
+  }, []);
 
   const [filtroTipo, setFiltroTipo] = useState<string>('TODOS');
   const [busca, setBusca] = useState('');
