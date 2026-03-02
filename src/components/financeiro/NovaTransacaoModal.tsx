@@ -155,6 +155,22 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
 
         await db.transacoes.put(transacaoAtualizada);
 
+        // Atualizar data das próximas parcelas/fixas se a data mudou
+        if (transacaoParaEditar.grupoParcelaId && dataSelecionadaLocal.getTime() !== new Date(transacaoParaEditar.data).getTime()) {
+          const proximas = await db.transacoes
+            .where('grupoParcelaId')
+            .equals(transacaoParaEditar.grupoParcelaId)
+            .filter(t => new Date(t.data).getTime() > new Date(transacaoParaEditar.data).getTime())
+            .toArray();
+
+          for (const t of proximas) {
+            const dtT = new Date(t.data);
+            // Manter o mês e ano original daquela parcela, mas mudar para o novo dia
+            const novaData = new Date(dtT.getFullYear(), dtT.getMonth(), day);
+            await db.transacoes.update(t.id, { data: novaData });
+          }
+        }
+
         // Ajustar saldo da conta se necessário
         if (contaBancariaId !== 'caixa-geral') {
           const valorAntigo = Number(transacaoParaEditar.valor);
