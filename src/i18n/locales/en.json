@@ -90,6 +90,8 @@
     "yearView": "Year View",
     "appointmentDetails": "Appointment Details",
     "viewAndManage": "View and manage your appointment",
+    "completeAppointment": "Complete Appointment",
+    "reopenAppointment": "Reopen Appointment",
     "editAppointment": "Edit Appointment",
     "updateInfo": "Update appointment information",
     "fillDetails": "Fill in your appointment details",
