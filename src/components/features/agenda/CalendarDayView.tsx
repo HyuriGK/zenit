@@ -111,16 +111,14 @@ export function CalendarDayView({ compromissos, onSlotClick, onCompromissoClick,
 
         {/* Dia */}
         <div
-          className={`p-2 sm:p-2.5 text-center transition-all ${
-            isToday ? 'bg-green-500/10' : ''
-          }`}
+          className={`p-2 sm:p-2.5 text-center transition-all ${isToday ? 'bg-green-500/10' : ''
+            }`}
         >
           <div className="text-[10px] sm:text-xs text-gray-400 uppercase font-medium">
             {format(currentDate, 'EEEE', { locale: ptBR })}
           </div>
-          <div className={`text-xl sm:text-2xl font-bold transition-colors ${
-            isToday ? 'text-green-400' : 'text-white'
-          }`}>
+          <div className={`text-xl sm:text-2xl font-bold transition-colors ${isToday ? 'text-green-400' : 'text-white'
+            }`}>
             {format(currentDate, 'd')}
           </div>
         </div>
@@ -165,7 +163,7 @@ export function CalendarDayView({ compromissos, onSlotClick, onCompromissoClick,
                 <button
                   key={comp.id}
                   onClick={() => onCompromissoClick(comp)}
-                  className="absolute left-1 right-1 sm:left-2 sm:right-2 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-left overflow-hidden hover:opacity-90 active:opacity-80 active:scale-[0.98] transition-all z-10 touch-manipulation shadow-sm"
+                  className={`absolute left-1 right-1 sm:left-2 sm:right-2 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-left overflow-hidden hover:opacity-90 active:opacity-80 active:scale-[0.98] transition-all z-10 touch-manipulation shadow-sm ${comp.concluido ? 'line-through opacity-60' : ''}`}
                   style={{
                     top: style.top,
                     height: style.height,

@@ -120,6 +120,12 @@ function AgendaPageContent() {
     fetchAgenda();
   };
 
+  const handleStatusChange = () => {
+    setIsDetailsOpen(false);
+    setSelectedCompromisso(null);
+    fetchAgenda();
+  };
+
   const handleToday = () => {
     setCurrentDate(new Date());
   };
@@ -260,6 +266,7 @@ function AgendaPageContent() {
               onEdit={handleEdit}
               onDelete={handleDeleteSuccess}
               onClose={() => setIsDetailsOpen(false)}
+              onStatusChange={handleStatusChange}
             />
           )}
         </DialogContent>

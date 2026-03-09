@@ -115,16 +115,14 @@ export function CalendarWeekView({ compromissos, onSlotClick, onCompromissoClick
         {weekDays.map((day, i) => (
           <div
             key={i}
-            className={`p-2 sm:p-3 text-center border-r border-zinc-800 transition-all duration-200 ${
-              isToday(day) ? 'bg-zenit-500/10 border-b-2 border-b-zenit-500' : ''
-            }`}
+            className={`p-2 sm:p-3 text-center border-r border-zinc-800 transition-all duration-200 ${isToday(day) ? 'bg-zenit-500/10 border-b-2 border-b-zenit-500' : ''
+              }`}
           >
             <div className="text-[10px] sm:text-xs text-gray-400 uppercase font-medium">
               {format(day, 'EEE', { locale: ptBR })}
             </div>
-            <div className={`text-sm sm:text-xl font-bold mt-0.5 sm:mt-1 transition-colors ${
-              isToday(day) ? 'text-zenit-400' : 'text-white'
-            }`}>
+            <div className={`text-sm sm:text-xl font-bold mt-0.5 sm:mt-1 transition-colors ${isToday(day) ? 'text-zenit-400' : 'text-white'
+              }`}>
               {format(day, 'd')}
             </div>
           </div>
@@ -177,7 +175,7 @@ export function CalendarWeekView({ compromissos, onSlotClick, onCompromissoClick
                     <button
                       key={comp.id}
                       onClick={() => onCompromissoClick(comp)}
-                      className="absolute left-0.5 right-0.5 sm:left-1 sm:right-1 rounded-md px-1 sm:px-2 py-0.5 sm:py-1 text-left text-[10px] sm:text-xs overflow-hidden hover:opacity-90 active:opacity-80 transition-opacity z-10 touch-manipulation"
+                      className={`absolute left-0.5 right-0.5 sm:left-1 sm:right-1 rounded-md px-1 sm:px-2 py-0.5 sm:py-1 text-left text-[10px] sm:text-xs overflow-hidden hover:opacity-90 active:opacity-80 transition-opacity z-10 touch-manipulation ${comp.concluido ? 'line-through opacity-60' : ''}`}
                       style={{
                         top: style.top,
                         height: style.height,

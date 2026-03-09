@@ -101,6 +101,7 @@ export async function PUT(request: Request) {
         const horaFim = data.horaFim || null;
         const categoria = data.categoria || null;
         const cor = data.cor || '#3b82f6';
+        const concluido = data.concluido !== undefined ? Boolean(data.concluido) : false;
 
         // Recorrência
         const isRecorrente = Boolean(data.isRecorrente);
@@ -113,7 +114,7 @@ export async function PUT(request: Request) {
             UPDATE "Compromisso" SET
                 "titulo" = ${titulo}, "descricao" = ${descricao}, "data" = ${dataCompromisso}, 
                 "horaInicio" = ${horaInicio}, "horaFim" = ${horaFim}, "categoria" = ${categoria},
-                "cor" = ${cor}, "isRecorrente" = ${isRecorrente}, "tipoRecorrencia" = ${tipoRecorrencia},
+                "cor" = ${cor}, "concluido" = ${concluido}, "isRecorrente" = ${isRecorrente}, "tipoRecorrencia" = ${tipoRecorrencia},
                 "intervaloRecorrencia" = ${intervaloRecorrencia}, "dataFimRecorrencia" = ${dataFimRecorrencia},
                 "syncWithGoogle" = ${syncWithGoogle}, "updatedAt" = NOW()
             WHERE id = ${id} AND "userId" = ${userId}

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Compromisso } from '@/types/compromisso';
 import { Button } from '@/components/ui/button';
-import { Calendar, Clock, Tag, Edit, Trash2, RefreshCw } from 'lucide-react';
+import { Calendar, Clock, Tag, Edit, Trash2, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 import { ptBR, enUS } from 'date-fns/locale';
 import { RecurrenceActionModal } from '@/components/features/agenda/RecurrenceActionModal';
@@ -17,6 +17,7 @@ interface CompromissoDetailsProps {
   onEdit: (compromisso: Compromisso) => void;
   onDelete: (id: string) => void;
   onClose: () => void;
+  onStatusChange?: () => void;
 }
 
 export function CompromissoDetails({
@@ -33,6 +34,37 @@ export function CompromissoDetails({
   const [recurrenceAction, setRecurrenceAction] = useState<'edit' | 'delete'>('delete');
   const [isDeleting, setIsDeleting] = useState(false);
   const [modalExcluir, setModalExcluir] = useState(false);
+  const [isToggling, setIsToggling] = useState(false);
+
+  const handleToggleConcluido = async () => {
+    setIsToggling(true);
+    try {
+      const updatedCompromisso = {
+        ...compromisso,
+        concluido: !compromisso.concluido,
+        syncWithGoogle: compromisso.syncWithGoogle || false
+      };
+
+      const response = await fetch(`/api/agenda`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedCompromisso),
+      });
+
+      if (!response.ok) throw new Error('Falha ao atualizar na nuvem');
+
+      if (onStatusChange) {
+        onStatusChange();
+      } else {
+        onClose();
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Erro ao atualizar compromisso');
+    } finally {
+      setIsToggling(false);
+    }
+  };
 
   const handleEditClick = () => {
     if (compromisso.isRecorrente) {
@@ -159,24 +191,42 @@ export function CompromissoDetails({
         </div>
 
         {/* Ações */}
-        <div className="flex gap-2 pt-2 border-t border-zinc-700">
+        <div className="flex flex-col gap-2 pt-2 border-t border-zinc-700">
           <Button
-            onClick={handleEditClick}
-            className="flex-1 bg-zenit-500 hover:bg-zenit-600 h-9 sm:h-10 text-sm sm:text-base"
-            disabled={isDeleting}
+            onClick={handleToggleConcluido}
+            className={`w-full h-9 sm:h-10 text-sm sm:text-base ${compromisso.concluido
+                ? 'bg-zinc-700 hover:bg-zinc-600 text-white'
+                : 'bg-green-600 hover:bg-green-700 text-white'
+              }`}
+            disabled={isDeleting || isToggling}
           >
-            <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-            {t('edit')}
+            {compromisso.concluido ? (
+              <XCircle className="w-4 h-4 mr-2" />
+            ) : (
+              <CheckCircle className="w-4 h-4 mr-2" />
+            )}
+            {compromisso.concluido ? t('reopenAppointment', { defaultValue: 'Reabrir Compromisso' }) : t('completeAppointment', { defaultValue: 'Concluir Compromisso' })}
           </Button>
-          <Button
-            onClick={handleDeleteClick}
-            variant="default"
-            className="flex-1 border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-400 h-9 sm:h-10 text-sm sm:text-base"
-            disabled={isDeleting}
-          >
-            <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
-            {isDeleting ? t('deleting') : t('delete')}
-          </Button>
+
+          <div className="flex gap-2">
+            <Button
+              onClick={handleEditClick}
+              className="flex-1 bg-zenit-500 hover:bg-zenit-600 h-9 sm:h-10 text-sm sm:text-base"
+              disabled={isDeleting || isToggling}
+            >
+              <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+              {t('edit')}
+            </Button>
+            <Button
+              onClick={handleDeleteClick}
+              variant="default"
+              className="flex-1 border-red-500/50 text-red-400 hover:bg-red-500/10 hover:text-red-400 h-9 sm:h-10 text-sm sm:text-base"
+              disabled={isDeleting || isToggling}
+            >
+              <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-1.5 sm:mr-2" />
+              {isDeleting ? t('deleting') : t('delete')}
+            </Button>
+          </div>
         </div>
       </div>
 

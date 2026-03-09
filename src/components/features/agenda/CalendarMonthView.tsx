@@ -137,6 +137,7 @@ export function CalendarMonthView({
                         text-xs px-1.5 py-1 rounded-md border truncate cursor-pointer transition-colors
                         ${getEventColor(event.categoria || '')}
                         hover:brightness-125
+                        ${event.concluido ? 'line-through opacity-60' : ''}
                       `}
                                             title={`${event.horaInicio} - ${event.titulo}`}
                                         >
