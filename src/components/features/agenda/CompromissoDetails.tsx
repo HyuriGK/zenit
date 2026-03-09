@@ -24,7 +24,8 @@ export function CompromissoDetails({
   compromisso,
   onEdit,
   onDelete,
-  onClose
+  onClose,
+  onStatusChange
 }: CompromissoDetailsProps) {
   const t = useTranslations('agenda');
   const locale = useLocale();
@@ -195,8 +196,8 @@ export function CompromissoDetails({
           <Button
             onClick={handleToggleConcluido}
             className={`w-full h-9 sm:h-10 text-sm sm:text-base ${compromisso.concluido
-                ? 'bg-zinc-700 hover:bg-zinc-600 text-white'
-                : 'bg-green-600 hover:bg-green-700 text-white'
+              ? 'bg-zinc-700 hover:bg-zinc-600 text-white'
+              : 'bg-green-600 hover:bg-green-700 text-white'
               }`}
             disabled={isDeleting || isToggling}
           >
