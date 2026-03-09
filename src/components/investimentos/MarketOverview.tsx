@@ -26,17 +26,27 @@ export default function MarketOverview() {
         const fetchMarket = async () => {
             try {
                 // Trocado BTC-BRL por BTC-USD pois a API gratuita não retorna BTC-BRL diretamente na cotação
-                const tickers = '^BVSP,USDBRL=X,BTC-USD,EURBRL=X,PETR4,NVDC34';
-                const res = await fetch(`https://brapi.dev/api/quote/${tickers}?token=u6eKiojA48yU4cMkdLqT8V`);
-                const data = await res.json();
+                const rawTickers = ['^BVSP', 'USDBRL=X', 'BTC-USD', 'EURBRL=X', 'PETR4', 'NVDC34'];
 
-                if (data.results) {
+                // Fetch each ticker individually to avoid free plan "1 asset per request" limit
+                const promises = rawTickers.map(ticker =>
+                    fetch(`https://brapi.dev/api/quote/${ticker}?token=u6eKiojA48yU4cMkdLqT8V`)
+                        .then(res => res.json())
+                        .catch(() => ({ results: [] }))
+                );
+
+                const responses = await Promise.all(promises);
+
+                // Aggregate all results into a single array
+                const allResults = responses.flatMap(res => res.results || []);
+
+                if (allResults.length > 0) {
                     // Conversão manual do Bitcoin para Reais
-                    const btcUsd = data.results.find((r: any) => r.symbol === 'BTC-USD');
-                    const usdBrl = data.results.find((r: any) => r.symbol === 'USDBRL=X');
+                    const btcUsd = allResults.find((r: any) => r.symbol === 'BTC-USD');
+                    const usdBrl = allResults.find((r: any) => r.symbol === 'USDBRL=X');
 
                     if (btcUsd && usdBrl) {
-                        data.results.push({
+                        allResults.push({
                             symbol: 'BTC-BRL',
                             regularMarketPrice: btcUsd.regularMarketPrice * usdBrl.regularMarketPrice,
                             regularMarketChangePercent: btcUsd.regularMarketChangePercent // Mantemos a variacao em dolar como base
@@ -60,10 +70,10 @@ export default function MarketOverview() {
                     const rawOrder = ['^BVSP', 'USDBRL=X', 'BTC-BRL', 'EURBRL=X', 'PETR4', 'NVDC34'];
 
                     const formattedMap = new Map();
-                    data.results.forEach((item: any) => {
+                    allResults.forEach((item: any) => {
                         const isPositive = item.regularMarketChangePercent >= 0;
                         const sign = isPositive ? '+' : '';
-                        const changeStr = `${sign}${item.regularMarketChangePercent.toFixed(2)}%`;
+                        const changeStr = `${sign}${item.regularMarketChangePercent?.toFixed(2) || '0.00'}%`;
 
                         formattedMap.set(item.symbol, {
                             name: names[item.symbol] || item.symbol,
