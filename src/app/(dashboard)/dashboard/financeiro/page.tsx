@@ -4,8 +4,9 @@ import { useEffect, useState, useMemo } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, initCategoriasPadrao } from '@/lib/dexie';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, TrendingUp, TrendingDown, Target, Plus, Loader2, AlertCircle, ChevronDown, Calendar, ArrowUpRight, ArrowDownRight, CreditCard, Info, DollarSign, Activity } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Target, Plus, Loader2, AlertCircle, ChevronDown, Calendar, ArrowUpRight, ArrowDownRight, CreditCard, Info, DollarSign, Activity, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { formatarMoeda } from '@/lib/financeiro-helper';
 import NovaTransacaoModal from '@/components/financeiro/NovaTransacaoModal';
 import { format, subMonths, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
@@ -277,6 +278,16 @@ export default function FinanceiroDashboardPage() {
           <p className="text-sm text-zinc-500">Acompanhe seu desempenho em {dashboard.mes}</p>
         </div>
         <div className="flex gap-3">
+          <Button
+            asChild
+            variant="outline"
+            className="border-zinc-800 bg-zinc-900 text-white hover:bg-zinc-800 hover:text-white font-bold"
+          >
+            <Link href="/dashboard/financeiro/transacoes">
+              <List className="w-4 h-4 mr-2" />
+              Registros
+            </Link>
+          </Button>
           <Button
             onClick={() => setModalTransacaoAberto(true)}
             className="bg-blue-600 hover:bg-blue-700 font-bold"
