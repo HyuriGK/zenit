@@ -23,6 +23,7 @@ import { useTranslations } from 'next-intl';
 import { usePlano } from '@/hooks/usePlano';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/dexie';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
@@ -47,12 +48,7 @@ export default function DashboardPage() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zenit-500 mx-auto"></div>
-          <p className="mt-4 text-gray-400">{tCommon('loading')}</p>
-        </div>
-      </div>
+      <LoadingScreen message={tCommon('loading')} />
     );
   }
 

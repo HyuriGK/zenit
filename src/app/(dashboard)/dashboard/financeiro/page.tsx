@@ -9,9 +9,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { formatarMoeda } from '@/lib/financeiro-helper';
 import NovaTransacaoModal from '@/components/financeiro/NovaTransacaoModal';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { format, subMonths, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { PageHeader } from '@/components/ui/PageHeader';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -261,12 +262,7 @@ export default function FinanceiroDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mx-auto mb-4" />
-          <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest animate-pulse">Carregando módulo financeiro...</p>
-        </div>
-      </div>
+      <LoadingScreen message="Carregando módulo financeiro..." />
     );
   }
 

@@ -36,6 +36,7 @@ import { TrendChart } from './components/TrendChart';
 import { WeekdayStats } from './components/WeekdayStats';
 import { MonthlyCalendar } from './components/MonthlyCalendar';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 interface CategoriaHabito {
   id: string;
@@ -557,12 +558,7 @@ export default function HabitosPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mx-auto mb-4" />
-          <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest animate-pulse">{t('loading')}</p>
-        </div>
-      </div>
+      <LoadingScreen message={t('loading')} />
     );
   }
 

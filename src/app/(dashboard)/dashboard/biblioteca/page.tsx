@@ -11,6 +11,7 @@ import { NovaMidiaModal } from '@/components/leituras/NovaMidiaModal';
 import { CitacoesModal } from '@/components/leituras/CitacoesModal';
 import { GerenciarCitacoesModal } from '@/components/leituras/GerenciarCitacoesModal';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 export default function BibliotecaPage() {
   const [midias, setMidias] = useState<Midia[]>([]);
@@ -80,12 +81,7 @@ export default function BibliotecaPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mx-auto mb-4" />
-          <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest animate-pulse">Carregando...</p>
-        </div>
-      </div>
+      <LoadingScreen message="Carregando biblioteca..." />
     );
   }
 

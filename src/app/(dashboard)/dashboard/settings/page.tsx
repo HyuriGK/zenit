@@ -40,6 +40,7 @@ import { ImageCropModal } from '@/components/settings/ImageCropModal';
 import { ChangePasswordModal } from '@/components/settings/ChangePasswordModal';
 import { DeleteAccountModal } from '@/components/settings/DeleteAccountModal';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 // --- Types ---
 type SettingsTab = 'account' | 'appearance' | 'notifications' | 'privacy' | 'billing';

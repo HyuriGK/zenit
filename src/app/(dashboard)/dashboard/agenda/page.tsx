@@ -24,6 +24,7 @@ import { useTranslations } from 'next-intl';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/dexie';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 type ViewType = 'day' | 'week' | 'month' | 'year';
 
@@ -155,15 +156,7 @@ function AgendaPageContent() {
 
       <div className="flex-1 min-h-0 max-h-full bg-zinc-900/50 overflow-hidden flex flex-col">
         {loading ? (
-          <div className="flex items-center justify-center h-full bg-zinc-950/50">
-            <div className="text-center">
-              <Activity className="w-12 h-12 text-emerald-500 mx-auto mb-6 animate-pulse" />
-              <div className="w-48 h-1 bg-zinc-900 border border-zinc-800 mx-auto overflow-hidden relative rounded-full">
-                <div className="absolute inset-0 bg-emerald-500/50 animate-[loading-bar_2s_infinite_ease-in-out]"></div>
-              </div>
-              <p className="mt-4 text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase animate-pulse">{t('loadingCalendar')}</p>
-            </div>
-          </div>
+          <LoadingScreen message={t('loadingCalendar')} />
         ) : view === 'day' ? (
           <>
             <CalendarToolbar

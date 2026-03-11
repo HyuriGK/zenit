@@ -23,6 +23,7 @@ import {
   Minimize2,
   Loader2,
 } from 'lucide-react';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import RichTextEditor from '@/components/estudos/RichTextEditor';
 import { PomodoroTimer } from '@/components/PomodoroTimer';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
@@ -439,15 +440,7 @@ export default function CursoDetalhePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
-        <div className="text-center">
-          <div className="relative">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-green-500/20 border-t-green-500 mx-auto mb-4"></div>
-            <Sparkles className="w-6 h-6 text-green-400 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 animate-pulse" />
-          </div>
-          <p className="text-zinc-400 font-medium">{t('loadingCourse')}</p>
-        </div>
-      </div>
+      <LoadingScreen message={t('loadingCourse')} />
     );
   }
 

@@ -13,6 +13,7 @@ import { ReviewDisplayModal } from '@/components/leituras/ReviewDisplayModal';
 import { db } from '@/lib/dexie';
 import { ShareMidiaModal } from '@/components/share/ShareMidiaModal';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 export default function DetalheMidiaPage() {
   const router = useRouter();
@@ -131,12 +132,7 @@ export default function DetalheMidiaPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-zinc-400">Carregando...</p>
-        </div>
-      </div>
+      <LoadingScreen message="Carregando..." />
     );
   }
 

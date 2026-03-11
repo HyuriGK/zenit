@@ -38,6 +38,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 const statusColors = {
   PLANEJADA: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20' },
@@ -298,12 +299,7 @@ export default function ViagensPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Plane className="w-10 h-10 text-emerald-500 animate-bounce mx-auto mb-4" />
-          <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest animate-pulse">Carregando viagens...</p>
-        </div>
-      </div>
+      <LoadingScreen message="Carregando viagens..." />
     );
   }
 
