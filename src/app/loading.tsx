@@ -12,13 +12,6 @@ export default function Loading() {
           Carregando...
         </p>
       </div>
-      
-      <style jsx global>{`
-        @keyframes loading-bar {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-      `}</style>
     </div>
   );
 }
