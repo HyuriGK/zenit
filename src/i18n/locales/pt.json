@@ -50,6 +50,8 @@
     "noAppointments": "Nenhum compromisso agendado",
     "oneAppointment": "1 compromisso agendado",
     "manyAppointments": "{count} compromissos agendados",
+    "balancePositive": "Saldo em dia",
+    "balanceNegative": "Saldo negativo",
     "configureFinances": "Configure suas finanças",
     "startStudies": "Comece seu planner",
     "defineGoals": "Defina suas metas",

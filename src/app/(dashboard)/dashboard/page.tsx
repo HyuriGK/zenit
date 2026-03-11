@@ -7,6 +7,9 @@ import {
   Calendar,
   Wallet,
   BookOpen,
+  TrendingUp,
+  Target,
+  CheckCircle2,
   Library,
   TrendingDown,
 } from 'lucide-react';
