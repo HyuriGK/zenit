@@ -240,18 +240,23 @@ export default function RichTextEditor({ content, onChange, placeholder }: RichT
     </Button>
   );
 
-  const ColorButton = ({ color, title }: { color: string; title: string }) => (
-    <Button
-      type="button"
-      onClick={() => editor.chain().focus().setColor(color).run()}
-      variant="ghost"
-      size="sm"
-      className="h-8 w-8 p-0"
-      title={title}
-    >
-      <div className="w-4 h-4 rounded" style={{ backgroundColor: color }} />
-    </Button>
-  );
+  const ColorButton = ({ color, title }: { color: string; title: string }) => {
+    const isActive = editor.isActive('textStyle', { color });
+    return (
+      <Button
+        type="button"
+        onClick={() => editor.chain().focus().setColor(color).run()}
+        variant="ghost"
+        size="sm"
+        className={`h-8 w-8 p-0 ${
+          isActive ? 'ring-2 ring-green-600 ring-offset-2 ring-offset-zinc-800' : ''
+        }`}
+        title={title}
+      >
+        <div className="w-4 h-4 rounded shadow-sm border border-zinc-700/50" style={{ backgroundColor: color }} />
+      </Button>
+    );
+  };
 
   const HighlightButton = ({ color, title }: { color: string; title: string }) => (
     <Button
@@ -260,12 +265,12 @@ export default function RichTextEditor({ content, onChange, placeholder }: RichT
       variant="ghost"
       size="sm"
       className={`h-8 w-8 p-0 ${
-        editor.isActive('highlight', { color }) ? 'ring-2 ring-green-500' : ''
+        editor.isActive('highlight', { color }) ? 'ring-2 ring-green-600 ring-offset-2 ring-offset-zinc-800' : ''
       }`}
       title={title}
     >
-      <div className="flex items-center justify-center">
-        <Highlighter className="h-4 w-4" style={{ color }} />
+      <div className="flex items-center justify-center w-5 h-5 rounded shadow-sm border border-zinc-700/50" style={{ backgroundColor: color }}>
+        <Highlighter className="h-3 w-3 text-zinc-900" />
       </div>
     </Button>
   );
@@ -342,7 +347,7 @@ export default function RichTextEditor({ content, onChange, placeholder }: RichT
         }
       `}</style>
       {/* Toolbar */}
-      <div className="border-b border-zinc-700 bg-zinc-800/50 p-2 flex flex-wrap gap-1">
+      <div className="sticky top-0 z-30 border-b border-zinc-700 bg-zinc-900/95 backdrop-blur-md p-2 flex flex-wrap gap-1 shadow-sm transition-all duration-300">
         {/* Undo/Redo */}
         <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}
@@ -484,7 +489,7 @@ export default function RichTextEditor({ content, onChange, placeholder }: RichT
         <ColorButton color="#F59E0B" title="Laranja" />
         <ColorButton color="#10B981" title="Verde" />
         <ColorButton color="#3B82F6" title="Azul" />
-        <ColorButton color="#10B981" title="Roxo" />
+        <ColorButton color="#8B5CF6" title="Roxo" />
 
         <div className="w-px h-8 bg-zinc-700 mx-1" />
 
