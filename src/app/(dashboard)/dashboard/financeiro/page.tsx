@@ -279,9 +279,16 @@ export default function FinanceiroDashboardPage() {
         </div>
         <div className="flex gap-3">
           <Button
+            onClick={() => setModalTransacaoAberto(true)}
+            variant="premium"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Nova Transação
+          </Button>
+          <Button
             asChild
             variant="outline"
-            className="border-zinc-800 bg-zinc-900 text-white hover:bg-zinc-800 hover:text-white font-bold"
+            className="rounded-xl font-bold uppercase tracking-widest text-[10px]"
           >
             <Link href="/dashboard/financeiro/transacoes">
               <List className="w-4 h-4 mr-2" />
@@ -292,46 +299,54 @@ export default function FinanceiroDashboardPage() {
       </div>
 
       {/* KPIs Minimalistas */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 px-2">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Wallet className="w-4 h-4 text-zinc-500" />
-            <span className="text-[12px] uppercase tracking-wider font-bold text-zinc-500">Saldo Mensal</span>
-          </div>
-          <div className="text-3xl font-black text-white">{formatarMoeda(dashboard.resumoMensal.saldo)}</div>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <Wallet className="w-4 h-4 text-zinc-500" />
+              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-500">Saldo Mensal</span>
+            </div>
+            <div className="text-3xl font-black text-white leading-none">{formatarMoeda(dashboard.resumoMensal.saldo)}</div>
+          </CardContent>
+        </Card>
 
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-green-500/50" />
-            <span className="text-[12px] uppercase tracking-wider font-bold text-zinc-500">Receitas</span>
-          </div>
-          <div className="text-3xl font-black text-green-500">{formatarMoeda(dashboard.resumoMensal.receitas)}</div>
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="w-4 h-4 text-emerald-500/50" />
+              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-500">Receitas</span>
+            </div>
+            <div className="text-3xl font-black text-emerald-500 leading-none">{formatarMoeda(dashboard.resumoMensal.receitas)}</div>
+          </CardContent>
+        </Card>
 
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <TrendingDown className="w-4 h-4 text-red-500/50" />
-            <span className="text-[12px] uppercase tracking-wider font-bold text-zinc-500">Despesas</span>
-          </div>
-          <div className="text-3xl font-black text-red-500">{formatarMoeda(dashboard.resumoMensal.despesas)}</div>
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingDown className="w-4 h-4 text-red-500/50" />
+              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-500">Despesas</span>
+            </div>
+            <div className="text-3xl font-black text-red-500 leading-none">{formatarMoeda(dashboard.resumoMensal.despesas)}</div>
+          </CardContent>
+        </Card>
 
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <Target className="w-4 h-4 text-zinc-500" />
-            <span className="text-[12px] uppercase tracking-wider font-bold text-zinc-500">Sobra</span>
-          </div>
-          <div className="text-3xl font-black text-white">{formatarMoeda(dashboard.resumoMensal.sobra)}</div>
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <Target className="w-4 h-4 text-zinc-500" />
+              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-500">Sobra</span>
+            </div>
+            <div className="text-3xl font-black text-white leading-none">{formatarMoeda(dashboard.resumoMensal.sobra)}</div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Row 1: Gastos e Receitas por Categoria */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between py-4 px-6 border-b border-zinc-800/50">
-            <CardTitle className="text-base font-bold text-white">Gastos por Categoria</CardTitle>
-            <div className="flex items-center gap-2 bg-zinc-800/50 px-2 py-1 rounded text-[11px] font-bold text-zinc-400">
+            <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Gastos por Categoria</CardTitle>
+            <div className="flex items-center gap-2 bg-zinc-800/50 px-2 py-1 rounded-lg text-[9px] font-black text-zinc-500 uppercase tracking-widest">
               Top 5 <ChevronDown className="w-3 h-3" />
             </div>
           </CardHeader>
@@ -358,10 +373,10 @@ export default function FinanceiroDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between py-4 px-6 border-b border-zinc-800/50">
-            <CardTitle className="text-base font-bold text-white">Receitas por Categoria</CardTitle>
-            <div className="flex items-center gap-2 bg-zinc-800/50 px-2 py-1 rounded text-[11px] font-bold text-zinc-400">
+            <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Receitas por Categoria</CardTitle>
+            <div className="flex items-center gap-2 bg-zinc-800/50 px-2 py-1 rounded-lg text-[9px] font-black text-zinc-500 uppercase tracking-widest">
               Top 5 <ChevronDown className="w-3 h-3" />
             </div>
           </CardHeader>
@@ -391,55 +406,55 @@ export default function FinanceiroDashboardPage() {
 
       {/* Row 2: Balanço e Meus Cartões */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="bg-zinc-900 border-zinc-800">
-          <CardHeader className="py-4 px-6">
-            <CardTitle className="text-base font-bold text-white">Balanço</CardTitle>
+        <Card>
+          <CardHeader className="py-4 px-6 border-b border-zinc-800/50">
+            <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Balanço</CardTitle>
           </CardHeader>
-          <CardContent className="px-6 pb-6 space-y-3">
-            <div className="flex items-center justify-between p-3 bg-zinc-950/50 rounded-lg">
-              <div className="flex items-center gap-3 text-xs font-bold text-zinc-400">
+          <CardContent className="p-6 space-y-3">
+            <div className="flex items-center justify-between p-4 bg-zinc-900/40 border border-zinc-800/50 rounded-xl">
+              <div className="flex items-center gap-3 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
                 <TrendingUp className="w-4 h-4" /> RECEITA
               </div>
-              <div className="text-sm font-black text-green-500">{formatarMoeda(dashboard.resumoMensal.receitas)}</div>
+              <div className="text-sm font-black text-emerald-500">{formatarMoeda(dashboard.resumoMensal.receitas)}</div>
             </div>
-            <div className="flex items-center justify-between p-3 bg-zinc-950/50 rounded-lg">
-              <div className="flex items-center gap-3 text-xs font-bold text-zinc-400">
+            <div className="flex items-center justify-between p-4 bg-zinc-900/40 border border-zinc-800/50 rounded-xl">
+              <div className="flex items-center gap-3 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
                 <TrendingDown className="w-4 h-4" /> DESPESAS
               </div>
               <div className="text-sm font-black text-red-500">{formatarMoeda(dashboard.resumoMensal.despesas)}</div>
             </div>
-            <div className="flex items-center justify-between p-3 bg-zinc-950/50 rounded-lg">
-              <div className="flex items-center gap-3 text-xs font-bold text-zinc-400">
+            <div className="flex items-center justify-between p-4 bg-zinc-900/40 border border-zinc-800/50 rounded-xl">
+              <div className="flex items-center gap-3 text-[10px] font-black text-zinc-500 uppercase tracking-widest">
                 <CreditCard className="w-4 h-4" /> CARTÃO
               </div>
-              <div className="text-sm font-black text-white">{formatarMoeda(dashboard.resumoMensal.gastoCartao)}</div>
+              <div className="text-sm font-black text-zinc-100">{formatarMoeda(dashboard.resumoMensal.gastoCartao)}</div>
             </div>
-            <div className="flex items-center justify-between p-4 bg-blue-500/5 border border-blue-500/20 rounded-lg mt-4">
-              <div className="flex items-center gap-3 text-xs font-bold text-blue-400">
+            <div className="flex items-center justify-between p-5 bg-emerald-500/5 border border-emerald-500/20 rounded-xl mt-6">
+              <div className="flex items-center gap-3 text-[11px] font-black text-emerald-500 uppercase tracking-[0.2em]">
                 = BALANÇO FINAL
               </div>
-              <div className="text-base font-black text-blue-400">{formatarMoeda(dashboard.resumoMensal.saldo)}</div>
+              <div className="text-lg font-black text-emerald-500">{formatarMoeda(dashboard.resumoMensal.saldo)}</div>
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card>
           <CardHeader className="py-4 px-6 border-b border-zinc-800/50">
-            <CardTitle className="text-base font-bold text-white">Meus Cartões</CardTitle>
+            <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Meus Cartões</CardTitle>
           </CardHeader>
           <CardContent className="p-6">
             {dashboard.resumoMensal.gastoCartao === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-zinc-600 italic text-sm">
+              <div className="flex flex-col items-center justify-center py-12 text-zinc-600 font-bold uppercase tracking-widest text-[10px]">
                 Nenhum cartão com movimentação.
               </div>
             ) : (
-              <div className="flex items-center gap-4 p-4 bg-zinc-950/50 rounded-xl border border-zinc-800">
-                <div className="w-12 h-12 bg-zinc-800 rounded-lg flex items-center justify-center">
-                  <CreditCard className="w-6 h-6 text-zinc-500" />
+              <div className="flex items-center gap-4 p-5 bg-zinc-900/40 rounded-2xl border border-zinc-800/50">
+                <div className="w-12 h-12 bg-zinc-800 border border-zinc-700/50 rounded-xl flex items-center justify-center shadow-lg">
+                  <CreditCard className="w-6 h-6 text-zinc-400" />
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-white uppercase tracking-tight">Cartão Principal</div>
-                  <div className="text-xs text-zinc-500">Gasto Atual: {formatarMoeda(dashboard.resumoMensal.gastoCartao)}</div>
+                  <div className="text-sm font-black text-white uppercase tracking-tight">Cartão Principal</div>
+                  <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1">Gasto Atual: <span className="text-zinc-300 ml-1">{formatarMoeda(dashboard.resumoMensal.gastoCartao)}</span></div>
                 </div>
               </div>
             )}
@@ -450,17 +465,17 @@ export default function FinanceiroDashboardPage() {
       {/* Row 3: Saúde, Próximos 7 Dias e Comparativo */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Saúde Financeira */}
-        <Card className="bg-zinc-900 border-zinc-800 p-6">
+        <Card className="p-6">
           <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-2 text-sm font-bold text-white">
-              <Activity className="w-4 h-4 text-blue-500" /> Saúde Financeira
+            <div className="flex items-center gap-2 text-[10px] font-black text-zinc-100 uppercase tracking-[0.2em]">
+              <Activity className="w-4 h-4 text-emerald-500" /> Saúde Financeira
             </div>
-            <Info className="w-4 h-4 text-zinc-600" />
+            <Info className="w-4 h-4 text-zinc-700" />
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-8">
             <div className="relative w-24 h-24 flex items-center justify-center">
               <svg className="w-full h-full transform -rotate-90">
-                <circle cx="48" cy="48" r="40" fill="none" stroke="currentColor" strokeWidth="8" className="text-zinc-800" />
+                <circle cx="48" cy="48" r="40" fill="none" stroke="currentColor" strokeWidth="8" className="text-zinc-800/50" />
                 <circle
                   cx="48"
                   cy="48"
@@ -469,118 +484,104 @@ export default function FinanceiroDashboardPage() {
                   stroke="currentColor"
                   strokeWidth="8"
                   strokeDasharray={`${2.5 * dashboard.saudeFinanceira.score} 251`}
-                  className={dashboard.saudeFinanceira.status === 'EXCELENTE' ? 'text-green-500' : 'text-red-500'}
+                  className={dashboard.saudeFinanceira.status === 'EXCELENTE' ? 'text-emerald-500' : 'text-red-500'}
                 />
               </svg>
               <div className="absolute flex flex-col items-center">
-                <span className="text-2xl font-black text-white">{dashboard.saudeFinanceira.score}</span>
-                <span className="text-[8px] font-bold text-zinc-500 uppercase">Score</span>
+                <span className="text-2xl font-black text-white leading-none">{dashboard.saudeFinanceira.score}</span>
+                <span className="text-[8px] font-black text-zinc-600 uppercase tracking-widest mt-1">Score</span>
               </div>
             </div>
             <div>
-              <div className={`text-lg font-black uppercase tracking-tighter ${dashboard.saudeFinanceira.status === 'EXCELENTE' ? 'text-green-500' : 'text-red-500'}`}>
+              <div className={`text-xl font-black uppercase tracking-tighter ${dashboard.saudeFinanceira.status === 'EXCELENTE' ? 'text-emerald-500' : 'text-red-500'}`}>
                 {dashboard.saudeFinanceira.status}
               </div>
-              <p className="text-[10px] text-zinc-500 leading-tight mt-1">
-                Seu índice de sobra mensal em relação aos ganhos.
+              <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest leading-relaxed mt-2 max-w-[120px]">
+                Seu índice de sobra mensal.
               </p>
             </div>
           </div>
         </Card>
 
         {/* Próximos 7 Dias */}
-        <Card className="bg-zinc-900 border-zinc-800 p-6 flex flex-col items-center justify-center text-center">
-          <div className="flex items-center gap-2 text-sm font-bold text-white self-start mb-auto">
-            <Calendar className="w-4 h-4 text-zinc-400" /> Próximos 7 Dias
+        <Card className="p-6 flex flex-col items-center justify-center text-center">
+          <div className="flex items-center gap-2 text-[10px] font-black text-zinc-100 uppercase tracking-[0.2em] self-start mb-auto">
+            <Calendar className="w-4 h-4 text-zinc-500" /> Próximos 7 Dias
           </div>
-          <div className="py-4">
+          <div className="py-6">
             {dashboard.proximos7Dias.length === 0 ? (
               <>
-                <div className="w-10 h-10 rounded-full border-2 border-zinc-700 flex items-center justify-center mb-3 mx-auto">
-                  <Plus className="w-5 h-5 text-zinc-600 rotate-45" />
+                <div className="w-12 h-12 rounded-2xl bg-zinc-800/50 border border-zinc-700/30 flex items-center justify-center mb-4 mx-auto">
+                  <Plus className="w-6 h-6 text-zinc-600 rotate-45" />
                 </div>
-                <p className="text-xs text-zinc-500 font-bold max-w-[180px]">
-                  Tudo em dia! Nenhuma conta vencendo nos próximos 7 dias.
+                <p className="text-[10px] text-zinc-500 font-black uppercase tracking-widest max-w-[200px] leading-relaxed">
+                  Tudo em dia! Sem pendências próximas.
                 </p>
               </>
             ) : (
-              <div className="space-y-2 text-left">
+              <div className="space-y-3 text-left">
                 {dashboard.proximos7Dias.slice(0, 2).map((t, idx) => (
-                  <div key={idx} className="flex justify-between gap-4 text-xs font-bold border-l-2 border-red-500 pl-2">
-                    <span className="text-zinc-400 truncate max-w-[100px]">{t.descricao}</span>
-                    <span className="text-white">{formatarMoeda(t.valor)}</span>
+                  <div key={idx} className="flex justify-between gap-6 text-[10px] font-black uppercase tracking-widest border-l-2 border-red-500 pl-3">
+                    <span className="text-zinc-500 truncate max-w-[120px]">{t.descricao}</span>
+                    <span className="text-zinc-100">{formatarMoeda(t.valor)}</span>
                   </div>
                 ))}
               </div>
             )}
           </div>
-          <Button variant="link" className="text-blue-500 text-xs font-bold hover:no-underline mt-auto">
+          <Button variant="link" className="text-emerald-500 text-[10px] font-black uppercase tracking-widest hover:no-underline mt-auto">
             Ver calendário &rsaquo;
           </Button>
         </Card>
 
         {/* Comparativo Mensal */}
-        <Card className="bg-zinc-900 border-zinc-800 p-6">
-          <div className="flex items-center gap-2 text-sm font-bold text-white mb-8">
-            <TrendingUp className="w-4 h-4 text-green-500" /> Comparativo Mensal
+        <Card className="p-6">
+          <div className="flex items-center gap-2 text-[10px] font-black text-zinc-100 uppercase tracking-[0.2em] mb-8">
+            <TrendingUp className="w-4 h-4 text-emerald-500" /> Comparativo Mensal
           </div>
           <div className="grid grid-cols-2 divide-x divide-zinc-800">
             <div className="text-center px-2">
-              <div className="text-[10px] font-bold text-zinc-500 uppercase mb-2">Receitas</div>
-              <div className="text-lg font-black text-white flex items-center justify-center gap-1">
+              <div className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-3">Receitas</div>
+              <div className="text-2xl font-black text-white flex items-center justify-center gap-1 leading-none">
                 {dashboard.comparativo.receitasPercent >= 0 ? '+' : ''}{dashboard.comparativo.receitasPercent.toFixed(1)}%
-                <ArrowUpRight className={`w-4 h-4 ${dashboard.comparativo.receitasPercent >= 0 ? 'text-green-500' : 'text-red-500'}`} />
+                <ArrowUpRight className={`w-5 h-5 ${dashboard.comparativo.receitasPercent >= 0 ? 'text-emerald-500' : 'text-red-500'}`} />
               </div>
-              <div className="text-[10px] text-zinc-600">vs mês anterior</div>
+              <div className="text-[9px] font-bold text-zinc-700 uppercase tracking-widest mt-2">vs mês anterior</div>
             </div>
             <div className="text-center px-2">
-              <div className="text-[10px] font-bold text-zinc-500 uppercase mb-2">Despesas</div>
-              <div className="text-lg font-black text-white flex items-center justify-center gap-1">
+              <div className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-3">Despesas</div>
+              <div className="text-2xl font-black text-white flex items-center justify-center gap-1 leading-none">
                 {dashboard.comparativo.despesasPercent >= 0 ? '+' : ''}{dashboard.comparativo.despesasPercent.toFixed(1)}%
-                <ArrowDownRight className={`w-4 h-4 ${dashboard.comparativo.despesasPercent >= 0 ? 'text-red-500' : 'text-green-500'}`} />
+                <ArrowDownRight className={`w-5 h-5 ${dashboard.comparativo.despesasPercent >= 0 ? 'text-red-500' : 'text-emerald-500'}`} />
               </div>
-              <div className="text-[10px] text-zinc-600">vs mês anterior</div>
+              <div className="text-[9px] font-bold text-zinc-700 uppercase tracking-widest mt-2">vs mês anterior</div>
             </div>
-          </div>
-          <div className="mt-6 p-2 bg-zinc-950/50 rounded flex items-center gap-2 text-[10px] text-zinc-500 border border-zinc-800/50">
-            <Info className="w-3 h-3" /> Considerando despesas fixas e cartão.
           </div>
         </Card>
       </div>
 
       {/* Row 4: Fluxo de Caixa Diário */}
-      <Card className="bg-zinc-900 border-zinc-800">
-        <CardHeader className="py-4 px-6 border-b border-zinc-800/50">
-          <CardTitle className="text-base font-bold text-white">Fluxo de Caixa Diário - {dashboard.mes}</CardTitle>
-          <p className="text-[10px] text-zinc-500 uppercase font-bold tracking-widest mt-1">Receitas e Despesas por dia de vencimento</p>
+      <Card>
+        <CardHeader className="py-6 px-6 border-b border-zinc-800/50">
+          <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Fluxo de Caixa Diário — {dashboard.mes}</CardTitle>
         </CardHeader>
         <CardContent className="h-[300px] p-6">
           {dashboard.resumoMensal.receitas === 0 && dashboard.resumoMensal.despesas === 0 ? (
-            <div className="flex items-center justify-center h-full text-zinc-600 italic text-sm">
+            <div className="flex items-center justify-center h-full text-zinc-600 font-bold uppercase tracking-widest text-[10px]">
               Sem movimentações este mês.
             </div>
           ) : (
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={dashboard.fluxoCaixa}>
-                <defs>
-                  <linearGradient id="colorReceita" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
-                  </linearGradient>
-                  <linearGradient id="colorDespesa" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                <XAxis dataKey="dia" stroke="#71717a" fontSize={10} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#18181b" vertical={false} />
+                <XAxis dataKey="dia" stroke="#3f3f46" fontSize={10} axisLine={false} tickLine={false} tick={{ fontWeight: 'bold' }} />
                 <YAxis hide />
                 <RechartsTooltip
-                  contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '8px', fontSize: '10px' }}
-                  itemStyle={{ fontSize: '12px', fontWeight: 'bold' }}
+                  contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '12px', fontSize: '10px', border: '1px solid rgba(255,255,255,0.05)' }}
+                  itemStyle={{ fontSize: '12px', fontWeight: '900', textTransform: 'uppercase' }}
                 />
-                <Area type="monotone" dataKey="receita" stroke="#22c55e" fillOpacity={1} fill="url(#colorReceita)" strokeWidth={3} />
-                <Area type="monotone" dataKey="despesa" stroke="#ef4444" fillOpacity={1} fill="url(#colorDespesa)" strokeWidth={3} />
+                <Area type="monotone" dataKey="receita" stroke="#10b981" fill="#10b981" fillOpacity={0.05} strokeWidth={4} animationDuration={1000} />
+                <Area type="monotone" dataKey="despesa" stroke="#ef4444" fill="#ef4444" fillOpacity={0.05} strokeWidth={4} animationDuration={1000} />
               </AreaChart>
             </ResponsiveContainer>
           )}
@@ -588,52 +589,48 @@ export default function FinanceiroDashboardPage() {
       </Card>
 
       {/* Row 5: Indicadores Econômicos */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-zinc-900 border-zinc-800 p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg"><TrendingUp className="w-4 h-4 text-blue-500" /></div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="p-5">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center justify-center"><TrendingUp className="w-5 h-5 text-blue-500" /></div>
             <div>
-              <div className="text-[10px] font-bold text-zinc-500 uppercase leading-none mb-1">Taxa Selic</div>
-              <div className="text-base font-black text-white">
-                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-600" /> : indicadores.selic}
+              <div className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1 leading-none">Taxa Selic</div>
+              <div className="text-lg font-black text-white leading-none">
+                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-700" /> : indicadores.selic}
               </div>
-              <div className="text-[10px] text-zinc-600">Meta Atual</div>
             </div>
           </div>
         </Card>
-        <Card className="bg-zinc-900 border-zinc-800 p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/10 rounded-lg"><TrendingDown className="w-4 h-4 text-green-500" /></div>
+        <Card className="p-5">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center"><TrendingDown className="w-5 h-5 text-emerald-500" /></div>
             <div>
-              <div className="text-[10px] font-bold text-zinc-500 uppercase leading-none mb-1">IPCA (Inflação)</div>
-              <div className="text-base font-black text-white">
-                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-600" /> : indicadores.ipca}
+              <div className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1 leading-none">IPCA</div>
+              <div className="text-lg font-black text-white leading-none">
+                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-700" /> : indicadores.ipca}
               </div>
-              <div className="text-[10px] text-zinc-600">Acumulado</div>
             </div>
           </div>
         </Card>
-        <Card className="bg-zinc-900 border-zinc-800 p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-500/10 rounded-lg"><DollarSign className="w-4 h-4 text-orange-500" /></div>
+        <Card className="p-5">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-orange-500/10 border border-orange-500/20 rounded-xl flex items-center justify-center"><DollarSign className="w-5 h-5 text-orange-500" /></div>
             <div>
-              <div className="text-[10px] font-bold text-zinc-500 uppercase leading-none mb-1">Dólar (USD)</div>
-              <div className="text-base font-black text-white">
-                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-600" /> : indicadores.usd}
+              <div className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1 leading-none">Dólar (USD)</div>
+              <div className="text-lg font-black text-white leading-none">
+                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-700" /> : indicadores.usd}
               </div>
-              <div className="text-[10px] text-zinc-600">Comercial</div>
             </div>
           </div>
         </Card>
-        <Card className="bg-zinc-900 border-zinc-800 p-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500/10 rounded-lg"><DollarSign className="w-4 h-4 text-purple-500" /></div>
+        <Card className="p-5">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-center justify-center"><DollarSign className="w-5 h-5 text-purple-500" /></div>
             <div>
-              <div className="text-[10px] font-bold text-zinc-500 uppercase leading-none mb-1">Euro (EUR)</div>
-              <div className="text-base font-black text-white">
-                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-600" /> : indicadores.eur}
+              <div className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1 leading-none">Euro (EUR)</div>
+              <div className="text-lg font-black text-white leading-none">
+                {indicadores.loading ? <Loader2 className="w-4 h-4 animate-spin text-zinc-700" /> : indicadores.eur}
               </div>
-              <div className="text-[10px] text-zinc-600">Comercial</div>
             </div>
           </div>
         </Card>

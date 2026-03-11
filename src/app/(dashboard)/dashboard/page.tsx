@@ -112,25 +112,27 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1 - Compromissos Hoje */}
         <Card
-          className="bg-zinc-900/50 border-zinc-800 cursor-pointer hover:border-zenit-500/50 transition-all"
+          className="cursor-pointer transition-all"
           onClick={handleIrParaAgenda}
         >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">
+            <CardTitle className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
               {t('appointmentsToday')}
             </CardTitle>
-            <Calendar className="w-4 h-4 text-zenit-500" />
+            <div className="p-2 bg-zinc-800/50 rounded-lg">
+              <Calendar className="w-4 h-4 text-zinc-400" />
+            </div>
           </CardHeader>
           <CardContent>
             {loadingCompromissos ? (
               <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-zenit-500"></div>
-                <span className="text-sm text-gray-400">{tCommon('loading')}</span>
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-zinc-500"></div>
+                <span className="text-sm text-zinc-500">{tCommon('loading')}</span>
               </div>
             ) : (
               <>
-                <div className="text-2xl font-bold text-white">{compromissosHoje}</div>
-                <p className="text-xs text-gray-500 mt-1">
+                <div className="text-3xl font-bold text-white leading-tight">{compromissosHoje}</div>
+                <p className="text-[10px] font-bold uppercase text-zinc-600 mt-1 tracking-widest">
                   {compromissosHoje === 0
                     ? t('noAppointments')
                     : compromissosHoje === 1
@@ -144,49 +146,54 @@ export default function DashboardPage() {
         </Card>
 
         {/* Card 2 - Saldo Mensal */}
-        <Card className="bg-zinc-900/50 border-zinc-800">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">
+            <CardTitle className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
               {t('monthlyBalance')}
             </CardTitle>
-            <Wallet className="w-4 h-4 text-green-500" />
+            <div className="p-2 bg-emerald-500/10 rounded-lg">
+              <Wallet className="w-4 h-4 text-emerald-500" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">R$ 0,00</div>
-            <p className="text-xs text-green-500 mt-1 flex items-center gap-1">
-              <TrendingUp className="w-3 h-3" />
+            <div className="text-3xl font-bold text-white leading-tight">R$ 0,00</div>
+            <p className="text-[10px] font-bold uppercase text-emerald-600 mt-1 tracking-widest flex items-center gap-1">
               {t('configureFinances')}
             </p>
           </CardContent>
         </Card>
 
         {/* Card 3 - Cursos Ativos */}
-        <Card className="bg-zinc-900/50 border-zinc-800">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">
+            <CardTitle className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
               {t('activeCourses')}
             </CardTitle>
-            <BookOpen className="w-4 h-4 text-orange-500" />
+            <div className="p-2 bg-zinc-800/50 rounded-lg">
+              <BookOpen className="w-4 h-4 text-zinc-400" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">0</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <div className="text-3xl font-bold text-white leading-tight">0</div>
+            <p className="text-[10px] font-bold uppercase text-zinc-600 mt-1 tracking-widest">
               {t('startStudies')}
             </p>
           </CardContent>
         </Card>
 
         {/* Card 4 - Metas do Mês */}
-        <Card className="bg-zinc-900/50 border-zinc-800">
+        <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-gray-400">
+            <CardTitle className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
               {t('monthlyGoals')}
             </CardTitle>
-            <Target className="w-4 h-4 text-blue-500" />
+            <div className="p-2 bg-zinc-800/50 rounded-lg">
+              <Target className="w-4 h-4 text-zinc-400" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">0/0</div>
-            <p className="text-xs text-gray-500 mt-1">
+            <div className="text-3xl font-bold text-white leading-tight">0/0</div>
+            <p className="text-[10px] font-bold uppercase text-zinc-600 mt-1 tracking-widest">
               {t('defineGoals')}
             </p>
           </CardContent>
@@ -199,47 +206,48 @@ export default function DashboardPage() {
         <AtividadesRecentes />
 
         {/* Quick Actions */}
-        <Card className="flex flex-col bg-zinc-900/50 border-zinc-800 h-full">
-          <CardHeader className="flex-shrink-0">
-            <CardTitle className="text-white text-lg sm:text-xl">{t('quickActions')}</CardTitle>
-            <CardDescription className="text-gray-400 text-sm">
-              {t('accessQuickly')}
-            </CardDescription>
+        <Card className="flex flex-col h-full bg-zinc-900/40">
+          <CardHeader className="flex-shrink-0 border-b border-zinc-800/50 mb-4 p-6">
+            <CardTitle className="text-white text-lg font-bold tracking-tight uppercase tracking-widest text-xs opacity-50">{t('quickActions')}</CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto space-y-2 sm:space-y-3 min-h-0">
-            {/* Botão Novo Compromisso - FUNCIONAL */}
+          <CardContent className="flex-1 overflow-y-auto space-y-3 min-h-0 p-6 pt-0">
+            {/* Botão Novo Compromisso */}
             <Button
               onClick={handleNovoCompromisso}
-              className="w-full justify-start h-auto py-3 bg-zenit-500 hover:bg-zenit-600 text-white border-0 shadow-lg shadow-zenit-500/25 transition-all hover:shadow-zenit-500/40 text-sm sm:text-base"
+              variant="default"
+              className="w-full justify-start h-12"
             >
-              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              <Calendar className="w-5 h-5 mr-3" />
               {t('newAppointment')}
             </Button>
 
-            {/* Nova Transação - FUNCIONAL */}
+            {/* Nova Transação */}
             <Button
               onClick={handleNovaTransacao}
-              className="w-full justify-start h-auto py-3 bg-green-500/10 hover:bg-green-500/20 text-green-400 border border-green-500/20 hover:border-green-500/40 transition-all text-sm sm:text-base"
+              variant="secondary"
+              className="w-full justify-start h-12"
             >
-              <Wallet className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              <Wallet className="w-5 h-5 mr-3" />
               {t('newTransaction')}
             </Button>
 
-            {/* Adicionar no Planner - FUNCIONAL */}
+            {/* Adicionar no Planner */}
             <Button
               onClick={handleNovoCurso}
-              className="w-full justify-start h-auto py-3 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 hover:border-orange-500/40 transition-all text-sm sm:text-base"
+              variant="outline"
+              className="w-full justify-start h-12"
             >
-              <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              <BookOpen className="w-5 h-5 mr-3" />
               Adicionar no Planner
             </Button>
             <Button
               disabled
-              className="w-full justify-start h-auto py-3 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 cursor-not-allowed text-sm sm:text-base"
+              variant="ghost"
+              className="w-full justify-start h-12 opacity-30"
             >
-              <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+              <Target className="w-5 h-5 mr-3" />
               {t('createGoal')}
-              <Badge variant="secondary" className="ml-auto text-xs">{tCommon('premium')}</Badge>
+              <Badge variant="secondary" className="ml-auto text-[10px] uppercase font-black">{tCommon('premium')}</Badge>
             </Button>
           </CardContent>
         </Card>

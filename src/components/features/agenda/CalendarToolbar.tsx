@@ -98,71 +98,83 @@ export function CalendarToolbar({ currentDate, view, onDateChange, onViewChange,
   };
 
   return (
-    <div className="flex flex-col gap-1.5 sm:gap-2 p-2 sm:p-2.5 bg-zinc-900/95 border-b border-zinc-800 sticky top-0 z-30 backdrop-blur-md shrink-0">
+    <div className="flex flex-col gap-3 p-4 bg-zinc-950 border-b border-zinc-800 sticky top-0 z-30 shrink-0">
       {/* Primeira linha: Navegação e data */}
-      <div className="flex items-center justify-between gap-2 w-full">
+      <div className="flex items-center justify-between gap-4 w-full">
         {/* Botões de navegação */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             onClick={handlePrevious}
-            className="hover:bg-zinc-800 h-8 w-8 sm:h-9 sm:w-9"
+            className="h-10 w-10 rounded-xl"
           >
-            <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+            <ChevronLeft className="w-5 h-5" />
           </Button>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             onClick={handleNext}
-            className="hover:bg-zinc-800 h-8 w-8 sm:h-9 sm:w-9"
+            className="h-10 w-10 rounded-xl"
           >
-            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            <ChevronRight className="w-5 h-5" />
           </Button>
         </div>
 
         {/* Data central */}
-        <h2 className="text-sm sm:text-base md:text-lg font-semibold text-white capitalize truncate flex-1 text-center">
-          {getDateLabel()}
-        </h2>
+        <div className="flex-1 text-center">
+          <h2 className="text-lg md:text-xl font-bold text-white uppercase tracking-tight truncate">
+            {getDateLabel()}
+          </h2>
+        </div>
 
         {/* Botões de ação */}
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <Button
-            variant="ghost"
-            size="icon"
+            variant="outline"
+            size="sm"
             onClick={onToday}
-            className="hover:bg-zinc-800 h-8 w-8 sm:h-9 sm:w-9"
+            className="hidden sm:flex rounded-xl font-bold uppercase tracking-widest text-[10px]"
             title={t('today')}
           >
-            <Calendar className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <Calendar className="w-3.5 h-3.5 mr-2" />
+            {t('today')}
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onToday}
+            className="sm:hidden h-10 w-10 rounded-xl"
+            title={t('today')}
+          >
+            <Calendar className="w-5 h-5" />
           </Button>
 
           {onRefresh && (
             <Button
-              variant="ghost"
+              variant="outline"
               size="icon"
               onClick={handleSync}
               disabled={isSyncing}
-              className="hover:bg-zinc-800 h-8 w-8 sm:h-9 sm:w-9"
+              className="h-10 w-10 rounded-xl"
               title={isSyncing ? t('synchronizing') : t('synchronize')}
             >
-              <RefreshCw className={`w-4 h-4 sm:w-4.5 sm:h-4.5 ${isSyncing ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />
             </Button>
           )}
         </div>
       </div>
 
-      {/* Segunda linha: Filtros de Visualização - mais compacto */}
-      <div className="flex items-center gap-0.5 bg-zinc-800/50 rounded-md p-0.5 w-full">
+      {/* Segunda linha: Filtros de Visualização - Estilo Segmented Control */}
+      <div className="flex items-center gap-1 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-1.5 w-full max-w-md mx-auto sm:mx-0">
         <Button
           variant="ghost"
           size="sm"
           onClick={() => onViewChange('day')}
-          className={`flex-1 text-xs h-7 transition-all ${
+          className={`flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl transition-all ${
             view === 'day'
-              ? 'bg-green-600 text-white hover:bg-green-700'
-              : 'text-gray-400 hover:text-white hover:bg-zinc-700'
+              ? 'bg-zinc-800 text-emerald-500 shadow-sm'
+              : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'
           }`}
         >
           {t('day')}
@@ -171,10 +183,10 @@ export function CalendarToolbar({ currentDate, view, onDateChange, onViewChange,
           variant="ghost"
           size="sm"
           onClick={() => onViewChange('week')}
-          className={`flex-1 text-xs h-7 transition-all ${
+          className={`flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl transition-all ${
             view === 'week'
-              ? 'bg-green-600 text-white hover:bg-green-700'
-              : 'text-gray-400 hover:text-white hover:bg-zinc-700'
+              ? 'bg-zinc-800 text-emerald-500 shadow-sm'
+              : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'
           }`}
         >
           {t('week')}
@@ -183,10 +195,10 @@ export function CalendarToolbar({ currentDate, view, onDateChange, onViewChange,
           variant="ghost"
           size="sm"
           onClick={() => onViewChange('month')}
-          className={`flex-1 text-xs h-7 transition-all ${
+          className={`flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl transition-all ${
             view === 'month'
-              ? 'bg-green-600 text-white hover:bg-green-700'
-              : 'text-gray-400 hover:text-white hover:bg-zinc-700'
+              ? 'bg-zinc-800 text-emerald-500 shadow-sm'
+              : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'
           }`}
         >
           {t('month')}
@@ -195,10 +207,10 @@ export function CalendarToolbar({ currentDate, view, onDateChange, onViewChange,
           variant="ghost"
           size="sm"
           onClick={() => onViewChange('year')}
-          className={`flex-1 text-xs h-7 transition-all hidden sm:flex ${
+          className={`flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl transition-all hidden sm:flex ${
             view === 'year'
-              ? 'bg-green-600 text-white hover:bg-green-700'
-              : 'text-gray-400 hover:text-white hover:bg-zinc-700'
+              ? 'bg-zinc-800 text-emerald-500 shadow-sm'
+              : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'
           }`}
         >
           {t('year')}

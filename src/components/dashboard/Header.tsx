@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from '@/lib/auth-mock';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 import { Menu, Bell, Crown, User, Settings, LogOut, Sparkles } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -46,7 +47,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-xl">
       <div className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3">
         {/* Mobile Menu + Logo */}
         <div className="flex items-center gap-2 sm:gap-3">
@@ -57,7 +58,7 @@ export function Header() {
                 <Menu className="w-4 h-4 sm:w-5 sm:h-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-64 bg-zinc-900 border-zinc-800">
+            <SheetContent side="left" className="p-0 w-64 bg-zinc-950 border-zinc-800">
               <VisuallyHidden>
                 <SheetTitle>{t('navigationMenu')}</SheetTitle>
               </VisuallyHidden>
@@ -66,7 +67,14 @@ export function Header() {
           </Sheet>
 
           {/* Logo (mobile only) */}
-          <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-zenit-400 to-blue-400 bg-clip-text text-transparent lg:hidden">
+          <h1 className="text-xl font-bold text-white lg:hidden flex items-center gap-2">
+            <Image
+              src="/images/logo-sem-fundo.png"
+              alt="Zênit Logo"
+              width={20}
+              height={20}
+              className="w-5 h-5 object-contain"
+            />
             Zênit
           </h1>
         </div>
@@ -82,39 +90,38 @@ export function Header() {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-1.5 sm:gap-2 px-1.5 sm:px-2 hover:bg-zinc-800 h-8 sm:h-9">
-                <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
+              <Button variant="ghost" className="gap-2 px-2 hover:bg-zinc-900 border border-transparent hover:border-zinc-800 h-9 rounded-xl transition-all">
+                <Avatar className="w-7 h-7">
                   <AvatarImage src={session?.user?.image || undefined} />
-                  <AvatarFallback className="bg-gradient-to-br from-zenit-500 to-blue-500 text-white text-xs sm:text-sm">
+                  <AvatarFallback className="bg-zinc-800 text-zinc-100 text-xs">
                     {getInitials(session?.user?.name)}
                   </AvatarFallback>
                 </Avatar>
-                <div className="hidden md:block text-left">
-                  <p className="text-sm font-medium leading-none">{session?.user?.name}</p>
-                  <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[150px]">{session?.user?.email}</p>
+                <div className="hidden md:block text-left mr-1">
+                  <p className="text-sm font-bold leading-none text-zinc-100">{session?.user?.name}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-72 bg-zinc-900 border-zinc-800 p-0">
+            <DropdownMenuContent align="end" className="w-80 bg-zinc-950 border-zinc-800 p-0 shadow-2xl rounded-2xl overflow-hidden">
               {/* Header do Menu */}
-              <div className="p-4 bg-gradient-to-br from-zenit-500/10 via-blue-500/10 to-green-500/10 border-b border-zinc-800">
-                <div className="flex items-center gap-3">
-                  <Avatar className="w-12 h-12 border-2 border-zenit-500/20">
+              <div className="p-6 bg-zinc-900/50 border-b border-zinc-800">
+                <div className="flex items-center gap-4">
+                  <Avatar className="w-14 h-14 border border-zinc-700">
                     <AvatarImage src={session?.user?.image || undefined} />
-                    <AvatarFallback className="bg-gradient-to-br from-zenit-500 to-blue-500 text-white text-lg font-bold">
+                    <AvatarFallback className="bg-zinc-800 text-white text-xl font-bold">
                       {getInitials(session?.user?.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">{session?.user?.name}</p>
-                    <p className="text-xs text-gray-400 truncate">{session?.user?.email}</p>
-                    <div className="flex items-center gap-1.5 mt-1.5">
-                      <Crown className={`w-3 h-3 ${currentPlano === 'PREMIUM' ? 'text-green-500' : 'text-gray-500'}`} />
-                      <span className={`text-xs font-semibold ${currentPlano === 'PREMIUM'
-                        ? 'bg-gradient-to-r from-green-500 to-teal-500 bg-clip-text text-transparent'
-                        : 'text-gray-400'
+                    <p className="text-base font-bold text-white truncate">{session?.user?.name}</p>
+                    <p className="text-xs text-zinc-500 font-medium truncate mb-2">{session?.user?.email}</p>
+                    <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-zinc-800 rounded-full border border-zinc-700">
+                      <Crown className={`w-3 h-3 ${currentPlano === 'PREMIUM' ? 'text-emerald-500' : 'text-zinc-500'}`} />
+                      <span className={`text-[10px] font-black uppercase tracking-widest ${currentPlano === 'PREMIUM'
+                        ? 'text-emerald-500'
+                        : 'text-zinc-500'
                         }`}>
-                        {t('plan')} {currentPlano || 'FREE'}
+                        {currentPlano || 'FREE'}
                       </span>
                     </div>
                   </div>
@@ -124,67 +131,67 @@ export function Header() {
               {/* Menu Items */}
               <div className="p-2">
                 <DropdownMenuItem
-                  className="cursor-pointer hover:bg-zinc-800 focus:bg-zinc-800 rounded-lg px-3 py-2.5 flex items-center gap-3 transition-colors"
+                  className="cursor-pointer hover:bg-zinc-900 focus:bg-zinc-900 rounded-xl px-4 py-3 flex items-center gap-4 transition-all"
                   onClick={() => router.push('/dashboard/perfil')}
                 >
-                  <div className="p-1.5 bg-zenit-500/10 rounded-lg">
-                    <User className="w-4 h-4 text-zenit-400" />
+                  <div className="w-10 h-10 bg-zinc-900 border border-zinc-800 flex items-center justify-center rounded-xl group-hover:border-zinc-700 transition-colors">
+                    <User className="w-5 h-5 text-zinc-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-white">{t('myProfile')}</p>
-                    <p className="text-xs text-gray-500">{t('viewAndEdit')}</p>
+                    <p className="text-sm font-bold text-zinc-100 uppercase tracking-tight">{t('myProfile')}</p>
+                    <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5 opacity-50">{t('viewAndEdit')}</p>
                   </div>
                 </DropdownMenuItem>
 
                 <DropdownMenuItem
-                  className="cursor-pointer hover:bg-zinc-800 focus:bg-zinc-800 rounded-lg px-3 py-2.5 flex items-center gap-3 transition-colors"
+                  className="cursor-pointer hover:bg-zinc-900 focus:bg-zinc-900 rounded-xl px-4 py-3 flex items-center gap-4 transition-all"
                   onClick={() => router.push('/dashboard/settings')}
                 >
-                  <div className="p-1.5 bg-blue-500/10 rounded-lg">
-                    <Settings className="w-4 h-4 text-blue-400" />
+                  <div className="w-10 h-10 bg-zinc-900 border border-zinc-800 flex items-center justify-center rounded-xl group-hover:border-zinc-700 transition-colors">
+                    <Settings className="w-5 h-5 text-zinc-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-white">{t('settings')}</p>
-                    <p className="text-xs text-gray-500">{t('systemPreferences')}</p>
+                    <p className="text-sm font-bold text-zinc-100 uppercase tracking-tight">{t('settings')}</p>
+                    <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5 opacity-50">{t('systemPreferences')}</p>
                   </div>
                 </DropdownMenuItem>
               </div>
 
-              <DropdownMenuSeparator className="bg-zinc-800 my-1" />
+              <DropdownMenuSeparator className="bg-zinc-800 mx-4 h-px" />
 
               {/* Upgrade CTA */}
               {currentPlano === 'FREE' && (
                 <>
                   <div className="p-2">
                     <DropdownMenuItem
-                      className="cursor-pointer hover:bg-gradient-to-r hover:from-yellow-500/20 hover:to-orange-500/20 focus:bg-gradient-to-r focus:from-yellow-500/20 focus:to-orange-500/20 rounded-lg px-3 py-2.5 flex items-center gap-3 transition-all border border-yellow-500/20"
+                      className="cursor-pointer bg-emerald-500/5 hover:bg-emerald-500/10 focus:bg-emerald-500/10 rounded-xl px-4 py-3 flex items-center gap-4 transition-all border border-emerald-500/10 hover:border-emerald-500/20 m-1"
                       onClick={() => router.push('/premium')}
                     >
-                      <div className="p-1.5 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-lg">
-                        <Sparkles className="w-4 h-4 text-yellow-500" />
+                      <div className="w-10 h-10 bg-emerald-500/10 flex items-center justify-center rounded-xl">
+                        <Sparkles className="w-5 h-5 text-emerald-500" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-semibold bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">{t('upgrade')}</p>
-                        <p className="text-xs text-gray-500">{t('unlockPremium')}</p>
+                        <p className="text-sm font-black text-emerald-500 uppercase tracking-tight">{t('upgrade')}</p>
+                        <p className="text-[10px] font-bold text-emerald-600/60 uppercase tracking-widest mt-0.5">{t('unlockPremium')}</p>
                       </div>
                     </DropdownMenuItem>
                   </div>
-                  <DropdownMenuSeparator className="bg-zinc-800 my-1" />
+                  <DropdownMenuSeparator className="bg-zinc-800 mx-4 h-px" />
                 </>
               )}
 
               {/* Logout */}
-              <div className="p-2">
+              <div className="p-2 pb-4">
                 <DropdownMenuItem
-                  className="cursor-pointer hover:bg-red-500/10 focus:bg-red-500/10 rounded-lg px-3 py-2.5 flex items-center gap-3 transition-colors group"
+                  className="cursor-pointer hover:bg-red-500/5 focus:bg-red-500/5 rounded-xl px-4 py-3 flex items-center gap-4 transition-all group"
                   onClick={() => signOut()}
                 >
-                  <div className="p-1.5 bg-red-500/10 rounded-lg group-hover:bg-red-500/20 transition-colors">
-                    <LogOut className="w-4 h-4 text-red-400" />
+                  <div className="w-10 h-10 bg-red-500/10 flex items-center justify-center rounded-xl group-hover:bg-red-500/20 transition-colors">
+                    <LogOut className="w-5 h-5 text-red-500" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-red-400">{t('logout')}</p>
-                    <p className="text-xs text-gray-500">{t('endSession')}</p>
+                    <p className="text-sm font-bold text-red-500 uppercase tracking-tight">{t('logout')}</p>
+                    <p className="text-[11px] font-bold text-red-600/60 uppercase tracking-widest mt-0.5">{t('endSession')}</p>
                   </div>
                 </DropdownMenuItem>
               </div>

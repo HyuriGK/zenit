@@ -107,48 +107,48 @@ export default function NovoAtivoModal({ aberto, onFechar, onSucesso }: NovoAtiv
 
     return (
         <Dialog open={aberto} onOpenChange={onFechar}>
-            <DialogContent className="bg-zinc-900 border-zinc-800 max-w-xl">
-                <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold text-white flex items-center gap-2">
-                        <Plus className="w-6 h-6 text-green-500" />
+            <DialogContent className="bg-zinc-900/90 backdrop-blur-xl border-zinc-800/50 max-w-xl rounded-3xl p-8">
+                <DialogHeader className="mb-8">
+                    <DialogTitle className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 flex items-center gap-2">
+                        <Plus className="w-4 h-4 text-emerald-500" />
                         {t('newAsset')}
                     </DialogTitle>
-                    <DialogDescription className="text-zinc-400">
+                    <DialogDescription className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mt-2">
                         {t('startAddingAssets')}
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <Label className="text-zinc-300">{t('assetName')} *</Label>
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('assetName')} *</Label>
                         <Input
                             value={nome}
                             onChange={(e) => setNome(e.target.value)}
                             placeholder={t('assetNamePlaceholder')}
                             required
-                            className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white uppercase"
+                            className="bg-zinc-950/50 border-zinc-800/50 focus:border-emerald-500/50 text-white uppercase font-black tracking-tight h-12 rounded-xl"
                         />
                     </div>
 
-                    <div>
-                        <Label className="text-zinc-300">{t('type')} *</Label>
+                    <div className="space-y-2">
+                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('type')} *</Label>
                         <Select value={tipo} onValueChange={(value: any) => setTipo(value)}>
-                            <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white">
+                            <SelectTrigger className="bg-zinc-950/50 border-zinc-800/50 text-white font-bold h-12 rounded-xl focus:ring-emerald-500/20">
                                 <SelectValue placeholder="Selecione o tipo do ativo" />
                             </SelectTrigger>
-                            <SelectContent className="bg-zinc-900 border-zinc-800">
-                                <SelectItem value="ACAO" className="text-white hover:bg-zinc-800">{t('types.ACAO')}</SelectItem>
-                                <SelectItem value="FII" className="text-white hover:bg-zinc-800">{t('types.FII')}</SelectItem>
-                                <SelectItem value="RENDA_FIXA" className="text-white hover:bg-zinc-800">{t('types.RENDA_FIXA')}</SelectItem>
-                                <SelectItem value="CRIPTO" className="text-white hover:bg-zinc-800">{t('types.CRIPTO')}</SelectItem>
-                                <SelectItem value="OUTRO" className="text-white hover:bg-zinc-800">{t('types.OUTRO')}</SelectItem>
+                            <SelectContent className="bg-zinc-900 border-zinc-800 rounded-xl">
+                                <SelectItem value="ACAO" className="text-sm font-bold text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">{t('types.ACAO')}</SelectItem>
+                                <SelectItem value="FII" className="text-sm font-bold text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">{t('types.FII')}</SelectItem>
+                                <SelectItem value="RENDA_FIXA" className="text-sm font-bold text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">{t('types.RENDA_FIXA')}</SelectItem>
+                                <SelectItem value="CRIPTO" className="text-sm font-bold text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">{t('types.CRIPTO')}</SelectItem>
+                                <SelectItem value="OUTRO" className="text-sm font-bold text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">{t('types.OUTRO')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <Label className="text-zinc-300">{t('quantity')} *</Label>
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('quantity')} *</Label>
                             <Input
                                 type="text"
                                 inputMode="decimal"
@@ -156,11 +156,11 @@ export default function NovoAtivoModal({ aberto, onFechar, onSucesso }: NovoAtiv
                                 onChange={(e) => setQuantidade(e.target.value)}
                                 placeholder="0.00"
                                 required
-                                className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+                                className="bg-zinc-950/50 border-zinc-800/50 focus:border-emerald-500/50 text-white font-bold h-12 rounded-xl"
                             />
                         </div>
-                        <div>
-                            <Label className="text-zinc-300">{t('pricePerShare')} *</Label>
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('pricePerShare')} *</Label>
                             <Input
                                 type="text"
                                 inputMode="decimal"
@@ -168,54 +168,57 @@ export default function NovoAtivoModal({ aberto, onFechar, onSucesso }: NovoAtiv
                                 onChange={(e) => setPrecoCota(e.target.value)}
                                 placeholder="R$ 0,00"
                                 required
-                                className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+                                className="bg-zinc-950/50 border-zinc-800/50 focus:border-emerald-500/50 text-white font-bold h-12 rounded-xl"
                             />
                         </div>
-                        <div>
-                            <Label className="text-zinc-300">{t('fees')}</Label>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('fees')}</Label>
                             <Input
                                 type="text"
                                 inputMode="decimal"
                                 value={taxas}
                                 onChange={(e) => setTaxas(e.target.value)}
                                 placeholder="R$ 0,00"
-                                className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
+                                className="bg-zinc-950/50 border-zinc-800/50 focus:border-emerald-500/50 text-white font-bold h-12 rounded-xl"
+                            />
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Data de Compra *</Label>
+                            <Input
+                                type="date"
+                                value={dataCompra}
+                                onChange={(e) => setDataCompra(e.target.value)}
+                                required
+                                className="bg-zinc-950/50 border-zinc-800/50 focus:border-emerald-500/50 text-white font-bold h-12 rounded-xl"
                             />
                         </div>
                     </div>
 
-                    <div className="p-3 rounded-lg border border-green-500/20 bg-green-500/5">
-                        <div className="text-sm text-zinc-400">{t('averagePrice')}</div>
-                        <div className="text-lg font-bold text-green-500">
+                    <div className="p-5 rounded-2xl border border-emerald-500/10 bg-emerald-500/5">
+                        <div className="text-[9px] font-black uppercase tracking-[0.2em] text-emerald-500/60 mb-1">{t('averagePrice')}</div>
+                        <div className="text-2xl font-black text-emerald-500">
                             {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(precoMedioCalculado())}
                         </div>
                     </div>
 
-                    <div>
-                        <Label className="text-zinc-300">Data de Compra *</Label>
-                        <Input
-                            type="date"
-                            value={dataCompra}
-                            onChange={(e) => setDataCompra(e.target.value)}
-                            required
-                            className="bg-zinc-900/50 border-zinc-800 focus:border-green-500 text-white"
-                        />
-                    </div>
-
-                    <div className="flex gap-3 pt-4">
+                    <div className="flex gap-4 pt-4">
                         <Button
                             type="button"
-                            variant="default"
+                            variant="outline"
                             onClick={onFechar}
-                            className="flex-1 border-zinc-800 hover:bg-zinc-800"
+                            className="flex-1 border-zinc-800 hover:bg-zinc-800 h-12 rounded-xl font-black uppercase tracking-widest text-[10px]"
                             disabled={carregando}
                         >
                             {t('cancel')}
                         </Button>
                         <Button
                             type="submit"
+                            variant="premium"
                             disabled={carregando}
-                            className="flex-1 bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                            className="flex-1 h-12 text-[10px]"
                         >
                             {carregando ? (
                                 <>

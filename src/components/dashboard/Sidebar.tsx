@@ -51,15 +51,20 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
   return (
     <aside className={`${isMobile ? 'flex' : 'hidden lg:flex'} flex-col h-screen fixed left-0 top-0 border-r border-zinc-800 bg-zinc-900/50 backdrop-blur-xl transition-all duration-300 z-40 ${isCollapsed ? 'w-20' : 'w-64'}`}>
       {/* Logo */}
-      <div className={`border-b border-zinc-800 bg-zinc-900 flex items-center ${isCollapsed ? 'p-4 justify-center' : 'p-6 justify-between'}`}>
+      <div className={`border-b border-zinc-800 flex items-center ${isCollapsed ? 'p-4 justify-center' : 'p-6 justify-between'}`}>
         {!isCollapsed && (
           <Link href="/dashboard" className="hover:opacity-80 transition-opacity">
-            <h1 className="text-2xl font-extrabold">
-              <span className="bg-gradient-to-r from-zenit-400 via-blue-400 to-green-400 bg-clip-text text-transparent drop-shadow-md">
-                Zênit
-              </span>
+            <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+              <Image
+                src="/images/logo-sem-fundo.png"
+                alt="Zênit Logo"
+                width={24}
+                height={24}
+                className="w-6 h-6 object-contain"
+              />
+              Zênit
             </h1>
-            <p className="text-xs text-gray-500">{t('personalManagement')}</p>
+            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-0.5">{t('personalManagement')}</p>
           </Link>
         )}
         {isCollapsed && (
@@ -67,9 +72,9 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
             <Image
               src="/images/logo-sem-fundo.png"
               alt="Zênit Logo"
-              width={96}
-              height={96}
-              className="w-12 h-12 flex-shrink-0 object-contain"
+              width={32}
+              height={32}
+              className="w-8 h-8 flex-shrink-0 object-contain"
             />
           </Link>
         )}
@@ -106,10 +111,10 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
               href={item.href}
               onClick={onNavigate}
               className={`
-                flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all relative group
+                flex items-center gap-3 px-3 py-2 rounded-lg transition-all relative group
                 ${isActive
-                  ? 'bg-zenit-500/10 text-zenit-400 border border-zenit-500/20'
-                  : 'text-gray-400 hover:text-white hover:bg-zinc-800/50'
+                  ? 'bg-zinc-100 text-zinc-950 font-semibold'
+                  : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80'
                 }
                 ${isCollapsed ? 'justify-center' : ''}
               `}
@@ -127,17 +132,17 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
       {/* Upgrade Card - Only show for free plan */}
       {ehFree && !isCollapsed && (
         <div className="p-4 border-t border-zinc-800">
-          <div className="bg-gradient-to-br from-zenit-500/10 to-blue-500/10 border border-zenit-500/20 rounded-xl p-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Crown className="w-5 h-5 text-yellow-500" />
-              <h3 className="font-semibold text-sm">{t('freePlan')}</h3>
+              <Crown className="w-4 h-4 text-emerald-500" />
+              <h3 className="font-bold text-xs uppercase tracking-wider">{t('freePlan')}</h3>
             </div>
-            <p className="text-xs text-gray-400 mb-3">
+            <p className="text-[11px] text-zinc-500 leading-relaxed mb-3">
               {t('unlockPremiumFeatures')}
             </p>
             <button
               onClick={() => router.push('/premium')}
-              className="w-full bg-gradient-to-r from-zenit-500 to-blue-500 hover:from-zenit-600 hover:to-blue-600 text-white text-sm font-medium py-2 rounded-lg transition-all">
+              className="w-full bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold py-2 rounded-lg transition-all uppercase tracking-widest">
               {t('upgrade')}
             </button>
           </div>
@@ -148,9 +153,9 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
         <div className="p-4 border-t border-zinc-800 flex justify-center">
           <button
             onClick={() => router.push('/premium')}
-            className="bg-gradient-to-r from-zenit-500 to-blue-500 hover:from-zenit-600 hover:to-blue-600 text-white p-2 rounded-lg transition-all"
+            className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100 p-2 rounded-lg transition-all"
             title={t('upgrade')}>
-            <Crown className="w-5 h-5 text-yellow-500" />
+            <Crown className="w-5 h-5 text-emerald-500" />
           </button>
         </div>
       )}
@@ -160,7 +165,7 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
         <Link
           href="/dashboard/settings"
           onClick={onNavigate}
-          className={`flex items-center rounded-lg text-gray-400 hover:text-white hover:bg-zinc-800/50 transition-all ${isCollapsed ? 'justify-center p-2.5' : 'w-full gap-3 px-3 py-2.5'}`}
+          className={`flex items-center rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800/80 transition-all ${isCollapsed ? 'justify-center p-2' : 'w-full gap-3 px-3 py-2'}`}
           title={isCollapsed ? t('settings') : ''}
         >
           <Settings className="w-5 h-5 shrink-0" />

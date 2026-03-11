@@ -131,10 +131,13 @@ function AgendaPageContent() {
   };
 
   return (
-    <div className="flex flex-col h-full p-4 lg:p-6 overflow-hidden">
+    <div className="flex flex-col h-full overflow-hidden bg-zinc-950">
       {/* Header compacto - apenas mobile */}
-      <div className="md:hidden flex items-center justify-between gap-2 p-3 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-sm shrink-0">
-        <h1 className="text-lg font-bold text-white">{t('title')}</h1>
+      <div className="md:hidden flex items-center justify-between gap-4 p-4 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
+        <div>
+          <h1 className="text-lg font-bold text-white tracking-tight">{t('title')}</h1>
+          <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{t('subtitle') || 'Agenda'}</p>
+        </div>
         <Button
           onClick={() => {
             setSelectedDate(null);
@@ -143,8 +146,8 @@ function AgendaPageContent() {
             setIsEditMode(false);
             setIsModalOpen(true);
           }}
+          variant="premium"
           size="sm"
-          className="bg-green-600 hover:bg-green-700 h-8"
         >
           <Plus className="w-3.5 h-3.5 mr-1.5" />
           {t('new')}
@@ -152,8 +155,11 @@ function AgendaPageContent() {
       </div>
 
       {/* Header desktop - integrado */}
-      <div className="hidden md:flex items-center justify-between gap-3 px-4 py-2 border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-sm shrink-0">
-        <h1 className="text-xl font-bold text-white">{t('title')}</h1>
+      <div className="hidden md:flex items-center justify-between gap-4 px-6 py-4 border-b border-zinc-800 bg-zinc-900/20 shrink-0">
+        <div>
+          <h1 className="text-2xl font-bold text-white tracking-tight">{t('title')}</h1>
+          <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-0.5">{t('subtitle') || 'Gerencie seus compromissos'}</p>
+        </div>
         <Button
           onClick={() => {
             setSelectedDate(null);
@@ -162,7 +168,7 @@ function AgendaPageContent() {
             setIsEditMode(false);
             setIsModalOpen(true);
           }}
-          className="bg-green-600 hover:bg-green-700 h-9"
+          variant="premium"
         >
           <Plus className="w-4 h-4 mr-2" />
           {t('newAppointment')}

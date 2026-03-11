@@ -11,11 +11,7 @@ export default function DashboardLayout({
 }) {
   return (
     <NotificationProvider>
-      <div className="h-screen text-white flex overflow-hidden relative bg-gradient-to-br from-[#0a0a0a] via-[#050505] to-[#0a0a0a]">
-        {/* Performance: Using CSS class instead of inline SVG filter */}
-        <div className="noise-texture absolute inset-0" />
-        {/* Very subtle grid - optimized with contain */}
-        <div className="absolute inset-0 opacity-[0.02] pointer-events-none grid-pattern" />
+      <div className="h-screen text-white flex overflow-hidden relative bg-[#09090b]">
         {/* Sidebar - Desktop */}
         <Sidebar />
 

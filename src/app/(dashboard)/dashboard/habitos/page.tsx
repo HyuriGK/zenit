@@ -570,79 +570,83 @@ export default function HabitosPage() {
       {/* Header */}
       <div className="flex-shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('pageTitle')}</h1>
-          <p className="text-sm sm:text-base text-zinc-400">{t('subtitle')}</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{t('pageTitle')}</h1>
+          <p className="text-xs sm:text-sm font-bold text-zinc-500 uppercase tracking-widest mt-1">{t('subtitle')}</p>
         </div>
         <Button
           onClick={() => setModalHabitoAberto(true)}
-          className="bg-green-600 hover:bg-green-700"
+          variant="premium"
         >
           <Plus className="w-4 h-4 mr-2" />
           {t('newHabit')}
         </Button>
       </div>
 
-      <div className="flex-1 overflow-y-auto min-h-0 space-y-4 sm:space-y-6 pr-1 sm:pr-2 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900">
+      <div className="flex-1 overflow-y-auto min-h-0 space-y-4 sm:space-y-6 pr-1 sm:pr-2 scroll-container">
         {/* Estatísticas resumidas */}
         {estatisticas && (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Card className="bg-zinc-900 border-zinc-800">
-              <CardContent className="p-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card>
+              <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-zinc-500">{t('todayProgress')}</p>
-                    <p className="text-2xl font-bold text-white">
-                      {estatisticas.completadosHoje}/{estatisticas.totalHabitos}
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">{t('todayProgress')}</p>
+                    <p className="text-3xl font-bold text-white leading-tight">
+                      {estatisticas.completadosHoje}
+                      <span className="text-zinc-700 mx-1">/</span>
+                      <span className="text-zinc-400">{estatisticas.totalHabitos}</span>
                     </p>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <CheckCircle2 className="w-5 h-5 text-green-500" />
+                  <div className="w-12 h-12 rounded-xl bg-zinc-800/50 flex items-center justify-center border border-zinc-700/30">
+                    <CheckCircle2 className="w-6 h-6 text-zinc-400" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-zinc-900 border-zinc-800">
-              <CardContent className="p-4">
+            <Card>
+              <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-zinc-500">{t('currentStreak')}</p>
-                    <p className="text-2xl font-bold text-white">
-                      {estatisticas.maiorSequenciaAtual} <span className="text-sm font-normal text-zinc-500">{t('days')}</span>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">{t('currentStreak')}</p>
+                    <p className="text-3xl font-bold text-white leading-tight">
+                      {estatisticas.maiorSequenciaAtual}
+                      <span className="text-[10px] ml-2 font-black uppercase text-zinc-600 tracking-tighter">{t('days')}</span>
                     </p>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-orange-500/20 flex items-center justify-center">
-                    <Flame className="w-5 h-5 text-orange-500" />
+                  <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
+                    <Flame className="w-6 h-6 text-orange-500" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-zinc-900 border-zinc-800">
-              <CardContent className="p-4">
+            <Card>
+              <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-zinc-500">{t('bestStreak')}</p>
-                    <p className="text-2xl font-bold text-white">
-                      {estatisticas.maiorSequenciaHistorica} <span className="text-sm font-normal text-zinc-500">{t('days')}</span>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">{t('bestStreak')}</p>
+                    <p className="text-3xl font-bold text-white leading-tight">
+                      {estatisticas.maiorSequenciaHistorica}
+                      <span className="text-[10px] ml-2 font-black uppercase text-zinc-600 tracking-tighter">{t('days')}</span>
                     </p>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-yellow-500" />
+                  <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
+                    <TrendingUp className="w-6 h-6 text-emerald-500" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-zinc-900 border-zinc-800">
-              <CardContent className="p-4">
+            <Card>
+              <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs text-zinc-500">{t('totalCompleted')}</p>
-                    <p className="text-2xl font-bold text-white">{estatisticas.totalCompletados}</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">{t('totalCompleted')}</p>
+                    <p className="text-3xl font-bold text-white leading-tight">{estatisticas.totalCompletados}</p>
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center">
-                    <Target className="w-5 h-5 text-green-500" />
+                  <div className="w-12 h-12 rounded-xl bg-zinc-800/50 flex items-center justify-center border border-zinc-700/30">
+                    <Target className="w-6 h-6 text-zinc-400" />
                   </div>
                 </div>
               </CardContent>
@@ -714,68 +718,79 @@ export default function HabitosPage() {
 
         {/* Lista de Hábitos - Compacta */}
         {habitos.length === 0 ? (
-          <Card className="bg-zinc-900 border-zinc-800">
-            <CardContent className="p-6 text-center">
-              <Target className="w-10 h-10 text-zinc-600 mx-auto mb-3" />
-              <h3 className="text-base font-medium text-white mb-1">{t('noHabitsYet')}</h3>
-              <p className="text-sm text-zinc-400 mb-3">{t('startCreatingHabits')}</p>
+          <Card>
+            <CardContent className="p-12 text-center">
+              <div className="w-16 h-16 bg-zinc-800/50 rounded-2xl flex items-center justify-center mx-auto mb-6 border border-zinc-700/30">
+                <Target className="w-8 h-8 text-zinc-500" />
+              </div>
+              <h3 className="text-lg font-bold text-white uppercase tracking-tight mb-2">{t('noHabitsYet')}</h3>
+              <p className="text-sm text-zinc-500 uppercase tracking-widest font-bold mb-8 max-w-xs mx-auto leading-relaxed">{t('startCreatingHabits')}</p>
               <Button
                 onClick={() => setModalHabitoAberto(true)}
-                size="sm"
-                className="bg-green-600 hover:bg-green-700"
+                variant="premium"
               >
-                <Plus className="w-4 h-4 mr-1" />
+                <Plus className="w-4 h-4 mr-2" />
                 {t('createFirstHabit')}
               </Button>
             </CardContent>
           </Card>
         ) : (
-          <Card className="bg-zinc-900 border-zinc-800">
-            <CardContent className="p-3">
+          <Card>
+            <CardContent className="p-6">
               {/* Hábitos Pendentes */}
               {habitosPendentes.length > 0 && (
-                <div className={habitosCompletados.length > 0 ? 'mb-3' : ''}>
-                  <h2 className="text-xs font-medium text-zinc-500 mb-2 flex items-center gap-1.5 px-1">
+                <div className={habitosCompletados.length > 0 ? 'mb-8' : ''}>
+                  <h2 className="text-[10px] font-black text-zinc-500 mb-4 flex items-center gap-2 uppercase tracking-[0.2em] opacity-50">
                     <Circle className="w-3 h-3" />
-                    {t('pending')} ({habitosPendentes.length})
+                    {t('pending')} — {habitosPendentes.length}
                   </h2>
-                  <div className="space-y-1">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {habitosPendentes.map((habito) => (
                       <div
                         key={habito.id}
-                        className={`flex items-center gap-3 p-2 rounded-lg transition-colors group ${isVisualizandoDiaAtual ? 'hover:bg-zinc-800/50' : 'opacity-70'
+                        className={`flex items-center gap-4 p-4 rounded-xl border border-zinc-800/50 bg-zinc-900/40 transition-all group ${isVisualizandoDiaAtual ? 'hover:bg-zinc-800/50 hover:border-zinc-700/50' : 'opacity-40'
                           }`}
                       >
                         <button
                           onClick={() => completarHabito(habito)}
                           disabled={completandoHabito === habito.id}
-                          className={`flex-shrink-0 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors hover:bg-zinc-800 cursor-pointer`}
-                          style={{ borderColor: habito.cor }}
+                          className={`flex-shrink-0 w-10 h-10 rounded-xl border flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-sm`}
+                          style={{
+                            borderColor: `${habito.cor}40`,
+                            backgroundColor: `${habito.cor}10`
+                          }}
                         >
-                          {completandoHabito === habito.id && (
-                            <Loader2 className="w-3 h-3 animate-spin" style={{ color: habito.cor }} />
+                          {completandoHabito === habito.id ? (
+                            <Loader2 className="w-5 h-5 animate-spin" style={{ color: habito.cor }} />
+                          ) : (
+                            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: habito.cor }} />
                           )}
                         </button>
 
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-white truncate">{habito.nome}</p>
+                          <p className="text-sm font-bold text-zinc-100 uppercase tracking-tight truncate">{habito.nome}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <div className="flex items-center gap-1 text-orange-500/80">
+                              <Flame className="w-3 h-3" />
+                              <span className="text-[10px] font-black">{habito.sequenciaAtual}</span>
+                            </div>
+                            {habito.categoria && (
+                              <span className="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-500 tracking-widest">
+                                {habito.categoria.nome}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-0.5 text-orange-500">
-                            <Flame className="w-3.5 h-3.5" />
-                            <span className="text-xs font-medium">{habito.sequenciaAtual}</span>
-                          </div>
-                          <button
-                            onClick={() => {
-                              setHabitoSelecionado(habito);
-                              setModalExcluirHabito(true);
-                            }}
-                            className="p-1 text-zinc-600 hover:text-red-400 transition-colors rounded opacity-0 group-hover:opacity-100"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => {
+                            setHabitoSelecionado(habito);
+                            setModalExcluirHabito(true);
+                          }}
+                          className="p-2 text-zinc-700 hover:text-red-500 transition-all rounded-lg opacity-0 group-hover:opacity-100"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -784,55 +799,41 @@ export default function HabitosPage() {
 
               {/* Divisor */}
               {habitosPendentes.length > 0 && habitosCompletados.length > 0 && (
-                <div className="border-t border-zinc-800 my-2" />
+                <div className="border-t border-zinc-800/50 my-8" />
               )}
 
               {/* Hábitos Completados */}
               {habitosCompletados.length > 0 && (
                 <div>
-                  <h2 className="text-xs font-medium text-zinc-500 mb-2 flex items-center gap-1.5 px-1">
-                    <CheckCircle2 className="w-3 h-3 text-green-500" />
-                    {t('completed')} ({habitosCompletados.length})
+                  <h2 className="text-[10px] font-black text-emerald-500/50 mb-4 flex items-center gap-2 uppercase tracking-[0.2em]">
+                    <CheckCircle2 className="w-3 h-3" />
+                    {t('completed')} — {habitosCompletados.length}
                   </h2>
-                  <div className="space-y-1">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {habitosCompletados.map((habito) => (
                       <div
                         key={habito.id}
-                        className={`flex items-center gap-3 p-2 rounded-lg transition-colors group opacity-60 ${isVisualizandoDiaAtual ? 'hover:bg-zinc-800/30' : ''
-                          }`}
+                        className="flex items-center gap-4 p-4 rounded-xl border border-zinc-800/30 bg-zinc-950/40 opacity-60 hover:opacity-100 transition-opacity"
                       >
                         <button
                           onClick={() => completarHabito(habito)}
                           disabled={completandoHabito === habito.id}
-                          className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center cursor-pointer`}
-                          style={{ backgroundColor: habito.cor }}
+                          className="flex-shrink-0 w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center transition-all"
                         >
-                          {completandoHabito === habito.id ? (
-                            <Loader2 className="w-3 h-3 animate-spin text-white" />
-                          ) : (
-                            <CheckCircle2 className="w-4 h-4 text-white" />
-                          )}
+                          <CheckCircle2 className="w-5 h-5 text-emerald-500" />
                         </button>
-
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm text-zinc-400 line-through truncate">{habito.nome}</p>
+                          <p className="text-sm font-bold text-zinc-400 uppercase tracking-tight line-through truncate">{habito.nome}</p>
                         </div>
-
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-0.5 text-orange-500/50">
-                            <Flame className="w-3.5 h-3.5" />
-                            <span className="text-xs font-medium">{habito.sequenciaAtual}</span>
-                          </div>
-                          <button
-                            onClick={() => {
-                              setHabitoSelecionado(habito);
-                              setModalExcluirHabito(true);
-                            }}
-                            className="p-1 text-zinc-600 hover:text-red-400 transition-colors rounded opacity-0 group-hover:opacity-100"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+                        <button
+                          onClick={() => {
+                            setHabitoSelecionado(habito);
+                            setModalExcluirHabito(true);
+                          }}
+                          className="p-2 text-zinc-800 hover:text-red-500 transition-all"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     ))}
                   </div>

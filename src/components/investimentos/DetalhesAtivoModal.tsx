@@ -130,129 +130,132 @@ export default function DetalhesAtivoModal({ aberto, nomeAtivo, onFechar }: Deta
 
     return (
         <Dialog open={aberto} onOpenChange={onFechar}>
-            <DialogContent className="bg-zinc-900 border-zinc-800 w-[95vw] !max-w-[95vw] h-[95vh] overflow-hidden flex flex-col p-4 sm:p-6">
-                <DialogHeader className="shrink-0">
-                    <DialogTitle className="text-2xl font-bold text-white flex items-center justify-between">
-                        <span>Aportes Detalhados: <span className="text-green-500">{nomeAtivo}</span></span>
+            <DialogContent className="bg-zinc-950/95 backdrop-blur-2xl border-zinc-800/50 w-[95vw] !max-w-[1000px] h-[85vh] overflow-hidden flex flex-col p-8 rounded-3xl">
+                <DialogHeader className="shrink-0 mb-8">
+                    <DialogTitle className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500">
+                        Aportes Detalhados: <span className="text-white ml-2">{nomeAtivo}</span>
                     </DialogTitle>
-                    <DialogDescription className="text-zinc-400">
+                    <DialogDescription className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mt-2">
                         Visualize e edite individualmente todos os lançamentos para este ativo.
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="flex-1 overflow-y-auto mt-4 pr-2">
+                <div className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-800">
                     {!aportes || aportes.length === 0 ? (
-                        <div className="text-center py-8 text-zinc-500">Nenhum aporte encontrado.</div>
+                        <div className="text-center py-20">
+                            <div className="w-16 h-16 rounded-2xl bg-zinc-900/50 border border-zinc-800/50 flex items-center justify-center mx-auto mb-6">
+                                <Trash2 className="w-8 h-8 text-zinc-800" />
+                            </div>
+                            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Nenhum aporte encontrado.</p>
+                        </div>
                     ) : (
-                        <div className="rounded-md border border-zinc-800">
+                        <div className="rounded-2xl border border-zinc-800/50 overflow-hidden bg-zinc-900/20 shadow-2xl">
                             <table className="w-full text-sm text-left">
-                                <thead className="text-xs text-zinc-400 uppercase bg-zinc-900/80 border-b border-zinc-800 sticky top-0 z-10">
+                                <thead className="text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] bg-zinc-950/50 border-b border-zinc-800/50 sticky top-0 z-10">
                                     <tr>
-                                        <th className="px-4 py-3">Data</th>
-                                        <th className="px-4 py-3 text-right">Quantidade</th>
-                                        <th className="px-4 py-3 text-right">Preço/Cota</th>
-                                        <th className="px-4 py-3 text-right">Taxas</th>
-                                        <th className="px-4 py-3 text-right">Valor Aplicado</th>
-                                        <th className="px-4 py-3 text-center">Ações</th>
+                                        <th className="px-6 py-4">Data</th>
+                                        <th className="px-6 py-4 text-right">Quantidade</th>
+                                        <th className="px-6 py-4 text-right">Preço/Cota</th>
+                                        <th className="px-6 py-4 text-right">Taxas</th>
+                                        <th className="px-6 py-4 text-right">Aplicado</th>
+                                        <th className="px-6 py-4 text-center">Ações</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-zinc-800/50 bg-zinc-900/30">
+                                <tbody className="divide-y divide-zinc-800/30">
                                     {aportes.sort((a, b) => new Date(b.dataCompra).getTime() - new Date(a.dataCompra).getTime()).map((aporte: any) => {
                                         const isEditing = editandoId === aporte.id;
-
-                                        // Usamos precoCota se existir, senao fallback p/ precoMedio (legado)
                                         const cotaPrice = aporte.precoCota !== undefined ? aporte.precoCota : aporte.precoMedio;
                                         const feePrice = aporte.taxas || 0;
                                         const totalDisplay = (aporte.quantidade * cotaPrice);
 
                                         return (
-                                            <tr key={aporte.id} className="hover:bg-zinc-800/30 transition-colors">
+                                            <tr key={aporte.id} className="hover:bg-zinc-900/40 transition-all group">
                                                 {/* Data */}
-                                                <td className="px-4 py-3">
+                                                <td className="px-6 py-5">
                                                     {isEditing ? (
                                                         <Input
                                                             type="date"
                                                             value={editForm.dataCompra}
                                                             onChange={e => setEditForm({ ...editForm, dataCompra: e.target.value })}
-                                                            className="h-8 bg-zinc-950 border-zinc-700 text-white min-w-[130px]"
+                                                            className="h-9 bg-zinc-950 border-zinc-800 text-xs font-bold text-white min-w-[130px] rounded-lg"
                                                         />
                                                     ) : (
-                                                        <span className="text-zinc-300">
+                                                        <span className="text-xs font-bold text-zinc-400">
                                                             {new Date(aporte.dataCompra).toLocaleDateString('pt-BR', { timeZone: 'UTC' })}
                                                         </span>
                                                     )}
                                                 </td>
 
                                                 {/* Quantidade */}
-                                                <td className="px-4 py-3 text-right">
+                                                <td className="px-6 py-5 text-right">
                                                     {isEditing ? (
                                                         <Input
                                                             type="text"
                                                             inputMode="decimal"
                                                             value={editForm.quantidade}
                                                             onChange={e => setEditForm({ ...editForm, quantidade: e.target.value })}
-                                                            className="h-8 bg-zinc-950 border-zinc-700 text-white w-24 ml-auto text-right"
+                                                            className="h-9 bg-zinc-950 border-zinc-800 text-xs font-bold text-white w-24 ml-auto text-right rounded-lg"
                                                         />
                                                     ) : (
-                                                        <span className="text-white">
+                                                        <span className="text-sm font-black text-zinc-100">
                                                             {aporte.quantidade.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 6 })}
                                                         </span>
                                                     )}
                                                 </td>
 
                                                 {/* Preço/Cota */}
-                                                <td className="px-4 py-3 text-right">
+                                                <td className="px-6 py-5 text-right">
                                                     {isEditing ? (
                                                         <Input
                                                             type="text"
                                                             inputMode="decimal"
                                                             value={editForm.precoCota}
                                                             onChange={e => setEditForm({ ...editForm, precoCota: e.target.value })}
-                                                            className="h-8 bg-zinc-950 border-zinc-700 text-white w-28 ml-auto text-right"
+                                                            className="h-9 bg-zinc-950 border-zinc-800 text-xs font-bold text-white w-28 ml-auto text-right rounded-lg"
                                                         />
                                                     ) : (
-                                                        <span className="text-zinc-300">{formatarMoeda(cotaPrice)}</span>
+                                                        <span className="text-xs font-bold text-zinc-300">{formatarMoeda(cotaPrice)}</span>
                                                     )}
                                                 </td>
 
                                                 {/* Taxas */}
-                                                <td className="px-4 py-3 text-right">
+                                                <td className="px-6 py-5 text-right">
                                                     {isEditing ? (
                                                         <Input
                                                             type="text"
                                                             inputMode="decimal"
                                                             value={editForm.taxas}
                                                             onChange={e => setEditForm({ ...editForm, taxas: e.target.value })}
-                                                            className="h-8 bg-zinc-950 border-zinc-700 text-white w-24 ml-auto text-right"
+                                                            className="h-9 bg-zinc-950 border-zinc-800 text-xs font-bold text-white w-24 ml-auto text-right rounded-lg"
                                                         />
                                                     ) : (
-                                                        <span className="text-zinc-400">{formatarMoeda(feePrice)}</span>
+                                                        <span className="text-xs font-bold text-zinc-500">{formatarMoeda(feePrice)}</span>
                                                     )}
                                                 </td>
 
                                                 {/* Valor Aplicado */}
-                                                <td className="px-4 py-3 text-right font-medium text-white">
+                                                <td className="px-6 py-5 text-right font-black text-emerald-500/80">
                                                     {isEditing ? '-' : formatarMoeda(totalDisplay)}
                                                 </td>
 
                                                 {/* Ações */}
-                                                <td className="px-4 py-3 text-center">
+                                                <td className="px-6 py-5 text-center">
                                                     {isEditing ? (
                                                         <div className="flex items-center justify-center gap-2">
-                                                            <button onClick={() => salvarEdicao(aporte)} className="p-1.5 text-green-500 hover:bg-green-500/20 rounded-md transition-colors" title="Salvar">
+                                                            <button onClick={() => salvarEdicao(aporte)} className="p-2 text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all" title="Salvar">
                                                                 <Save className="w-4 h-4" />
                                                             </button>
-                                                            <button onClick={cancelarEdicao} className="p-1.5 text-zinc-400 hover:text-white hover:bg-zinc-700 rounded-md transition-colors" title="Cancelar">
+                                                            <button onClick={cancelarEdicao} className="p-2 text-zinc-600 hover:text-white hover:bg-zinc-800 rounded-lg transition-all" title="Cancelar">
                                                                 <X className="w-4 h-4" />
                                                             </button>
                                                         </div>
                                                     ) : (
-                                                        <div className="flex items-center justify-center gap-2">
-                                                            <button onClick={() => iniciarEdicao(aporte)} className="p-1.5 text-blue-400 hover:bg-blue-500/20 rounded-md transition-colors" title="Editar Aporte">
-                                                                <Edit2 className="w-4 h-4" />
+                                                        <div className="flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                                                            <button onClick={() => iniciarEdicao(aporte)} className="p-2 text-blue-500/70 hover:text-blue-500 hover:bg-blue-500/10 rounded-lg transition-all" title="Editar Aporte">
+                                                                <Edit2 className="w-3.5 h-3.5" />
                                                             </button>
-                                                            <button onClick={() => deletarAporte(aporte.id)} className="p-1.5 text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-md transition-colors" title="Excluir Aporte">
-                                                                <Trash2 className="w-4 h-4" />
+                                                            <button onClick={() => deletarAporte(aporte.id)} className="p-2 text-red-500/70 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all" title="Excluir Aporte">
+                                                                <Trash2 className="w-3.5 h-3.5" />
                                                             </button>
                                                         </div>
                                                     )}
@@ -266,8 +269,8 @@ export default function DetalhesAtivoModal({ aberto, nomeAtivo, onFechar }: Deta
                     )}
                 </div>
 
-                <div className="shrink-0 pt-4 flex justify-end">
-                    <Button onClick={onFechar} variant="outline" className="border-zinc-700 hover:bg-zinc-800 text-white">
+                <div className="shrink-0 pt-8 flex justify-end">
+                    <Button onClick={onFechar} variant="outline" className="border-zinc-800 hover:bg-zinc-800 text-zinc-400 font-black uppercase tracking-widest text-[10px] h-11 px-8 rounded-xl transition-all">
                         Fechar
                     </Button>
                 </div>

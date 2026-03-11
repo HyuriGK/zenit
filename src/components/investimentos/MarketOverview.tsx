@@ -202,29 +202,29 @@ export default function MarketOverview() {
     }, [userAssets]);
 
     return (
-        <Card className="bg-zinc-900 border-zinc-800 h-full flex flex-col">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 shrink-0">
-                <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
-                    <Activity className="w-5 h-5 text-green-500" />
+        <Card className="h-full flex flex-col">
+            <CardHeader className="flex flex-row items-center justify-between py-4 px-6 border-b border-zinc-800/50 shrink-0">
+                <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500 flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-emerald-500" />
                     {t('marketOverview')}
                 </CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 relative">
+            <CardContent className="flex-1 overflow-y-auto p-6 scrollbar-thin scrollbar-thumb-zinc-800 relative">
                 {isLoading && (
-                    <div className="absolute inset-0 z-10 bg-zinc-900/50 backdrop-blur-sm flex items-center justify-center">
-                        <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
+                    <div className="absolute inset-0 z-10 bg-zinc-950/50 backdrop-blur-sm flex items-center justify-center">
+                        <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
                     </div>
                 )}
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
                     {marketData.map((item, i) => (
-                        <div key={i} className="p-4 rounded-xl bg-zinc-900/50 border border-zinc-800 hover:border-zinc-700 transition-colors">
-                            <div className="text-sm text-zinc-400 mb-1">{item.name}</div>
-                            <div className="text-xl font-bold text-white tracking-tight">{item.value}</div>
-                            <div className={`text-sm mt-1 flex items-center font-medium ${item.isPositive ? 'text-green-500' : 'text-red-500'}`}>
+                        <div key={i} className="p-5 rounded-2xl bg-zinc-900/40 border border-zinc-800/50 hover:border-zinc-700/50 transition-all group">
+                            <div className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-2 group-hover:text-zinc-500 transition-colors">{item.name}</div>
+                            <div className="text-2xl font-black text-white tracking-tight leading-none">{item.value}</div>
+                            <div className={`text-[10px] sm:text-xs mt-3 flex items-center font-black uppercase tracking-widest ${item.isPositive ? 'text-emerald-500' : 'text-red-500'}`}>
                                 {item.isPositive ? (
-                                    <TrendingUp className="w-3 h-3 mr-1" />
+                                    <TrendingUp className="w-3 h-3 mr-1.5" />
                                 ) : (
-                                    <TrendingDown className="w-3 h-3 mr-1" />
+                                    <TrendingDown className="w-3 h-3 mr-1.5" />
                                 )}
                                 {item.change}
                             </div>
@@ -233,29 +233,29 @@ export default function MarketOverview() {
                 </div>
 
                 {/* Chart Section */}
-                <div className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+                <div className="mt-8 rounded-2xl border border-zinc-800/50 bg-zinc-900/20 p-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-8">
                         <Select value={selectedAsset} onValueChange={setSelectedAsset}>
-                            <SelectTrigger className="w-full sm:w-[250px] bg-zinc-900 border-zinc-800 text-white font-medium">
+                            <SelectTrigger className="w-full sm:w-[280px] bg-zinc-900/50 border-zinc-800/50 text-white font-bold rounded-xl h-11">
                                 <SelectValue placeholder="Selecione um Ativo" />
                             </SelectTrigger>
-                            <SelectContent className="bg-zinc-900 border-zinc-800 max-h-[300px]">
-                                <div className="px-2 py-1.5 text-xs font-semibold text-zinc-500 uppercase">Mercado Padrão</div>
+                            <SelectContent className="bg-zinc-900 border-zinc-800 max-h-[300px] rounded-xl">
+                                <div className="px-3 py-2 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em]">Mercado Padrão</div>
                                 {combinedAssets.slice(0, 6).map(asset => (
-                                    <SelectItem key={asset.id} value={asset.id} className="text-white hover:bg-zinc-800">{asset.name}</SelectItem>
+                                    <SelectItem key={asset.id} value={asset.id} className="text-sm font-bold text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">{asset.name}</SelectItem>
                                 ))}
                                 {combinedAssets.length > 6 && (
                                     <>
-                                        <div className="px-2 py-1.5 text-xs font-semibold text-zinc-500 uppercase mt-2 border-t border-zinc-800/50 pt-2">Sua Carteira</div>
+                                        <div className="px-3 py-2 text-[9px] font-black text-zinc-600 uppercase tracking-[0.2em] mt-3 border-t border-zinc-800/50 pt-3">Sua Carteira</div>
                                         {combinedAssets.slice(6).map(asset => (
-                                            <SelectItem key={asset.id} value={asset.id} className="text-white hover:bg-zinc-800">{asset.name}</SelectItem>
+                                            <SelectItem key={asset.id} value={asset.id} className="text-sm font-bold text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">{asset.name}</SelectItem>
                                         ))}
                                     </>
                                 )}
                             </SelectContent>
                         </Select>
 
-                        <div className="flex bg-zinc-900 rounded-md border border-zinc-800 p-1 w-full sm:w-auto">
+                        <div className="flex bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-1.5 w-full sm:w-auto min-w-[200px]">
                             {[
                                 { id: '1d', label: '1D' },
                                 { id: '1mo', label: '1M' },
@@ -266,9 +266,9 @@ export default function MarketOverview() {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => setSelectedPeriod(period.id as any)}
-                                    className={`flex-1 sm:flex-none text-xs h-7 px-3 rounded-sm ${selectedPeriod === period.id
-                                        ? 'bg-zinc-800 text-white shadow-sm'
-                                        : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                                    className={`flex-1 sm:flex-none text-[10px] font-black uppercase tracking-widest h-10 px-6 rounded-xl transition-all ${selectedPeriod === period.id
+                                        ? 'bg-zinc-800 text-emerald-500 shadow-sm'
+                                        : 'text-zinc-600 hover:text-white hover:bg-zinc-800/50'
                                         }`}
                                 >
                                     {period.label}
@@ -277,42 +277,36 @@ export default function MarketOverview() {
                         </div>
                     </div>
 
-                    <div className="h-[250px] w-full relative">
+                    <div className="h-[280px] w-full relative">
                         {isChartLoading && (
-                            <div className="absolute inset-0 z-10 bg-zinc-900/50 backdrop-blur-sm flex items-center justify-center rounded-lg">
-                                <Loader2 className="w-8 h-8 text-green-500 animate-spin" />
+                            <div className="absolute inset-0 z-10 bg-zinc-950/20 backdrop-blur-[2px] flex items-center justify-center rounded-2xl">
+                                <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
                             </div>
                         )}
                         {!isChartLoading && chartData.length === 0 ? (
-                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-zinc-500">
-                                <Activity className="w-8 h-8 mb-2 opacity-20" />
-                                <p className="text-sm">Dados históricos não disponíveis</p>
+                            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-zinc-600">
+                                <Activity className="w-10 h-10 mb-4 opacity-10" />
+                                <p className="text-[10px] font-black uppercase tracking-widest">Dados históricos não disponíveis</p>
                             </div>
                         ) : (
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
-                                    <defs>
-                                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor={chartColor} stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor={chartColor} stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
+                                <AreaChart data={chartData} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
                                     <XAxis
                                         dataKey="date"
                                         axisLine={false}
                                         tickLine={false}
-                                        tick={{ fill: '#71717a', fontSize: 12 }}
-                                        tickMargin={10}
-                                        minTickGap={30}
+                                        tick={{ fill: '#3f3f46', fontSize: 10, fontWeight: 'bold' }}
+                                        tickMargin={15}
+                                        minTickGap={40}
                                     />
                                     <YAxis
                                         hide
                                         domain={['dataMin', 'dataMax']}
                                     />
                                     <Tooltip
-                                        contentStyle={{ backgroundColor: '#18181b', borderColor: '#27272a', borderRadius: '8px', color: '#fff' }}
-                                        itemStyle={{ color: chartColor, fontWeight: 'bold' }}
-                                        labelStyle={{ color: '#a1a1aa', marginBottom: '4px' }}
+                                        contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '12px', color: '#fff', border: '1px solid rgba(255,255,255,0.05)', fontSize: '10px' }}
+                                        itemStyle={{ color: chartColor, fontWeight: '900', textTransform: 'uppercase', fontSize: '12px' }}
+                                        labelStyle={{ color: '#52525b', marginBottom: '8px', fontWeight: 'bold', textTransform: 'uppercase', fontSize: '9px', letterSpacing: '0.1em' }}
                                         formatter={formatTooltip}
                                         labelFormatter={(label) => `Data: ${label}`}
                                     />
@@ -320,9 +314,10 @@ export default function MarketOverview() {
                                         type="monotone"
                                         dataKey="value"
                                         stroke={chartColor}
-                                        strokeWidth={2}
-                                        fillOpacity={1}
-                                        fill="url(#colorValue)"
+                                        strokeWidth={4}
+                                        fill={chartColor}
+                                        fillOpacity={0.05}
+                                        animationDuration={1000}
                                     />
                                 </AreaChart>
                             </ResponsiveContainer>
