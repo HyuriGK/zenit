@@ -313,13 +313,13 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
 
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
-      <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1200px] w-[95vw] max-h-[92vh] overflow-y-auto p-0 gap-0 shadow-2xl">
-        <div className="flex flex-col h-full">
+      <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1200px] w-[95vw] max-h-[90vh] overflow-visible p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 sm:rounded-[32px] border-zinc-800/30">
+        <div className="flex flex-col h-full overflow-visible">
           {/* Header com Gradiente */}
-          <div className="bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-900/50 p-8 border-b border-zinc-800/50">
+          <div className="bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-900/50 p-6 border-b border-zinc-800/50">
             <DialogHeader className="gap-1">
               <DialogTitle className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
-                <div className={`p-2 rounded-xl ${tipo === 'RECEITA' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                <div className={`p-2 rounded-xl transition-colors duration-500 ${tipo === 'RECEITA' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                   {tipo === 'RECEITA' ? <TrendingUp className="w-6 h-6" /> : <TrendingDown className="w-6 h-6" />}
                 </div>
                 {transacaoParaEditar ? 'Editar Registro' : 'Novo Registro Financeiro'}
@@ -330,7 +330,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
             </DialogHeader>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-8 space-y-8">
+          <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-visible">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Coluna Esquerda: Dados da Transação */}
             <div className="space-y-6">
@@ -368,7 +368,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   onChange={(e) => setDescricao(e.target.value)}
                   placeholder="Ex: Assinatura Netflix, Freelance Design..."
                   required
-                  className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl placeholder:text-zinc-600 focus:border-zinc-700 transition-all text-base"
+                  className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl placeholder:text-zinc-600 focus:border-zinc-700 focus-visible:ring-0 focus:ring-0 focus:outline-none transition-all text-base"
                 />
               </div>
 
@@ -385,7 +385,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                       onChange={(e) => setValor(e.target.value)}
                       placeholder="0,00"
                       required
-                      className="bg-zinc-900/50 border-zinc-800 text-white h-12 pl-8 rounded-xl focus:border-zinc-700 transition-all text-lg font-black"
+                      className="bg-zinc-900/50 border-zinc-800 text-white h-12 pl-8 rounded-xl focus:border-zinc-700 focus-visible:ring-0 focus:ring-0 focus:outline-none transition-all text-lg font-black"
                     />
                   </div>
                 </div>
@@ -396,7 +396,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                     value={data}
                     onChange={(e) => setData(e.target.value)}
                     required
-                    className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl focus:border-zinc-700 transition-all"
+                    className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl focus:border-zinc-700 focus-visible:ring-0 focus:ring-0 focus:outline-none transition-all"
                   />
                 </div>
               </div>
@@ -405,15 +405,15 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
               <div>
                 <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Categoria</Label>
                 <Select value={categoriaId} onValueChange={setCategoriaId}>
-                  <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl focus:border-zinc-700 transition-all">
+                  <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl focus:border-zinc-700 focus-visible:ring-0 focus:ring-0 focus:outline-none transition-all">
                     <SelectValue placeholder="Categorize sua transação" />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-950 border-zinc-800 rounded-xl shadow-2xl">
+                  <SelectContent className="bg-zinc-950 border-zinc-800/80 rounded-xl shadow-2xl overflow-visible">
                     {categorias.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id} className="text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg m-1 py-2">
+                      <SelectItem key={cat.id} value={cat.id} className="text-white hover:text-white focus:text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg m-1 py-2 cursor-pointer transition-colors duration-200">
                         <div className="flex items-center gap-3">
                           <div className="w-2.5 h-2.5 rounded-full ring-4 ring-white/5" style={{ backgroundColor: cat.cor }} />
-                          <span className="font-medium">{cat.nome}</span>
+                          <span className="font-medium group-hover:text-white">{cat.nome}</span>
                         </div>
                       </SelectItem>
                     ))}
@@ -431,35 +431,20 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   <p>Toda transação deve estar vinculada a uma <strong>conta bancária</strong> ou ao <strong>Caixa Geral</strong>.</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                   <div>
                     <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Conta Origem/Destino</Label>
                     <Select value={contaBancariaId} onValueChange={handleContaChange}>
-                      <SelectTrigger className={`bg-zinc-900/50 border-zinc-800 h-11 text-white rounded-xl ${!contaBancariaId ? 'border-red-500/50' : ''}`}>
+                      <SelectTrigger className={`bg-zinc-900/50 border-zinc-800 h-11 text-white rounded-xl focus-visible:ring-0 focus:ring-0 focus:outline-none transition-all ${!contaBancariaId ? 'border-red-500/50' : ''}`}>
                         <SelectValue placeholder="Selecionar conta" />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-950 border-zinc-800 rounded-xl m-1">
-                        <SelectItem value="caixa-geral" className="text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg p-2 font-black text-xs uppercase tracking-widest">
+                      <SelectContent className="bg-zinc-950 border-zinc-800/80 rounded-xl m-1 overflow-visible">
+                        <SelectItem value="caixa-geral" className="text-white hover:text-white focus:text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg p-2 font-black text-xs uppercase tracking-widest cursor-pointer">
                           🏦 Caixa Geral
                         </SelectItem>
                         {contas.map((conta) => (
-                          <SelectItem key={conta.id} value={conta.id} className="text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg p-2 font-medium">
+                          <SelectItem key={conta.id} value={conta.id} className="text-white hover:text-white focus:text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg p-2 font-medium cursor-pointer">
                             {conta.nome}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Cartão de Crédito</Label>
-                    <Select value={cartaoId} onValueChange={handleCartaoChange}>
-                      <SelectTrigger className="bg-zinc-900/50 border-zinc-800 h-11 text-white rounded-xl">
-                        <SelectValue placeholder="Opcional" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-zinc-950 border-zinc-800 rounded-xl m-1">
-                        {cartoes.map((cartao) => (
-                          <SelectItem key={cartao.id} value={cartao.id} className="text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg p-2 font-medium">
-                            {cartao.nome}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -479,30 +464,16 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                     <Switch
                       checked={aplicarProximas}
                       onCheckedChange={setAplicarProximas}
-                      className="data-[state=checked]:bg-blue-600"
+                      className="data-[state=checked]:bg-blue-600 focus-visible:ring-0 focus:ring-0"
                     />
                   </div>
                 </div>
               )}
 
-              {/* Pagamento e Opções Especiais */}
-                <div className="space-y-4 p-5 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden group transition-all hover:bg-zinc-900/60">
-                  <div className={`absolute top-0 left-0 w-1 h-full ${paga ? 'bg-green-500' : 'bg-red-500'} opacity-30 group-hover:opacity-100 transition-opacity`} />
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label className={`font-black text-xs uppercase tracking-widest ${paga ? 'text-green-500' : 'text-zinc-400'}`}>Status Pago</Label>
-                      <p className="text-[10px] text-zinc-600 font-bold uppercase mt-0.5">Liquidado / A Receber</p>
-                    </div>
-                    <Switch
-                      checked={paga}
-                      onCheckedChange={setPaga}
-                      className="data-[state=checked]:bg-green-600"
-                    />
-                  </div>
-                </div>
-
+              {/* Configurações Avançadas */}
+              <div className="grid grid-cols-2 gap-4">
                 {/* Transação Fixa */}
-                <div className="space-y-4 p-5 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden group transition-all hover:bg-zinc-900/60">
+                <div className="space-y-4 p-4 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden group transition-all hover:bg-zinc-900/60">
                   <div className={`absolute top-0 left-0 w-1 h-full ${isFixa ? 'bg-blue-500' : 'bg-zinc-800'} opacity-30 group-hover:opacity-100 transition-opacity`} />
                   <div className="flex items-center justify-between">
                     <div>
@@ -512,12 +483,13 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                     <Switch
                       checked={isFixa}
                       onCheckedChange={setIsFixa}
+                      className="focus-visible:ring-0 focus:ring-0"
                     />
                   </div>
                 </div>
 
                 {/* Parcelamento */}
-                <div className="space-y-4 p-5 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden group transition-all hover:bg-zinc-900/60">
+                <div className="space-y-4 p-4 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden group transition-all hover:bg-zinc-900/60">
                   <div className={`absolute top-0 left-0 w-1 h-full ${isParcela ? 'bg-purple-500' : 'bg-zinc-800'} opacity-30 group-hover:opacity-100 transition-opacity`} />
                   <div className="flex items-center justify-between gap-2">
                     <div>
@@ -528,9 +500,11 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                       checked={isParcela}
                       onCheckedChange={setIsParcela}
                       disabled={!!transacaoParaEditar}
+                      className="focus-visible:ring-0 focus:ring-0"
                     />
                   </div>
                 </div>
+              </div>
 
               {isParcela && (
                 <div className="p-4 bg-purple-500/5 border border-purple-500/20 rounded-xl animate-in fade-in slide-in-from-top-2">
@@ -542,7 +516,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                       max="48"
                       value={parcelaTotais}
                       onChange={(e) => setParcelaTotais(e.target.value)}
-                      className="bg-zinc-900/50 border-purple-500/20 text-white h-9 w-24 rounded-lg focus:border-purple-500 transition-all font-black text-center"
+                      className="bg-zinc-900/50 border-purple-500/20 text-white h-9 w-24 rounded-lg focus:border-purple-500 focus-visible:ring-0 focus:ring-0 focus:outline-none transition-all font-black text-center"
                     />
                   </div>
                 </div>
@@ -556,7 +530,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setObservacoes(e.target.value)}
                   placeholder="Notas, detalhes da compra, links ou referências..."
                   rows={2}
-                  className="bg-zinc-900/50 border-zinc-800 text-white resize-none rounded-xl p-4 placeholder:text-zinc-600 focus:border-zinc-700 transition-all min-h-[100px]"
+                  className="bg-zinc-900/50 border-zinc-800 text-white resize-none rounded-xl p-4 placeholder:text-zinc-600 focus:border-zinc-700 focus-visible:ring-0 focus:ring-0 focus:outline-none transition-all min-h-[80px]"
                 />
               </div>
             </div>
@@ -576,7 +550,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
             <Button
               type="submit"
               disabled={carregando || !contaBancariaId}
-              className={`flex-[2] h-14 rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] ${tipo === 'RECEITA'
+              className={`flex-[2] h-14 rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] focus:ring-0 focus:outline-none focus-visible:ring-0 ${tipo === 'RECEITA'
                 ? 'bg-green-600 hover:bg-green-700 shadow-green-900/20'
                 : 'bg-red-600 hover:bg-red-700 shadow-red-900/20'
                 } disabled:opacity-50 text-white`}
