@@ -61,6 +61,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
   const [isParcela, setIsParcela] = useState(false);
   const [paga, setPaga] = useState(false);
   const [parcelaTotais, setParcelaTotais] = useState('1');
+  const [aplicarProximas, setAplicarProximas] = useState(false);
 
   // Listas do Dexie
   const categoriasRaw = useLiveQuery(() => db.categorias.toArray(), []);
@@ -87,6 +88,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
         setIsParcela(false);
         setPaga(transacaoParaEditar.paga || false);
         setParcelaTotais('1');
+        setAplicarProximas(false);
       } else {
         limparFormulario();
         if (contas.length > 0 && !contaBancariaId) {
@@ -158,13 +160,19 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
         }
 
         await db.transacoes.put(transacaoAtualizada);
+        toast.dismiss(loadingToast);
 
         // Atualizar data e categoria das próximas parcelas/fixas se houve mudança
-        if (transacaoParaEditar.grupoParcelaId) {
+        if (transacaoParaEditar.grupoParcelaId && aplicarProximas) {
           const dataMudou = dataSelecionadaLocal.getTime() !== new Date(transacaoParaEditar.data).getTime();
           const categoriaMudou = categoriaId !== transacaoParaEditar.categoriaId;
+          const valorMudou = valorNumerico !== transacaoParaEditar.valor;
+          const descricaoMudou = descricao !== transacaoParaEditar.descricao;
+          const contaMudou = contaBancariaId !== transacaoParaEditar.contaBancariaId;
+          const cartaoMudou = cartaoId !== transacaoParaEditar.cartaoId;
+          const observacoesMudou = observacoes !== transacaoParaEditar.observacoes;
 
-          if (dataMudou || categoriaMudou) {
+          if (dataMudou || categoriaMudou || valorMudou || descricaoMudou || contaMudou || cartaoMudou || observacoesMudou) {
             const proximas = await db.transacoes
               .where('grupoParcelaId')
               .equals(transacaoParaEditar.grupoParcelaId)
@@ -172,20 +180,30 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
               .toArray();
 
             for (const t of proximas) {
-              const updates: any = {};
+              const updates: any = {
+                updatedAt: new Date()
+              };
 
               if (dataMudou) {
                 const dtT = new Date(t.data);
                 updates.data = new Date(dtT.getFullYear(), dtT.getMonth(), day);
               }
 
-              if (categoriaMudou) {
-                updates.categoriaId = categoriaId;
+              if (categoriaMudou) updates.categoriaId = categoriaId;
+              if (valorMudou) updates.valor = valorNumerico;
+              if (descricaoMudou) {
+                // Se for parcela, manter o sufixo (x/y)
+                if (t.isParcela && t.parcelaNumero && t.parcelaTotais) {
+                  updates.descricao = `${descricao} (${t.parcelaNumero}/${t.parcelaTotais})`;
+                } else {
+                  updates.descricao = descricao;
+                }
               }
+              if (contaMudou) updates.contaBancariaId = contaBancariaId;
+              if (cartaoMudou) updates.cartaoId = cartaoId;
+              if (observacoesMudou) updates.observacoes = observacoes || undefined;
 
-              if (Object.keys(updates).length > 0) {
-                await db.transacoes.update(t.id, updates);
-              }
+              await db.transacoes.update(t.id, updates);
             }
           }
         }
@@ -443,6 +461,23 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   </div>
                 </div>
               </div>
+
+              {/* Opções de Edição em Série */}
+              {transacaoParaEditar?.grupoParcelaId && (
+                <div className="p-4 bg-zinc-900/30 rounded-lg border border-blue-500/20 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-blue-400 font-bold">Atualizar Série</Label>
+                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Aplicar alterações às próximas transações</p>
+                    </div>
+                    <Switch
+                      checked={aplicarProximas}
+                      onCheckedChange={setAplicarProximas}
+                      className="data-[state=checked]:bg-blue-600"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Pagamento e Opções Especiais */}
               <div className="grid grid-cols-3 gap-4">
