@@ -23,6 +23,7 @@ import {
   ArrowUpDown,
   ArrowLeft,
   Check,
+  AlertCircle,
 } from 'lucide-react';
 import { formatarMoeda } from '@/lib/financeiro-helper';
 import { format, startOfMonth, endOfMonth, eachMonthOfInterval, subMonths, addMonths, isSameMonth, differenceInDays, startOfDay } from 'date-fns';
@@ -71,6 +72,7 @@ export default function TransacoesPage() {
   const [modalAberto, setModalAberto] = useState(false);
   const [transacaoParaEditar, setTransacaoParaEditar] = useState<any>(null);
   const [dataReferencia, setDataReferencia] = useState(() => startOfMonth(new Date()));
+  const [filtroAtrasado, setFiltroAtrasado] = useState(false);
   const [deleteGroupModalOpen, setDeleteGroupModalOpen] = useState(false);
   const [selectedForDelete, setSelectedForDelete] = useState<any>(null);
 
@@ -89,7 +91,9 @@ export default function TransacoesPage() {
       contaBancaria: t.contaBancariaId === 'caixa-geral' ? { nome: 'Caixa Geral' } : (contaBancaria ? { nome: contaBancaria.nome } : undefined),
       cartao: cartao ? { nome: cartao.nome } : undefined,
     };
-  }).filter(t => filtroTipo === 'TODOS' || t.tipo === filtroTipo);
+  })
+    .filter(t => filtroTipo === 'TODOS' || t.tipo === filtroTipo)
+    .sort((a, b) => b.valor - a.valor);
 
   // Gerar lista de meses (6 antes e 6 depois)
   const meses = useMemo(() => {
@@ -100,9 +104,18 @@ export default function TransacoesPage() {
 
   const loading = transacoesData === undefined || categoriasData === undefined || contasData === undefined || cartoesData === undefined;
 
-  const transacoesFiltradas = transacoes.filter((t) =>
-    t.descricao.toLowerCase().includes(busca.toLowerCase())
-  );
+  const transacoesFiltradas = transacoes.filter((t) => {
+    const matchesBusca = t.descricao.toLowerCase().includes(busca.toLowerCase());
+    
+    if (filtroAtrasado) {
+      const hoje = startOfDay(new Date());
+      const dataT = startOfDay(new Date(t.data));
+      const atrasada = !t.paga && dataT.getTime() < hoje.getTime();
+      return matchesBusca && atrasada;
+    }
+
+    return matchesBusca;
+  });
 
   const handleEditar = (transacao: any) => {
     // Pegar o objeto original do Dexie sem as transformações de string
@@ -427,6 +440,20 @@ export default function TransacoesPage() {
             }
           >
             Despesas
+          </Button>
+          <Button
+            variant={filtroAtrasado ? 'default' : 'default'}
+            onClick={() => {
+              setFiltroAtrasado(!filtroAtrasado);
+              if (!filtroAtrasado) setFiltroTipo('TODOS'); // Opcional: mostrar todas atrasadas independente de tipo
+            }}
+            className={filtroAtrasado
+              ? 'bg-red-600 hover:bg-red-700 shadow-lg shadow-red-500/20'
+              : 'border-zinc-800 hover:bg-zinc-800 text-zinc-400'
+            }
+          >
+            <AlertCircle className="w-4 h-4 mr-2" />
+            Atrasadas
           </Button>
         </div>
       </div>
