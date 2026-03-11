@@ -58,9 +58,8 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
 
   // Flags especiais
   const [isFixa, setIsFixa] = useState(false);
-  const [isParcela, setIsParcela] = useState(false);
   const [paga, setPaga] = useState(false);
-  const [parcelaTotais, setParcelaTotais] = useState('1');
+  const [parcelasRestantes, setParcelasRestantes] = useState('');
   const [aplicarProximas, setAplicarProximas] = useState(false);
 
   // Listas do Dexie
@@ -85,9 +84,8 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
         setContaBancariaId(transacaoParaEditar.contaBancariaId || '');
         setCartaoId(transacaoParaEditar.cartaoId || '');
         setIsFixa(transacaoParaEditar.isFixa || false);
-        setIsParcela(false);
+        setParcelasRestantes('');
         setPaga(transacaoParaEditar.paga || false);
-        setParcelaTotais('1');
         setAplicarProximas(false);
       } else {
         limparFormulario();
@@ -246,28 +244,29 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
       } else {
         // Lógica de Criação
         const idGrupo = crypto.randomUUID();
-        // Se for fixa, geramos 24 meses. Se for parcela, usamos o total informado.
-        const numParcelasTotal = isParcela ? parseInt(parcelaTotais) : (isFixa ? 24 : 1);
-
+        // Se for fixa e tiver parcelas restantes, usamos parcelasRestantes. Se for apenas fixa, default 24 meses.
+        const isParcelado = isFixa && parcelasRestantes !== '' && parseInt(parcelasRestantes) > 0;
+        const numParcelasTotal = isFixa ? (isParcelado ? parseInt(parcelasRestantes) : 24) : 1;
+        
         for (let i = 0; i < numParcelasTotal; i++) {
           const dt = new Date(year, month - 1 + i, day);
-
+          
           const transacao = {
             id: crypto.randomUUID(),
-            descricao: isParcela ? `${descricao} (${i + 1}/${numParcelasTotal})` : descricao,
+            descricao: isParcelado ? `${descricao} (${i + 1}/${numParcelasTotal})` : descricao,
             valor: valorNumerico,
             data: dt,
             tipo,
             observacoes: observacoes || undefined,
             categoriaId: categoriaId || undefined,
             contaBancariaId,
-            cartaoId: cartaoId || undefined,
+            cartaoId: undefined, // Removido conforme solicitação anterior
             isFixa,
-            isParcela,
-            paga,
-            parcelaNumero: isParcela ? i + 1 : undefined,
-            parcelaTotais: isParcela ? numParcelasTotal : undefined,
-            grupoParcelaId: (isParcela || isFixa) ? idGrupo : undefined,
+            isParcela: isParcelado,
+            paga: i === 0 ? paga : false, // Apenas a primeira pode ser paga na criação em massa
+            parcelaNumero: isParcelado ? i + 1 : undefined,
+            parcelaTotais: isParcelado ? numParcelasTotal : undefined,
+            grupoParcelaId: isFixa ? idGrupo : undefined,
             createdAt: new Date(),
             updatedAt: new Date(),
           };
@@ -306,9 +305,8 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
     setContaBancariaId('');
     setCartaoId('');
     setIsFixa(false);
-    setIsParcela(false);
     setPaga(false);
-    setParcelaTotais('1');
+    setParcelasRestantes('');
   };
 
   return (
@@ -471,14 +469,14 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
               )}
 
               {/* Configurações Avançadas */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className={`grid gap-4 transition-all duration-300 ${isFixa ? 'grid-cols-2' : 'grid-cols-1'}`}>
                 {/* Transação Fixa */}
-                <div className="space-y-4 p-4 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden group transition-all hover:bg-zinc-900/60">
+                <div className="space-y-4 p-4 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden group transition-all hover:bg-zinc-900/60 h-[88px] flex items-center">
                   <div className={`absolute top-0 left-0 w-1 h-full ${isFixa ? 'bg-blue-500' : 'bg-zinc-800'} opacity-30 group-hover:opacity-100 transition-opacity`} />
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between w-full">
                     <div>
-                      <Label className={`font-black text-xs uppercase tracking-widest ${isFixa ? 'text-blue-500' : 'text-zinc-400'}`}>Fixo</Label>
-                      <p className="text-[10px] text-zinc-600 font-bold uppercase mt-0.5">Recorrência Mensal</p>
+                      <Label className={`font-black text-xs uppercase tracking-widest ${isFixa ? 'text-blue-500' : 'text-zinc-400'}`}>Fixo / Recorrente</Label>
+                      <p className="text-[10px] text-zinc-600 font-bold uppercase mt-0.5">Assinaturas ou Parcelas</p>
                     </div>
                     <Switch
                       checked={isFixa}
@@ -488,39 +486,28 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   </div>
                 </div>
 
-                {/* Parcelamento */}
-                <div className="space-y-4 p-4 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden group transition-all hover:bg-zinc-900/60">
-                  <div className={`absolute top-0 left-0 w-1 h-full ${isParcela ? 'bg-purple-500' : 'bg-zinc-800'} opacity-30 group-hover:opacity-100 transition-opacity`} />
-                  <div className="flex items-center justify-between gap-2">
-                    <div>
-                      <Label className={`font-black text-xs uppercase tracking-widest ${isParcela ? 'text-purple-500' : 'text-zinc-400'}`}>Parcelado</Label>
-                      <p className="text-[10px] text-zinc-600 font-bold uppercase mt-0.5">Dividir valor</p>
+                {/* Parcelas Restantes - Condicional */}
+                {isFixa && (
+                  <div className="p-4 bg-zinc-900/40 rounded-2xl border border-blue-500/20 shadow-sm relative overflow-hidden group h-[88px] flex items-center">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-purple-500 opacity-30" />
+                    <div className="flex items-center justify-between w-full gap-4">
+                      <div className="shrink-0">
+                        <Label className="font-black text-xs uppercase tracking-widest text-purple-400">Parcelas</Label>
+                        <p className="text-[10px] text-zinc-600 font-bold uppercase mt-0.5">Restantes</p>
+                      </div>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="120"
+                        value={parcelasRestantes}
+                        onChange={(e) => setParcelasRestantes(e.target.value)}
+                        placeholder="Infinito"
+                        className="bg-zinc-950/50 border-zinc-800 text-white h-10 w-24 rounded-xl focus:border-purple-500 focus-visible:ring-0 focus:ring-0 focus:outline-none transition-all font-black text-center placeholder:text-[10px] placeholder:font-bold placeholder:text-zinc-700"
+                      />
                     </div>
-                    <Switch
-                      checked={isParcela}
-                      onCheckedChange={setIsParcela}
-                      disabled={!!transacaoParaEditar}
-                      className="focus-visible:ring-0 focus:ring-0"
-                    />
                   </div>
-                </div>
+                )}
               </div>
-
-              {isParcela && (
-                <div className="p-4 bg-purple-500/5 border border-purple-500/20 rounded-xl animate-in fade-in slide-in-from-top-2">
-                  <div className="flex items-center justify-between gap-6">
-                    <Label className="text-xs font-bold text-purple-300 uppercase shrink-0">Quantas Parcelas?</Label>
-                    <Input
-                      type="number"
-                      min="2"
-                      max="48"
-                      value={parcelaTotais}
-                      onChange={(e) => setParcelaTotais(e.target.value)}
-                      className="bg-zinc-900/50 border-purple-500/20 text-white h-9 w-24 rounded-lg focus:border-purple-500 focus-visible:ring-0 focus:ring-0 focus:outline-none transition-all font-black text-center"
-                    />
-                  </div>
-                </div>
-              )}
 
               {/* Observações */}
               <div>
