@@ -593,6 +593,7 @@ export default function TransacoesPage() {
           setTransacaoParaEditar(null);
         }}
         transacaoParaEditar={transacaoParaEditar}
+        dataReferencia={dataReferencia}
         onSucesso={() => {
           // Live query updates automatically
         }}

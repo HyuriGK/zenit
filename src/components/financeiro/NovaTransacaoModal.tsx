@@ -24,6 +24,7 @@ interface NovaTransacaoModalProps {
   onFechar: () => void;
   onSucesso: () => void;
   transacaoParaEditar?: any;
+  dataReferencia?: Date;
 }
 
 interface Categoria {
@@ -43,14 +44,26 @@ interface Cartao {
   nome: string;
 }
 
-export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transacaoParaEditar }: NovaTransacaoModalProps) {
+export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transacaoParaEditar, dataReferencia }: NovaTransacaoModalProps) {
   const [carregando, setCarregando] = useState(false);
   const [tipo, setTipo] = useState<'RECEITA' | 'DESPESA'>('DESPESA');
 
   // Dados do formulário
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
-  const [data, setData] = useState(new Date().toISOString().split('T')[0]);
+  const [data, setData] = useState(() => {
+    const today = new Date();
+    const defaultDate = dataReferencia ? new Date(dataReferencia) : today;
+    
+    // Se o mês selecionado for o mês atual, usa "Hoje" como padrão
+    if (dataReferencia && 
+        dataReferencia.getMonth() === today.getMonth() && 
+        dataReferencia.getFullYear() === today.getFullYear()) {
+      return today.toISOString().split('T')[0];
+    }
+    
+    return defaultDate.toISOString().split('T')[0];
+  });
   const [observacoes, setObservacoes] = useState('');
   const [categoriaId, setCategoriaId] = useState('');
   const [contaBancariaId, setContaBancariaId] = useState('');
@@ -299,7 +312,17 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
   const limparFormulario = () => {
     setDescricao('');
     setValor('');
-    setData(new Date().toISOString().split('T')[0]);
+    const today = new Date();
+    const defaultDate = dataReferencia ? new Date(dataReferencia) : today;
+    
+    let dateStr = defaultDate.toISOString().split('T')[0];
+    if (dataReferencia && 
+        dataReferencia.getMonth() === today.getMonth() && 
+        dataReferencia.getFullYear() === today.getFullYear()) {
+      dateStr = today.toISOString().split('T')[0];
+    }
+    
+    setData(dateStr);
     setObservacoes('');
     setCategoriaId('');
     setContaBancariaId('');
