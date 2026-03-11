@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
+import Link from 'next/link';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db, initCategoriasPadrao } from '@/lib/dexie';
 import { Card } from '@/components/ui/card';
@@ -262,37 +263,34 @@ export default function TransacoesPage() {
 
   return (
     <div className="bg-zinc-950 p-4 lg:p-6 space-y-4 sm:space-y-6">
-      <div className="relative mb-8">
-        <div className="relative">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <div className="flex items-center gap-4">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all"
-                  onClick={() => window.location.href = '/dashboard/financeiro'}
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </Button>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 via-teal-400 to-blue-400 bg-clip-text text-transparent">
-                  Transações
-                </h1>
-              </div>
-              <p className="text-zinc-400 mt-2">Gerencie suas receitas e despesas</p>
-            </div>
-            <Button
-              onClick={() => {
-                setTransacaoParaEditar(null);
-                setModalAberto(true);
-              }}
-              className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white shadow-lg shadow-green-500/50 transition-all hover:shadow-xl hover:shadow-green-500/60"
-              size="lg"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Nova Transação
-            </Button>
+      <div className="mb-8 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/dashboard/financeiro"
+            className="flex items-center text-zinc-500 hover:text-white transition-colors group"
+          >
+            <span className="font-black text-xs uppercase tracking-[0.2em] group-hover:translate-x-[-4px] transition-transform">Voltar</span>
+          </Link>
+          <div className="h-4 w-[1px] bg-zinc-800" />
+          <div>
+            <h1 className="text-2xl font-black text-white uppercase tracking-tighter">Registros</h1>
+            <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1 italic">Histórico completo de transações</p>
           </div>
+        </div>
+
+        <Button
+          onClick={() => {
+            setTransacaoParaEditar(null);
+            setModalAberto(true);
+          }}
+          className="bg-zinc-950 border border-zinc-800 hover:bg-zinc-900 text-white px-6 h-12 rounded-2xl flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl group"
+        >
+          <div className="bg-green-500/20 p-1.5 rounded-lg group-hover:bg-green-500 transition-colors">
+            <Plus className="w-4 h-4 text-green-500 group-hover:text-black" />
+          </div>
+          <span className="font-black text-xs uppercase tracking-widest">Nova Transação</span>
+        </Button>
+      </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Receitas */}
@@ -347,10 +345,8 @@ export default function TransacoesPage() {
                   Receitas - Despesas
                 </p>
               </div>
-            </Card>
-          </div>
+          </Card>
         </div>
-      </div>
 
       {/* Seletor de Mês Horizontal */}
       <div className="mb-6 flex items-center gap-4 bg-zinc-900/50 p-2 rounded-xl border border-zinc-800">
