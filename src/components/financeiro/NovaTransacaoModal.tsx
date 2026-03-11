@@ -313,101 +313,107 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
 
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
-      <DialogContent className="bg-zinc-900 border-zinc-800 max-w-[95vw] w-[1400px] max-h-[95vh] overflow-y-auto sm:overflow-hidden p-6 sm:p-10">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-white">
-            {transacaoParaEditar ? 'Editar Transação' : 'Nova Transação'}
-          </DialogTitle>
-          <DialogDescription className="text-zinc-400">
-            {transacaoParaEditar ? 'Altere os dados da transação selecionada' : 'Registre uma nova receita ou despesa de forma rápida'}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1200px] w-[95vw] max-h-[92vh] overflow-y-auto p-0 gap-0 shadow-2xl">
+        <div className="flex flex-col h-full">
+          {/* Header com Gradiente */}
+          <div className="bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-900/50 p-8 border-b border-zinc-800/50">
+            <DialogHeader className="gap-1">
+              <DialogTitle className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+                <div className={`p-2 rounded-xl ${tipo === 'RECEITA' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                  {tipo === 'RECEITA' ? <TrendingUp className="w-6 h-6" /> : <TrendingDown className="w-6 h-6" />}
+                </div>
+                {transacaoParaEditar ? 'Editar Registro' : 'Novo Registro Financeiro'}
+              </DialogTitle>
+              <DialogDescription className="text-zinc-500 font-medium text-base ml-12">
+                {transacaoParaEditar ? 'Ajuste os detalhes da sua movimentação para manter seu controle impecável.' : 'Registre suas entradas e saídas com precisão para uma saúde financeira sólida.'}
+              </DialogDescription>
+            </DialogHeader>
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="p-8 space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Coluna Esquerda: Dados da Transação */}
             <div className="space-y-6">
-              {/* Tipo de Transação */}
-              <div className="grid grid-cols-2 gap-3">
+              {/* Tipo de Transação - Design Premium */}
+              <div className="flex gap-4 p-1.5 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
                 <button
                   type="button"
                   onClick={() => setTipo('RECEITA')}
-                  className={`p-4 rounded-lg border-2 transition-all ${tipo === 'RECEITA'
-                    ? 'border-green-500 bg-green-500/10'
-                    : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
+                  className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 ${tipo === 'RECEITA'
+                    ? 'bg-green-600 text-white shadow-lg shadow-green-600/20 ring-1 ring-green-500/50'
+                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'
                     }`}
                 >
-                  <TrendingUp className={`w-6 h-6 mx-auto mb-2 ${tipo === 'RECEITA' ? 'text-green-400' : 'text-zinc-500'}`} />
-                  <span className={`font-semibold ${tipo === 'RECEITA' ? 'text-green-400' : 'text-zinc-400'}`}>
-                    Receita
-                  </span>
+                  <TrendingUp className="w-5 h-5" />
+                  Receita
                 </button>
                 <button
                   type="button"
                   onClick={() => setTipo('DESPESA')}
-                  className={`p-4 rounded-lg border-2 transition-all ${tipo === 'DESPESA'
-                    ? 'border-red-500 bg-red-500/10'
-                    : 'border-zinc-800 bg-zinc-900/50 hover:border-zinc-700'
+                  className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 ${tipo === 'DESPESA'
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-600/20 ring-1 ring-red-500/50'
+                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'
                     }`}
                 >
-                  <TrendingDown className={`w-6 h-6 mx-auto mb-2 ${tipo === 'DESPESA' ? 'text-red-400' : 'text-zinc-500'}`} />
-                  <span className={`font-semibold ${tipo === 'DESPESA' ? 'text-red-400' : 'text-zinc-400'}`}>
-                    Despesa
-                  </span>
+                  <TrendingDown className="w-5 h-5" />
+                  Despesa
                 </button>
               </div>
 
               {/* Descrição */}
               <div>
-                <Label className="text-zinc-300">Descrição *</Label>
+                <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Descrição Principal</Label>
                 <Input
                   value={descricao}
                   onChange={(e) => setDescricao(e.target.value)}
-                  placeholder="Ex: Compra no mercado"
+                  placeholder="Ex: Assinatura Netflix, Freelance Design..."
                   required
-                  className="bg-zinc-900/50 border-zinc-800 text-white"
+                  className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl placeholder:text-zinc-600 focus:border-zinc-700 transition-all text-base"
                 />
               </div>
 
               {/* Valor e Data */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <Label className="text-zinc-300">Valor (Unidade) *</Label>
-                  <Input
-                    type="number"
-                    step="0.01"
-                    value={valor}
-                    onChange={(e) => setValor(e.target.value)}
-                    placeholder="0,00"
-                    required
-                    className="bg-zinc-900/50 border-zinc-800 text-white"
-                  />
+                  <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Valor (R$)</Label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 font-bold">$</span>
+                    <Input
+                      type="number"
+                      step="0.01"
+                      value={valor}
+                      onChange={(e) => setValor(e.target.value)}
+                      placeholder="0,00"
+                      required
+                      className="bg-zinc-900/50 border-zinc-800 text-white h-12 pl-8 rounded-xl focus:border-zinc-700 transition-all text-lg font-black"
+                    />
+                  </div>
                 </div>
                 <div>
-                  <Label className="text-zinc-300">Data *</Label>
+                  <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Data da Operação</Label>
                   <Input
                     type="date"
                     value={data}
                     onChange={(e) => setData(e.target.value)}
                     required
-                    className="bg-zinc-900/50 border-zinc-800 text-white"
+                    className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl focus:border-zinc-700 transition-all"
                   />
                 </div>
               </div>
 
               {/* Categoria */}
               <div>
-                <Label className="text-zinc-300">Categoria</Label>
+                <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Categoria</Label>
                 <Select value={categoriaId} onValueChange={setCategoriaId}>
-                  <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white">
-                    <SelectValue placeholder="Selecione uma categoria" />
+                  <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl focus:border-zinc-700 transition-all">
+                    <SelectValue placeholder="Categorize sua transação" />
                   </SelectTrigger>
-                  <SelectContent className="bg-zinc-900 border-zinc-800">
+                  <SelectContent className="bg-zinc-950 border-zinc-800 rounded-xl shadow-2xl">
                     {categorias.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id} className="text-white hover:bg-zinc-800">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: cat.cor }} />
-                          {cat.nome}
+                      <SelectItem key={cat.id} value={cat.id} className="text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg m-1 py-2">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2.5 h-2.5 rounded-full ring-4 ring-white/5" style={{ backgroundColor: cat.cor }} />
+                          <span className="font-medium">{cat.nome}</span>
                         </div>
                       </SelectItem>
                     ))}
@@ -425,19 +431,19 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   <p>Toda transação deve estar vinculada a uma <strong>conta bancária</strong> ou ao <strong>Caixa Geral</strong>.</p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <Label className="text-zinc-300">Conta Bancária *</Label>
+                    <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Conta Origem/Destino</Label>
                     <Select value={contaBancariaId} onValueChange={handleContaChange}>
-                      <SelectTrigger className={`bg-zinc-900/50 border-zinc-800 text-white ${!contaBancariaId ? 'border-red-500/50' : ''}`}>
+                      <SelectTrigger className={`bg-zinc-900/50 border-zinc-800 h-11 text-white rounded-xl ${!contaBancariaId ? 'border-red-500/50' : ''}`}>
                         <SelectValue placeholder="Selecionar conta" />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-900 border-zinc-800">
-                        <SelectItem value="caixa-geral" className="text-white hover:bg-zinc-800 font-medium">
+                      <SelectContent className="bg-zinc-950 border-zinc-800 rounded-xl m-1">
+                        <SelectItem value="caixa-geral" className="text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg p-2 font-black text-xs uppercase tracking-widest">
                           🏦 Caixa Geral
                         </SelectItem>
                         {contas.map((conta) => (
-                          <SelectItem key={conta.id} value={conta.id} className="text-white hover:bg-zinc-800">
+                          <SelectItem key={conta.id} value={conta.id} className="text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg p-2 font-medium">
                             {conta.nome}
                           </SelectItem>
                         ))}
@@ -445,14 +451,14 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                     </Select>
                   </div>
                   <div>
-                    <Label className="text-zinc-300">Cartão de Crédito (Opcional)</Label>
+                    <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Cartão de Crédito</Label>
                     <Select value={cartaoId} onValueChange={handleCartaoChange}>
-                      <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white">
-                        <SelectValue placeholder="Selecionar cartão" />
+                      <SelectTrigger className="bg-zinc-900/50 border-zinc-800 h-11 text-white rounded-xl">
+                        <SelectValue placeholder="Opcional" />
                       </SelectTrigger>
-                      <SelectContent className="bg-zinc-900 border-zinc-800">
+                      <SelectContent className="bg-zinc-950 border-zinc-800 rounded-xl m-1">
                         {cartoes.map((cartao) => (
-                          <SelectItem key={cartao.id} value={cartao.id} className="text-white hover:bg-zinc-800">
+                          <SelectItem key={cartao.id} value={cartao.id} className="text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg p-2 font-medium">
                             {cartao.nome}
                           </SelectItem>
                         ))}
@@ -480,13 +486,12 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
               )}
 
               {/* Pagamento e Opções Especiais */}
-              <div className="grid grid-cols-3 gap-4">
-                {/* Status de Pagamento */}
-                <div className="space-y-4 p-4 bg-zinc-900/30 rounded-lg border border-zinc-700/50 shadow-sm">
+                <div className="space-y-4 p-5 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden group transition-all hover:bg-zinc-900/60">
+                  <div className={`absolute top-0 left-0 w-1 h-full ${paga ? 'bg-green-500' : 'bg-red-500'} opacity-30 group-hover:opacity-100 transition-opacity`} />
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-zinc-300 font-bold">Status de Pagamento</Label>
-                      <p className="text-[10px] text-zinc-500 uppercase tracking-wider font-bold">Paga / Recebida</p>
+                      <Label className={`font-black text-xs uppercase tracking-widest ${paga ? 'text-green-500' : 'text-zinc-400'}`}>Status Pago</Label>
+                      <p className="text-[10px] text-zinc-600 font-bold uppercase mt-0.5">Liquidado / A Receber</p>
                     </div>
                     <Switch
                       checked={paga}
@@ -497,11 +502,12 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                 </div>
 
                 {/* Transação Fixa */}
-                <div className="space-y-4 p-4 bg-zinc-900/30 rounded-lg border border-zinc-800">
+                <div className="space-y-4 p-5 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden group transition-all hover:bg-zinc-900/60">
+                  <div className={`absolute top-0 left-0 w-1 h-full ${isFixa ? 'bg-blue-500' : 'bg-zinc-800'} opacity-30 group-hover:opacity-100 transition-opacity`} />
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label className="text-zinc-300">Transação Fixa</Label>
-                      <p className="text-xs text-zinc-500">Repete mensalmente</p>
+                      <Label className={`font-black text-xs uppercase tracking-widest ${isFixa ? 'text-blue-500' : 'text-zinc-400'}`}>Fixo</Label>
+                      <p className="text-[10px] text-zinc-600 font-bold uppercase mt-0.5">Recorrência Mensal</p>
                     </div>
                     <Switch
                       checked={isFixa}
@@ -511,11 +517,12 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                 </div>
 
                 {/* Parcelamento */}
-                <div className="space-y-4 p-4 bg-zinc-900/30 rounded-lg border border-zinc-800">
+                <div className="space-y-4 p-5 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm relative overflow-hidden group transition-all hover:bg-zinc-900/60">
+                  <div className={`absolute top-0 left-0 w-1 h-full ${isParcela ? 'bg-purple-500' : 'bg-zinc-800'} opacity-30 group-hover:opacity-100 transition-opacity`} />
                   <div className="flex items-center justify-between gap-2">
                     <div>
-                      <Label className="text-zinc-300">Parcelar</Label>
-                      <p className="text-xs text-zinc-500">Repetir valor</p>
+                      <Label className={`font-black text-xs uppercase tracking-widest ${isParcela ? 'text-purple-500' : 'text-zinc-400'}`}>Parcelado</Label>
+                      <p className="text-[10px] text-zinc-600 font-bold uppercase mt-0.5">Dividir valor</p>
                     </div>
                     <Switch
                       checked={isParcela}
@@ -523,67 +530,70 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                       disabled={!!transacaoParaEditar}
                     />
                   </div>
-                  {isParcela && (
-                    <div className="space-y-2">
-                      <Label className="text-xs text-zinc-400">Quant. de Parcelas</Label>
-                      <Input
-                        type="number"
-                        min="2"
-                        max="48"
-                        value={parcelaTotais}
-                        onChange={(e) => setParcelaTotais(e.target.value)}
-                        className="bg-zinc-900/50 border-zinc-800 text-white h-8 mt-1"
-                      />
-                    </div>
-                  )}
                 </div>
-              </div>
+
+              {isParcela && (
+                <div className="p-4 bg-purple-500/5 border border-purple-500/20 rounded-xl animate-in fade-in slide-in-from-top-2">
+                  <div className="flex items-center justify-between gap-6">
+                    <Label className="text-xs font-bold text-purple-300 uppercase shrink-0">Quantas Parcelas?</Label>
+                    <Input
+                      type="number"
+                      min="2"
+                      max="48"
+                      value={parcelaTotais}
+                      onChange={(e) => setParcelaTotais(e.target.value)}
+                      className="bg-zinc-900/50 border-purple-500/20 text-white h-9 w-24 rounded-lg focus:border-purple-500 transition-all font-black text-center"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Observações */}
               <div>
-                <Label className="text-zinc-300">Observações</Label>
+                <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Observações Adicionais</Label>
                 <Textarea
                   value={observacoes}
                   onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setObservacoes(e.target.value)}
-                  placeholder="Informações adicionais..."
+                  placeholder="Notas, detalhes da compra, links ou referências..."
                   rows={2}
-                  className="bg-zinc-900/50 border-zinc-800 text-white resize-none"
+                  className="bg-zinc-900/50 border-zinc-800 text-white resize-none rounded-xl p-4 placeholder:text-zinc-600 focus:border-zinc-700 transition-all min-h-[100px]"
                 />
               </div>
             </div>
           </div>
 
           {/* Botões - Fora do grid para ocupar a largura total */}
-          <div className="flex gap-4 pt-4 border-t border-zinc-800">
+          <div className="flex gap-4 pt-10 border-t border-zinc-800/50">
             <Button
               type="button"
-              variant="default"
+              variant="outline"
               onClick={onFechar}
-              className="flex-1 border-zinc-800 hover:bg-zinc-800 h-11"
+              className="flex-1 border-zinc-800 hover:bg-zinc-900 text-zinc-400 hover:text-white h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all"
               disabled={carregando}
             >
-              Cancelar
+              Descartar
             </Button>
             <Button
               type="submit"
               disabled={carregando || !contaBancariaId}
-              className={`flex-1 h-11 text-base font-semibold ${tipo === 'RECEITA'
-                ? 'bg-green-600 hover:bg-green-700'
-                : 'bg-red-600 hover:bg-red-700'
-                } disabled:opacity-50`}
+              className={`flex-[2] h-14 rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-xl transition-all duration-300 hover:scale-[1.01] active:scale-[0.99] ${tipo === 'RECEITA'
+                ? 'bg-green-600 hover:bg-green-700 shadow-green-900/20'
+                : 'bg-red-600 hover:bg-red-700 shadow-red-900/20'
+                } disabled:opacity-50 text-white`}
             >
               {carregando ? (
                 <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  Salvando...
+                  <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                  Sincronizando...
                 </>
               ) : (
-                'Salvar Transação'
+                transacaoParaEditar ? 'Confirmar Alterações' : 'Finalizar Registro'
               )}
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
-  );
+      </div>
+    </DialogContent>
+  </Dialog>
+);
 }

@@ -288,13 +288,6 @@ export default function FinanceiroDashboardPage() {
               Registros
             </Link>
           </Button>
-          <Button
-            onClick={() => setModalTransacaoAberto(true)}
-            className="bg-blue-600 hover:bg-blue-700 font-bold"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nova Transação
-          </Button>
         </div>
       </div>
 
