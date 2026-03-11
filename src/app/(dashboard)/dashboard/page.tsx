@@ -43,8 +43,30 @@ export default function DashboardPage() {
       .toArray();
   }, [session]);
 
+  const saldoMensal = useLiveQuery(async () => {
+    if (!session) return 0;
+    const agora = new Date();
+    const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1);
+    const fimMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0);
+    
+    const transacoes = await db.transacoes
+      .where('data').between(inicioMes, fimMes)
+      .toArray();
+      
+    return transacoes.reduce((acc, t) => {
+      return t.tipo === 'RECEITA' ? acc + t.valor : acc - t.valor;
+    }, 0);
+  }, [session]);
+
+  const cursosAtivos = useLiveQuery(async () => {
+    if (!session) return 0;
+    return await db.cursos.count();
+  }, [session]);
+
   const loadingCompromissos = compromissosList === undefined;
   const compromissosHoje = compromissosList?.length || 0;
+  const loadingSaldo = saldoMensal === undefined;
+  const loadingCursos = cursosAtivos === undefined;
 
   if (status === 'loading') {
     return (
@@ -149,15 +171,26 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-white leading-tight">R$ 0,00</div>
-            <p className="text-[10px] font-medium uppercase text-emerald-500/60 mt-1 tracking-wider flex items-center gap-1">
-              {t('configureFinances')}
-            </p>
+            {loadingSaldo ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin h-5 w-5 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full"></div>
+                <span className="text-sm text-zinc-500">{tCommon('loading')}</span>
+              </div>
+            ) : (
+              <>
+                <div className={`text-4xl font-bold leading-tight ${saldoMensal! >= 0 ? 'text-white' : 'text-red-500'}`}>
+                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(saldoMensal || 0)}
+                </div>
+                <p className="text-[10px] font-medium uppercase text-emerald-500/60 mt-1 tracking-wider flex items-center gap-1">
+                  {saldoMensal! >= 0 ? t('balancePositive') || 'Saldo em dia' : t('balanceNegative') || 'Saldo negativo'}
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 
         {/* Card 3 - Cursos Ativos */}
-        <Card className="border border-zinc-800/50">
+        <Card className="border border-zinc-800/50" onClick={handleIrParaEstudos}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
               {t('activeCourses')}
@@ -167,10 +200,24 @@ export default function DashboardPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-4xl font-bold text-white leading-tight">0</div>
-            <p className="text-[10px] font-medium uppercase text-zinc-500 mt-1 tracking-wider">
-              {t('startStudies')}
-            </p>
+            {loadingCursos ? (
+              <div className="flex items-center gap-2">
+                <div className="animate-spin h-5 w-5 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full"></div>
+                <span className="text-sm text-zinc-500">{tCommon('loading')}</span>
+              </div>
+            ) : (
+              <>
+                <div className="text-4xl font-bold text-white leading-tight">{cursosAtivos}</div>
+                <p className="text-[10px] font-medium uppercase text-zinc-500 mt-1 tracking-wider">
+                  {cursosAtivos === 0
+                    ? t('startStudies')
+                    : cursosAtivos === 1
+                      ? '1 Curso em andamento'
+                      : `${cursosAtivos} Cursos em andamento`
+                  }
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
 

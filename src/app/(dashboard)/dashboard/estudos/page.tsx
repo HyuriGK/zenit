@@ -529,7 +529,7 @@ export default function EstudosPage() {
             </Button>
             <Button
               onClick={() => setModalCursoAberto(true)}
-              variant="premium"
+              variant="outline"
               className="flex-1 sm:flex-none"
             >
               <Plus className="w-4 h-4 mr-2" />

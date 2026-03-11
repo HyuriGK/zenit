@@ -276,7 +276,7 @@ export default function RichTextEditor({ content, onChange, placeholder }: RichT
   );
 
   return (
-    <div className="border border-zinc-700 rounded-lg bg-zinc-900 overflow-hidden">
+    <div className="border border-zinc-700 rounded-lg bg-zinc-900">
       <style jsx global>{`
         .ProseMirror img {
           max-width: 100%;
