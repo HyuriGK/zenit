@@ -7,10 +7,8 @@ import {
   Calendar,
   Wallet,
   BookOpen,
-  TrendingUp,
-  Target,
-  CheckCircle2,
   Library,
+  TrendingDown,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -124,10 +122,10 @@ export default function DashboardPage() {
       />
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="flex flex-wrap gap-4">
         {/* Card 1 - Compromissos Hoje */}
         <Card
-          className="cursor-pointer transition-all border border-zinc-800/50 hover:border-emerald-500/30"
+          className="flex-1 min-w-[240px] cursor-pointer transition-all border border-zinc-800/50 hover:border-emerald-500/30"
           onClick={handleIrParaAgenda}
         >
           <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -161,7 +159,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Card 2 - Saldo Mensal */}
-        <Card className="border border-zinc-800/50">
+        <Card className="flex-1 min-w-[240px] border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
               {t('monthlyBalance')}
@@ -181,16 +179,26 @@ export default function DashboardPage() {
                 <div className={`text-4xl font-bold leading-tight ${saldoMensal! >= 0 ? 'text-white' : 'text-red-500'}`}>
                   {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(saldoMensal || 0)}
                 </div>
-                <p className="text-[10px] font-medium uppercase text-emerald-500/60 mt-1 tracking-wider flex items-center gap-1">
-                  {saldoMensal! >= 0 ? t('balancePositive') || 'Saldo em dia' : t('balanceNegative') || 'Saldo negativo'}
-                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  {saldoMensal! >= 0 ? (
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                      <TrendingUp className="w-3 h-3 text-emerald-500" />
+                      <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Positivo</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-red-500/10 border border-red-500/20 rounded-full">
+                      <TrendingDown className="w-3 h-3 text-red-500" />
+                      <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">Negativo</span>
+                    </div>
+                  )}
+                </div>
               </>
             )}
           </CardContent>
         </Card>
 
         {/* Card 3 - Cursos Ativos */}
-        <Card className="border border-zinc-800/50" onClick={handleIrParaEstudos}>
+        <Card className="flex-1 min-w-[240px] border border-zinc-800/50" onClick={handleIrParaEstudos}>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
               {t('activeCourses')}
@@ -222,7 +230,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* Card 4 - Metas do Mês */}
-        <Card className="border border-zinc-800/50">
+        <Card className="flex-1 min-w-[240px] border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
               {t('monthlyGoals')}
