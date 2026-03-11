@@ -47,7 +47,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b-2 border-zinc-800 bg-zinc-950 font-minecraft">
+    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-md">
       <div className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3">
         {/* Mobile Menu + Logo */}
         <div className="flex items-center gap-2 sm:gap-3">
@@ -90,34 +90,34 @@ export function Header() {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 px-2 hover:bg-zinc-900 border-2 border-transparent hover:border-zinc-800 h-9 rounded-none transition-all shadow-none hover:shadow-[2px_2px_0_rgba(0,0,0,0.2)]">
-                <Avatar className="w-7 h-7 rounded-none">
+              <Button variant="ghost" className="gap-2 px-2 hover:bg-zinc-900 border border-transparent hover:border-zinc-800 h-9 rounded-xl transition-all">
+                <Avatar className="w-7 h-7 rounded-lg">
                   <AvatarImage src={session?.user?.image || undefined} />
-                  <AvatarFallback className="bg-zinc-800 text-zinc-100 text-xs rounded-none">
+                  <AvatarFallback className="bg-zinc-800 text-zinc-100 text-[10px] rounded-lg">
                     {getInitials(session?.user?.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden md:block text-left mr-1">
-                  <p className="text-sm font-black leading-none text-zinc-100 uppercase tracking-widest">{session?.user?.name}</p>
+                  <p className="text-sm font-semibold leading-none text-zinc-100">{session?.user?.name}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 bg-zinc-950 border-2 border-zinc-800 p-0 shadow-[8px_8px_0_rgba(0,0,0,0.5)] rounded-none overflow-hidden font-minecraft uppercase">
+            <DropdownMenuContent align="end" className="w-80 bg-zinc-950 border border-zinc-800 p-0 shadow-2xl rounded-2xl overflow-hidden">
               {/* Header do Menu */}
-              <div className="p-6 bg-zinc-900/50 border-b border-zinc-800">
+              <div className="p-6 bg-zinc-900/30 border-b border-zinc-800">
                 <div className="flex items-center gap-4">
-                  <Avatar className="w-14 h-14 border border-zinc-700">
+                  <Avatar className="w-14 h-14 border border-zinc-800 rounded-xl">
                     <AvatarImage src={session?.user?.image || undefined} />
-                    <AvatarFallback className="bg-zinc-800 text-white text-xl font-bold">
+                    <AvatarFallback className="bg-zinc-800 text-white text-xl font-bold rounded-xl">
                       {getInitials(session?.user?.name)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0">
                     <p className="text-base font-bold text-white truncate">{session?.user?.name}</p>
                     <p className="text-xs text-zinc-500 font-medium truncate mb-2">{session?.user?.email}</p>
-                    <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-zinc-800 rounded-full border border-zinc-700">
+                    <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                       <Crown className={`w-3 h-3 ${currentPlano === 'PREMIUM' ? 'text-emerald-500' : 'text-zinc-500'}`} />
-                      <span className={`text-[10px] font-black uppercase tracking-widest ${currentPlano === 'PREMIUM'
+                      <span className={`text-[10px] font-bold ${currentPlano === 'PREMIUM'
                         ? 'text-emerald-500'
                         : 'text-zinc-500'
                         }`}>
@@ -134,12 +134,12 @@ export function Header() {
                   className="cursor-pointer hover:bg-zinc-900 focus:bg-zinc-900 rounded-xl px-4 py-3 flex items-center gap-4 transition-all"
                   onClick={() => router.push('/dashboard/perfil')}
                 >
-                  <div className="w-10 h-10 bg-zinc-900 border border-zinc-800 flex items-center justify-center rounded-xl group-hover:border-zinc-700 transition-colors">
+                  <div className="w-10 h-10 bg-zinc-900/50 border border-zinc-800/50 flex items-center justify-center rounded-xl group-hover:border-zinc-700 transition-colors">
                     <User className="w-5 h-5 text-zinc-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-zinc-100 uppercase tracking-tight">{t('myProfile')}</p>
-                    <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5 opacity-50">{t('viewAndEdit')}</p>
+                    <p className="text-sm font-semibold text-zinc-100">{t('myProfile')}</p>
+                    <p className="text-[11px] font-medium text-zinc-500 mt-0.5">{t('viewAndEdit')}</p>
                   </div>
                 </DropdownMenuItem>
 
@@ -147,12 +147,12 @@ export function Header() {
                   className="cursor-pointer hover:bg-zinc-900 focus:bg-zinc-900 rounded-xl px-4 py-3 flex items-center gap-4 transition-all"
                   onClick={() => router.push('/dashboard/settings')}
                 >
-                  <div className="w-10 h-10 bg-zinc-900 border border-zinc-800 flex items-center justify-center rounded-xl group-hover:border-zinc-700 transition-colors">
+                  <div className="w-10 h-10 bg-zinc-900/50 border border-zinc-800/50 flex items-center justify-center rounded-xl group-hover:border-zinc-700 transition-colors">
                     <Settings className="w-5 h-5 text-zinc-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-zinc-100 uppercase tracking-tight">{t('settings')}</p>
-                    <p className="text-[11px] font-bold text-zinc-500 uppercase tracking-widest mt-0.5 opacity-50">{t('systemPreferences')}</p>
+                    <p className="text-sm font-semibold text-zinc-100">{t('settings')}</p>
+                    <p className="text-[11px] font-medium text-zinc-500 mt-0.5">{t('systemPreferences')}</p>
                   </div>
                 </DropdownMenuItem>
               </div>
@@ -171,8 +171,8 @@ export function Header() {
                         <Sparkles className="w-5 h-5 text-emerald-500" />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-black text-emerald-500 uppercase tracking-tight">{t('upgrade')}</p>
-                        <p className="text-[10px] font-bold text-emerald-600/60 uppercase tracking-widest mt-0.5">{t('unlockPremium')}</p>
+                        <p className="text-sm font-bold text-emerald-500 uppercase tracking-widest">{t('upgrade')}</p>
+                        <p className="text-[10px] font-medium text-emerald-600/60 mt-0.5">{t('unlockPremium')}</p>
                       </div>
                     </DropdownMenuItem>
                   </div>
@@ -190,8 +190,8 @@ export function Header() {
                     <LogOut className="w-5 h-5 text-red-500" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-bold text-red-500 uppercase tracking-tight">{t('logout')}</p>
-                    <p className="text-[11px] font-bold text-red-600/60 uppercase tracking-widest mt-0.5">{t('endSession')}</p>
+                    <p className="text-sm font-semibold text-red-500">{t('logout')}</p>
+                    <p className="text-[11px] font-medium text-red-600/60 mt-0.5">{t('endSession')}</p>
                   </div>
                 </DropdownMenuItem>
               </div>

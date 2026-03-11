@@ -18,6 +18,7 @@ import { Badge } from '@/components/ui/badge';
 import { startOfDay, endOfDay, parseISO, isWithinInterval } from 'date-fns';
 import { AtividadesRecentes } from '@/components/dashboard/AtividadesRecentes';
 import { PremiumModal } from '@/components/dashboard/PremiumModal';
+import { PageHeader } from '@/components/ui/PageHeader';
 import { useTranslations } from 'next-intl';
 import { usePlano } from '@/hooks/usePlano';
 import { useLiveQuery } from 'dexie-react-hooks';
@@ -99,40 +100,36 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col lg:h-[calc(100vh-theme(spacing.20))] space-y-4 sm:space-y-6 p-4 lg:p-6 lg:overflow-hidden">
       {/* Welcome Section */}
-      <div>
-        <h1 className="text-3xl sm:text-4xl font-minecraft font-black text-white mb-2 uppercase tracking-widest">
-          {t('greeting', { name: firstName })}
-        </h1>
-        <p className="text-sm sm:text-base text-gray-400 font-minecraft uppercase tracking-wider">
-          {t('daySummary')}
-        </p>
-      </div>
+      <PageHeader 
+        title={t('greeting', { name: firstName })}
+        description={t('daySummary')}
+      />
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Card 1 - Compromissos Hoje */}
         <Card
-          className="cursor-pointer transition-all"
+          className="cursor-pointer transition-all border border-zinc-800/50 hover:border-emerald-500/30"
           onClick={handleIrParaAgenda}
         >
-          <CardHeader className="flex flex-row items-center justify-between pb-2 font-minecraft uppercase">
-            <CardTitle className="text-sm font-black text-zinc-500 tracking-widest">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
               {t('appointmentsToday')}
             </CardTitle>
-            <div className="p-2 bg-zinc-950 border-2 border-zinc-800 rounded-none shadow-[2px_2px_0_rgba(0,0,0,0.3)]">
+            <div className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg">
               <Calendar className="w-4 h-4 text-zinc-400" />
             </div>
           </CardHeader>
-          <CardContent className="font-minecraft">
+          <CardContent>
             {loadingCompromissos ? (
               <div className="flex items-center gap-2">
-                <div className="animate-spin h-5 w-5 border-2 border-emerald-500/50"></div>
+                <div className="animate-spin h-5 w-5 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full"></div>
                 <span className="text-sm text-zinc-500">{tCommon('loading')}</span>
               </div>
             ) : (
               <>
-                <div className="text-4xl font-black text-white leading-tight tracking-widest">{compromissosHoje}</div>
-                <p className="text-[10px] font-bold uppercase text-zinc-600 mt-1 tracking-widest">
+                <div className="text-4xl font-bold text-white leading-tight">{compromissosHoje}</div>
+                <p className="text-[10px] font-medium uppercase text-zinc-500 mt-1 tracking-wider">
                   {compromissosHoje === 0
                     ? t('noAppointments')
                     : compromissosHoje === 1
@@ -146,54 +143,54 @@ export default function DashboardPage() {
         </Card>
 
         {/* Card 2 - Saldo Mensal */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2 font-minecraft uppercase">
-            <CardTitle className="text-sm font-black text-zinc-500 tracking-widest">
+        <Card className="border border-zinc-800/50">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
               {t('monthlyBalance')}
             </CardTitle>
-            <div className="p-2 bg-emerald-500/10 border-2 border-emerald-500/20 rounded-none shadow-[2px_2px_0_rgba(0,0,0,0.2)]">
+            <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
               <Wallet className="w-4 h-4 text-emerald-500" />
             </div>
           </CardHeader>
-          <CardContent className="font-minecraft">
-            <div className="text-4xl font-black text-white leading-tight tracking-widest">R$ 0,00</div>
-            <p className="text-[10px] font-black uppercase text-emerald-600 mt-1 tracking-widest flex items-center gap-1">
+          <CardContent>
+            <div className="text-4xl font-bold text-white leading-tight">R$ 0,00</div>
+            <p className="text-[10px] font-medium uppercase text-emerald-500/60 mt-1 tracking-wider flex items-center gap-1">
               {t('configureFinances')}
             </p>
           </CardContent>
         </Card>
 
         {/* Card 3 - Cursos Ativos */}
-        <Card>
+        <Card className="border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
+            <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
               {t('activeCourses')}
             </CardTitle>
-            <div className="p-2 bg-zinc-800/50 rounded-lg">
+            <div className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg">
               <BookOpen className="w-4 h-4 text-zinc-400" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white leading-tight">0</div>
-            <p className="text-[10px] font-bold uppercase text-zinc-600 mt-1 tracking-widest">
+            <div className="text-4xl font-bold text-white leading-tight">0</div>
+            <p className="text-[10px] font-medium uppercase text-zinc-500 mt-1 tracking-wider">
               {t('startStudies')}
             </p>
           </CardContent>
         </Card>
 
         {/* Card 4 - Metas do Mês */}
-        <Card>
+        <Card className="border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
+            <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
               {t('monthlyGoals')}
             </CardTitle>
-            <div className="p-2 bg-zinc-800/50 rounded-lg">
+            <div className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg">
               <Target className="w-4 h-4 text-zinc-400" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white leading-tight">0/0</div>
-            <p className="text-[10px] font-bold uppercase text-zinc-600 mt-1 tracking-widest">
+            <div className="text-4xl font-bold text-white leading-tight">0/0</div>
+            <p className="text-[10px] font-medium uppercase text-zinc-500 mt-1 tracking-wider">
               {t('defineGoals')}
             </p>
           </CardContent>
@@ -206,9 +203,9 @@ export default function DashboardPage() {
         <AtividadesRecentes />
 
         {/* Quick Actions */}
-        <Card className="flex flex-col h-full bg-zinc-900/40">
-          <CardHeader className="flex-shrink-0 border-b-2 border-zinc-800 mb-4 p-6 font-minecraft uppercase">
-            <CardTitle className="text-white text-lg font-black tracking-[0.2em] text-xs opacity-50">{t('quickActions')}</CardTitle>
+        <Card className="flex flex-col h-full bg-zinc-900/20 border border-zinc-800/50 overflow-hidden">
+          <CardHeader className="flex-shrink-0 border-b border-zinc-800 mb-4 p-6">
+            <CardTitle className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em]">{t('quickActions')}</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 overflow-y-auto space-y-3 min-h-0 p-6 pt-0">
             {/* Botão Novo Compromisso */}

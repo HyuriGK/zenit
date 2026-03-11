@@ -35,6 +35,7 @@ import { StreakCalendar } from './components/StreakCalendar';
 import { TrendChart } from './components/TrendChart';
 import { WeekdayStats } from './components/WeekdayStats';
 import { MonthlyCalendar } from './components/MonthlyCalendar';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 interface CategoriaHabito {
   id: string;
@@ -556,41 +557,41 @@ export default function HabitosPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-zinc-400">{t('loading')}</p>
+          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mx-auto mb-4" />
+          <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest animate-pulse">{t('loading')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col lg:h-[calc(100vh-theme(spacing.20))] h-[calc(100vh-theme(spacing.16))] pb-20 lg:pb-0 overflow-hidden space-y-4 sm:space-y-6 p-4 lg:p-6">
+    <div className="flex flex-col h-full overflow-hidden space-y-6 p-4 lg:p-6">
       {/* Header */}
-      <div className="flex-shrink-0 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4 sm:mb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">{t('pageTitle')}</h1>
-          <p className="text-xs sm:text-sm font-bold text-zinc-500 uppercase tracking-widest mt-1">{t('subtitle')}</p>
-        </div>
-        <Button
-          onClick={() => setModalHabitoAberto(true)}
-          variant="premium"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          {t('newHabit')}
-        </Button>
-      </div>
+      <PageHeader 
+        title={t('pageTitle')}
+        description={t('subtitle')}
+        action={
+          <Button
+            onClick={() => setModalHabitoAberto(true)}
+            variant="premium"
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            {t('newHabit')}
+          </Button>
+        }
+      />
 
       <div className="flex-1 overflow-y-auto min-h-0 space-y-4 sm:space-y-6 pr-1 sm:pr-2 scroll-container">
         {/* Estatísticas resumidas */}
         {estatisticas && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card>
+            <Card className="border border-zinc-800/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">{t('todayProgress')}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">{t('todayProgress')}</p>
                     <p className="text-3xl font-bold text-white leading-tight">
                       {estatisticas.completadosHoje}
                       <span className="text-zinc-700 mx-1">/</span>
@@ -598,20 +599,20 @@ export default function HabitosPage() {
                     </p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-zinc-800/50 flex items-center justify-center border border-zinc-700/30">
-                    <CheckCircle2 className="w-6 h-6 text-zinc-400" />
+                    <CheckCircle2 className="w-6 h-6 text-emerald-500/50" />
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border border-zinc-800/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">{t('currentStreak')}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">{t('currentStreak')}</p>
                     <p className="text-3xl font-bold text-white leading-tight">
                       {estatisticas.maiorSequenciaAtual}
-                      <span className="text-[10px] ml-2 font-black uppercase text-zinc-600 tracking-tighter">{t('days')}</span>
+                      <span className="text-[10px] ml-2 font-bold uppercase text-zinc-600 tracking-tighter">{t('days')}</span>
                     </p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
@@ -621,14 +622,14 @@ export default function HabitosPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border border-zinc-800/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">{t('bestStreak')}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">{t('bestStreak')}</p>
                     <p className="text-3xl font-bold text-white leading-tight">
                       {estatisticas.maiorSequenciaHistorica}
-                      <span className="text-[10px] ml-2 font-black uppercase text-zinc-600 tracking-tighter">{t('days')}</span>
+                      <span className="text-[10px] ml-2 font-bold uppercase text-zinc-600 tracking-tighter">{t('days')}</span>
                     </p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
@@ -638,15 +639,15 @@ export default function HabitosPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border border-zinc-800/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-1">{t('totalCompleted')}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-1">{t('totalCompleted')}</p>
                     <p className="text-3xl font-bold text-white leading-tight">{estatisticas.totalCompletados}</p>
                   </div>
                   <div className="w-12 h-12 rounded-xl bg-zinc-800/50 flex items-center justify-center border border-zinc-700/30">
-                    <Target className="w-6 h-6 text-zinc-400" />
+                    <Target className="w-6 h-6 text-zinc-500/50" />
                   </div>
                 </div>
               </CardContent>
@@ -735,7 +736,7 @@ export default function HabitosPage() {
             </CardContent>
           </Card>
         ) : (
-          <Card>
+          <Card className="border border-zinc-800/50 bg-zinc-900/40">
             <CardContent className="p-6">
               {/* Hábitos Pendentes */}
               {habitosPendentes.length > 0 && (

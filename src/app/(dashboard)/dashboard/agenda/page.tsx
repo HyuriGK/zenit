@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Plus, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -23,6 +23,7 @@ import { CompromissoDetails } from '@/components/features/agenda/CompromissoDeta
 import { useTranslations } from 'next-intl';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '@/lib/dexie';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 type ViewType = 'day' | 'week' | 'month' | 'year';
 
@@ -61,7 +62,6 @@ function AgendaPageContent() {
     } catch (error) {
       console.error('Erro ao buscar agenda:', error);
     } finally {
-      // Simulate slight delay for the immersive Minecraft loading feel
       setTimeout(() => setLoading(false), 300);
     }
   };
@@ -70,10 +70,7 @@ function AgendaPageContent() {
     fetchAgenda();
   }, []);
 
-  // Convert our Neon objects into the Compromisso format the UI expects
   const compromissos: Compromisso[] = compromissosData.map(c => {
-    // Normalizar fuso horário: datas vindas de servidores SQL (Midnight UTC) viram 21h do dia anterior no Brasil.
-    // Extraindo apenas a data (YYYY-MM-DD) e forçando meio-dia, garantimos que fiquem no dia correto no Frontend.
     const dateStr = typeof c.data === 'string' ? c.data : new Date(c.data).toISOString();
     const datePart = dateStr.includes('T') ? dateStr.split('T')[0] : dateStr.slice(0, 10);
     const safeData = `${datePart}T12:00:00`;
@@ -132,60 +129,39 @@ function AgendaPageContent() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden bg-zinc-950">
-      {/* Header compacto - apenas mobile */}
-      <div className="md:hidden flex items-center justify-between gap-4 p-4 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
-        <div>
-          <h1 className="text-lg font-bold text-white tracking-tight">{t('title')}</h1>
-          <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">{t('subtitle') || 'Agenda'}</p>
-        </div>
-        <Button
-          onClick={() => {
-            setSelectedDate(null);
-            setSelectedHour(null);
-            setSelectedCompromisso(null);
-            setIsEditMode(false);
-            setIsModalOpen(true);
-          }}
-          variant="premium"
-          size="sm"
-        >
-          <Plus className="w-3.5 h-3.5 mr-1.5" />
-          {t('new')}
-        </Button>
+    <div className="flex flex-col h-full overflow-hidden">
+      <div className="p-4 lg:p-6 pb-0">
+        <PageHeader 
+          title={t('title')}
+          description={t('subtitle') || 'Gerencie seus compromissos'}
+          action={
+            <Button
+              onClick={() => {
+                setSelectedDate(null);
+                setSelectedHour(null);
+                setSelectedCompromisso(null);
+                setIsEditMode(false);
+                setIsModalOpen(true);
+              }}
+              variant="premium"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              <span className="hidden sm:inline">{t('newAppointment')}</span>
+              <span className="sm:hidden">{t('new')}</span>
+            </Button>
+          }
+        />
       </div>
 
-      {/* Header desktop - integrado */}
-      <div className="hidden md:flex items-center justify-between gap-4 px-6 py-4 border-b border-zinc-800 bg-zinc-900/20 shrink-0">
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">{t('title')}</h1>
-          <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mt-0.5">{t('subtitle') || 'Gerencie seus compromissos'}</p>
-        </div>
-        <Button
-          onClick={() => {
-            setSelectedDate(null);
-            setSelectedHour(null);
-            setSelectedCompromisso(null);
-            setIsEditMode(false);
-            setIsModalOpen(true);
-          }}
-          variant="premium"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          {t('newAppointment')}
-        </Button>
-      </div>
-
-      {/* Calendário - ocupa todo espaço restante */}
       <div className="flex-1 min-h-0 max-h-full bg-zinc-900/50 overflow-hidden flex flex-col">
         {loading ? (
           <div className="flex items-center justify-center h-full bg-zinc-950/50">
-            <div className="text-center font-minecraft uppercase">
+            <div className="text-center">
               <Activity className="w-12 h-12 text-emerald-500 mx-auto mb-6 animate-pulse" />
-              <div className="w-48 h-2 bg-zinc-900 border-2 border-zinc-800 mx-auto overflow-hidden relative shadow-[4px_4px_0_rgba(0,0,0,0.3)]">
+              <div className="w-48 h-1 bg-zinc-900 border border-zinc-800 mx-auto overflow-hidden relative rounded-full">
                 <div className="absolute inset-0 bg-emerald-500/50 animate-[loading-bar_2s_infinite_ease-in-out]"></div>
               </div>
-              <p className="mt-4 text-xs font-black tracking-[0.3em] text-zinc-500 animate-pulse">{t('loadingCalendar')}</p>
+              <p className="mt-4 text-[10px] font-bold tracking-[0.2em] text-zinc-500 uppercase animate-pulse">{t('loadingCalendar')}</p>
             </div>
           </div>
         ) : view === 'day' ? (
@@ -261,9 +237,8 @@ function AgendaPageContent() {
         )}
       </div>
 
-      {/* Modal de Detalhes do Compromisso */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen} modal={false}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white w-[95vw] max-w-[500px] sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white w-[95vw] max-w-[500px] sm:max-w-md max-h-[90vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg">{t('appointmentDetails')}</DialogTitle>
             <DialogDescription className="text-gray-400 text-xs sm:text-sm">
@@ -282,9 +257,8 @@ function AgendaPageContent() {
         </DialogContent>
       </Dialog>
 
-      {/* Modal de Criar/Editar Compromisso */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen} modal={false}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white w-[95vw] max-w-[600px] sm:max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white w-[95vw] max-w-[600px] sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg">
               {isEditMode

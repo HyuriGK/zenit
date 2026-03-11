@@ -39,6 +39,7 @@ import { cn } from '@/lib/utils';
 import { ImageCropModal } from '@/components/settings/ImageCropModal';
 import { ChangePasswordModal } from '@/components/settings/ChangePasswordModal';
 import { DeleteAccountModal } from '@/components/settings/DeleteAccountModal';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 // --- Types ---
 type SettingsTab = 'account' | 'appearance' | 'notifications' | 'privacy' | 'billing';
@@ -62,14 +63,14 @@ const NAV_ITEMS: NavItem[] = [
 // --- Sub-components (Outside of render) ---
 const SectionHeader = ({ title, description }: { title: string; description: string }) => (
   <div className="mb-6">
-    <h2 className="text-xl font-semibold text-zinc-100 tracking-tight">{title}</h2>
-    <p className="text-sm text-zinc-400 mt-1">{description}</p>
-    <Separator className="mt-4 bg-zinc-800" />
+    <h2 className="text-xl font-bold text-white tracking-tight uppercase tracking-[0.05em]">{title}</h2>
+    <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1">{description}</p>
+    <Separator className="mt-4 bg-zinc-800/50" />
   </div>
 );
 
 const SettingsCard = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={cn("bg-zinc-900/40 border border-zinc-800 rounded-xl p-6 shadow-sm", className)}>
+  <div className={cn("bg-zinc-900/40 border border-zinc-800/50 rounded-2xl p-6 shadow-sm", className)}>
     {children}
   </div>
 );
@@ -342,22 +343,11 @@ export default function SettingsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
         {/* Page Header */}
-        <div className="mb-10">
-          {fromProfile && (
-            <Button
-              variant="ghost"
-              onClick={() => router.push('/dashboard/perfil')}
-              className="mb-4 text-zinc-400 hover:text-white hover:bg-zinc-800 -ml-2"
-            >
-              <ChevronLeft className="w-4 h-4 mr-1" />
-              Voltar ao Perfil
-            </Button>
-          )}
-          <h1 className="text-3xl font-bold tracking-tight text-white">Configurações</h1>
-          <p className="text-zinc-400 mt-2 text-lg">
-            Gerencie sua conta e preferências do sistema.
-          </p>
-        </div>
+        <PageHeader 
+          title="Configurações"
+          description="Gerencie sua conta e preferências do sistema."
+          showBackButton={fromProfile}
+        />
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
 
@@ -372,13 +362,13 @@ export default function SettingsPage() {
                     key={item.id}
                     onClick={() => setActiveTab(item.id)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap lg:whitespace-normal text-left",
+                      "flex items-center gap-3 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all duration-200 whitespace-nowrap lg:whitespace-normal text-left",
                       isActive
-                        ? "bg-zinc-900 text-white shadow-sm ring-1 ring-zinc-800"
-                        : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900/50"
+                        ? "bg-zinc-900 text-white shadow-sm ring-1 ring-zinc-800/50"
+                        : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/30"
                     )}
                   >
-                    <Icon className={cn("w-4 h-4 shrink-0", isActive ? "text-zenit-400" : "text-zinc-500")} />
+                    <Icon className={cn("w-4 h-4 shrink-0", isActive ? "text-emerald-400" : "text-zinc-600")} />
                     <span>{item.label}</span>
                   </button>
                 );

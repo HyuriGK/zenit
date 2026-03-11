@@ -15,6 +15,7 @@ import { RecursoPremium, PlanoUsuario } from '@/types/planos';
 import { useTranslations } from 'next-intl';
 import { AudioRecorder } from '@/components/estudos/AudioRecorder';
 import { AudioPlayer } from '@/components/estudos/AudioPlayer';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 interface Curso {
   id: string;
@@ -497,51 +498,50 @@ export default function EstudosPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-zinc-400">{t('loading')}</p>
+          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mx-auto mb-4" />
+          <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest animate-pulse">{t('loading')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 lg:p-6">
+    <div className="space-y-6 p-4 lg:p-6 overflow-hidden">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">{t('pageTitle')}</h1>
-          <p className="text-sm sm:text-base text-zinc-400">{t('subtitle')}</p>
-        </div>
-        <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
-          <Button
-            onClick={() => setBuscaAtiva(!buscaAtiva)}
-            variant="default"
-            className="flex-1 sm:flex-none border-zinc-700 hover:bg-zinc-800 h-auto py-2 text-sm"
-          >
-            <Search className="w-4 h-4 mr-1 sm:mr-2" />
-            <span className="hidden xs:inline">{t('search')}</span>
-          </Button>
-          <Button
-            onClick={() => setModalAnotacaoAberto(true)}
-            variant="default"
-            className="flex-1 sm:flex-none border-zinc-700 hover:bg-zinc-800 h-auto py-2 text-sm"
-          >
-            <StickyNote className="w-4 h-4 mr-1 sm:mr-2" />
-            <span className="hidden xs:inline">{t('newNote')}</span>
-            <span className="xs:hidden">{t('note')}</span>
-          </Button>
-          <Button
-            onClick={() => setModalCursoAberto(true)}
-            className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 h-auto py-2 text-sm"
-          >
-            <Plus className="w-4 h-4 mr-1 sm:mr-2" />
-            <span className="hidden xs:inline">{t('newCourse')}</span>
-            <span className="xs:hidden">{t('course')}</span>
-          </Button>
-        </div>
-      </div>
+      <PageHeader 
+        title={t('pageTitle')}
+        description={t('subtitle')}
+        action={
+          <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button
+              onClick={() => setBuscaAtiva(!buscaAtiva)}
+              variant="outline"
+              className="flex-1 sm:flex-none"
+            >
+              <Search className="w-4 h-4 mr-2" />
+              <span className="hidden xs:inline">{t('search')}</span>
+            </Button>
+            <Button
+              onClick={() => setModalAnotacaoAberto(true)}
+              variant="outline"
+              className="flex-1 sm:flex-none"
+            >
+              <StickyNote className="w-4 h-4 mr-2" />
+              <span className="hidden xs:inline">{t('newNote')}</span>
+            </Button>
+            <Button
+              onClick={() => setModalCursoAberto(true)}
+              variant="premium"
+              className="flex-1 sm:flex-none"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              <span className="hidden xs:inline">{t('newCourse')}</span>
+            </Button>
+          </div>
+        }
+      />
 
       {/* Busca */}
       {buscaAtiva && (
@@ -603,42 +603,42 @@ export default function EstudosPage() {
       )}
 
       {/* Estatísticas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-        <Card className="bg-zinc-900 border-zinc-800">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <Card className="border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
               {t('totalCourses')}
             </CardTitle>
-            <BookOpen className="w-4 h-4 text-green-500" />
+            <BookOpen className="w-4 h-4 text-emerald-500/50" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{cursos.length}</div>
+            <div className="text-3xl font-bold text-white leading-none">{cursos.length}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
               {t('totalModules')}
             </CardTitle>
-            <FileText className="w-4 h-4 text-blue-500" />
+            <FileText className="w-4 h-4 text-blue-500/50" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">
+            <div className="text-3xl font-bold text-white leading-none">
               {cursos.reduce((acc, c) => acc + (c._count?.modulos || 0), 0)}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
               {t('totalNotes')}
             </CardTitle>
-            <StickyNote className="w-4 h-4 text-yellow-500" />
+            <StickyNote className="w-4 h-4 text-yellow-500/50" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{anotacoes.length}</div>
+            <div className="text-3xl font-bold text-white leading-none">{anotacoes.length}</div>
           </CardContent>
         </Card>
       </div>
@@ -661,39 +661,39 @@ export default function EstudosPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {cursos.map((curso) => (
               <Card
                 key={curso.id}
-                className="bg-zinc-900 border-zinc-800 hover:border-zinc-700 cursor-pointer transition-colors"
+                className="border border-zinc-800/50 hover:border-emerald-500/30 cursor-pointer transition-all hover:bg-zinc-900/60 group"
                 onClick={() => window.location.href = `/dashboard/estudos/${curso.id}`}
               >
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div
-                        className="w-10 h-10 rounded-lg flex items-center justify-center"
-                        style={{ backgroundColor: curso.cor + '20', color: curso.cor }}
+                        className="w-10 h-10 rounded-xl flex items-center justify-center border border-current/20"
+                        style={{ backgroundColor: curso.cor + '10', color: curso.cor }}
                       >
                         <BookOpen className="w-5 h-5" />
                       </div>
                       <div>
-                        <CardTitle className="text-white text-lg">{curso.nome}</CardTitle>
+                        <CardTitle className="text-white text-lg group-hover:text-emerald-400 transition-colors">{curso.nome}</CardTitle>
                         {curso.descricao && (
-                          <p className="text-sm text-zinc-400 mt-1">{curso.descricao}</p>
+                          <p className="text-xs text-zinc-500 mt-1 line-clamp-1">{curso.descricao}</p>
                         )}
                       </div>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-zinc-500" />
+                    <ChevronRight className="w-5 h-5 text-zinc-700 group-hover:text-emerald-500 transition-colors" />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex gap-4 text-sm text-zinc-400">
+                  <div className="flex gap-4 text-[10px] font-bold uppercase tracking-widest text-zinc-600">
                     <div>
-                      <span className="font-medium">{curso._count?.modulos || 0}</span> {t('modules')}
+                      <span className="text-zinc-400">{curso._count?.modulos || 0}</span> {t('modules')}
                     </div>
                     <div>
-                      <span className="font-medium">{curso._count?.anotacoes || 0}</span> {t('notes')}
+                      <span className="text-zinc-400">{curso._count?.anotacoes || 0}</span> {t('notes')}
                     </div>
                   </div>
                 </CardContent>

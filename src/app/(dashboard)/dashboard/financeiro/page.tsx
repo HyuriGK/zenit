@@ -11,6 +11,7 @@ import { formatarMoeda } from '@/lib/financeiro-helper';
 import NovaTransacaoModal from '@/components/financeiro/NovaTransacaoModal';
 import { format, subMonths, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { PageHeader } from '@/components/ui/PageHeader';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -260,93 +261,93 @@ export default function FinanceiroDashboardPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-zinc-400">Carregando módulo financeiro...</p>
+          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mx-auto mb-4" />
+          <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest animate-pulse">Carregando módulo financeiro...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-theme(spacing.20))] overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-800 space-y-6 p-4 lg:p-6 bg-zinc-950">
+    <div className="flex flex-col space-y-6 p-4 lg:p-6 overflow-hidden">
       {/* Header */}
-      <div className="flex-shrink-0 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Painel Financeiro</h1>
-          <p className="text-sm text-zinc-500">Acompanhe seu desempenho em {dashboard.mes}</p>
-        </div>
-        <div className="flex gap-3">
-          <Button
-            onClick={() => setModalTransacaoAberto(true)}
-            variant="premium"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Nova Transação
-          </Button>
-          <Button
-            asChild
-            variant="outline"
-            className="rounded-xl font-bold uppercase tracking-widest text-[10px]"
-          >
-            <Link href="/dashboard/financeiro/transacoes">
-              <List className="w-4 h-4 mr-2" />
-              Registros
-            </Link>
-          </Button>
-        </div>
-      </div>
+      <PageHeader 
+        title="Painel Financeiro"
+        description={`Acompanhe seu desempenho em ${dashboard.mes}`}
+        action={
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setModalTransacaoAberto(true)}
+              variant="premium"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Nova Transação
+            </Button>
+            <Button
+              asChild
+              variant="outline"
+              className="rounded-xl font-bold uppercase tracking-widest text-[10px]"
+            >
+              <Link href="/dashboard/financeiro/transacoes">
+                <List className="w-4 h-4 mr-2" />
+                Registros
+              </Link>
+            </Button>
+          </div>
+        }
+      />
 
       {/* KPIs Minimalistas */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <Card className="border border-zinc-800/50">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-2">
               <Wallet className="w-4 h-4 text-zinc-500" />
-              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-500">Saldo Mensal</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Saldo Mensal</span>
             </div>
-            <div className="text-3xl font-black text-white leading-none">{formatarMoeda(dashboard.resumoMensal.saldo)}</div>
+            <div className="text-3xl font-bold text-white leading-none">{formatarMoeda(dashboard.resumoMensal.saldo)}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border border-zinc-800/50">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-4 h-4 text-emerald-500/50" />
-              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-500">Receitas</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Receitas</span>
             </div>
-            <div className="text-3xl font-black text-emerald-500 leading-none">{formatarMoeda(dashboard.resumoMensal.receitas)}</div>
+            <div className="text-3xl font-bold text-emerald-500 leading-none">{formatarMoeda(dashboard.resumoMensal.receitas)}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border border-zinc-800/50">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-2">
               <TrendingDown className="w-4 h-4 text-red-500/50" />
-              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-500">Despesas</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Despesas</span>
             </div>
-            <div className="text-3xl font-black text-red-500 leading-none">{formatarMoeda(dashboard.resumoMensal.despesas)}</div>
+            <div className="text-3xl font-bold text-red-500 leading-none">{formatarMoeda(dashboard.resumoMensal.despesas)}</div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border border-zinc-800/50">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-2">
               <Target className="w-4 h-4 text-zinc-500" />
-              <span className="text-[10px] uppercase tracking-[0.2em] font-black text-zinc-500">Sobra</span>
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Sobra</span>
             </div>
-            <div className="text-3xl font-black text-white leading-none">{formatarMoeda(dashboard.resumoMensal.sobra)}</div>
+            <div className="text-3xl font-bold text-white leading-none">{formatarMoeda(dashboard.resumoMensal.sobra)}</div>
           </CardContent>
         </Card>
       </div>
 
       {/* Row 1: Gastos e Receitas por Categoria */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card className="border border-zinc-800/50 overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between py-4 px-6 border-b border-zinc-800/50">
-            <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Gastos por Categoria</CardTitle>
-            <div className="flex items-center gap-2 bg-zinc-800/50 px-2 py-1 rounded-lg text-[9px] font-black text-zinc-500 uppercase tracking-widest">
+            <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">Gastos por Categoria</CardTitle>
+            <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded-lg text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
               Top 5 <ChevronDown className="w-3 h-3" />
             </div>
           </CardHeader>
@@ -373,10 +374,10 @@ export default function FinanceiroDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border border-zinc-800/50 overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between py-4 px-6 border-b border-zinc-800/50">
-            <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Receitas por Categoria</CardTitle>
-            <div className="flex items-center gap-2 bg-zinc-800/50 px-2 py-1 rounded-lg text-[9px] font-black text-zinc-500 uppercase tracking-widest">
+            <CardTitle className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">Receitas por Categoria</CardTitle>
+            <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-2 py-1 rounded-lg text-[9px] font-bold text-zinc-500 uppercase tracking-widest">
               Top 5 <ChevronDown className="w-3 h-3" />
             </div>
           </CardHeader>

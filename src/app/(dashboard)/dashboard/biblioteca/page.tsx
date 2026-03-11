@@ -3,13 +3,14 @@
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/dexie';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { BookOpen, Plus, Quote, Film, MoreVertical } from 'lucide-react';
+import { BookOpen, Plus, Quote, Film, MoreVertical, Loader2, Activity, CheckCircle2 } from 'lucide-react';
 import { StarRating } from '@/components/ui/star-rating';
 import { Button } from '@/components/ui/button';
 import { Midia, Citacao, StatusLeitura } from '@/types/midia';
 import { NovaMidiaModal } from '@/components/leituras/NovaMidiaModal';
 import { CitacoesModal } from '@/components/leituras/CitacoesModal';
 import { GerenciarCitacoesModal } from '@/components/leituras/GerenciarCitacoesModal';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 export default function BibliotecaPage() {
   const [midias, setMidias] = useState<Midia[]>([]);
@@ -79,47 +80,46 @@ export default function BibliotecaPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-zinc-400">Carregando...</p>
+          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mx-auto mb-4" />
+          <p className="text-sm font-medium text-zinc-500 uppercase tracking-widest animate-pulse">Carregando...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 lg:p-6">
+    <div className="space-y-6 p-4 lg:p-6 overflow-hidden">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Biblioteca</h1>
-          <p className="text-sm sm:text-base text-zinc-400">Organize seus livros e filmes</p>
-        </div>
-        <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
-          <Button
-            onClick={() => setModalCitacaoAberto(true)}
-            variant="default"
-            className="flex-1 sm:flex-none border-zinc-700 hover:bg-zinc-800 h-auto py-2 text-sm"
-          >
-            <Quote className="w-4 h-4 mr-1 sm:mr-2" />
-            <span className="hidden xs:inline">Nova Citação</span>
-            <span className="xs:hidden">Citação</span>
-          </Button>
-          <Button
-            onClick={() => setModalMidiaAberto(true)}
-            className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 h-auto py-2 text-sm"
-          >
-            <Plus className="w-4 h-4 mr-1 sm:mr-2" />
-            <span className="hidden xs:inline">Adicionar Item</span>
-            <span className="xs:hidden">Novo</span>
-          </Button>
-        </div>
-      </div>
+      <PageHeader 
+        title="Biblioteca"
+        description="Organize seus livros e filmes"
+        action={
+          <div className="flex flex-wrap gap-2 sm:gap-3 w-full sm:w-auto">
+            <Button
+              onClick={() => setModalCitacaoAberto(true)}
+              variant="outline"
+              className="flex-1 sm:flex-none"
+            >
+              <Quote className="w-4 h-4 mr-2" />
+              <span className="hidden xs:inline">Nova Citação</span>
+            </Button>
+            <Button
+              onClick={() => setModalMidiaAberto(true)}
+              variant="premium"
+              className="flex-1 sm:flex-none"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              <span className="hidden xs:inline">Adicionar Item</span>
+            </Button>
+          </div>
+        }
+      />
 
       {/* Frases Inspiradoras */}
       {citacoesDestaque.length > 0 && (
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="border border-zinc-800/50 bg-zinc-900/40">
           <CardHeader>
             <CardTitle className="flex items-center justify-between text-white text-lg sm:text-xl">
               <div className="flex items-center gap-2">
@@ -155,62 +155,64 @@ export default function BibliotecaPage() {
       )}
 
       {/* Estatísticas */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
-        <Card className="bg-zinc-900 border-zinc-800">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <Card className="border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
               Total
             </CardTitle>
-            <BookOpen className="w-4 h-4 text-green-500" />
+            <BookOpen className="w-4 h-4 text-emerald-500/50" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{midiasPorTipo.total}</div>
+            <div className="text-2xl font-bold text-white leading-none">{midiasPorTipo.total}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
               Livros
             </CardTitle>
-            <BookOpen className="w-4 h-4 text-blue-500" />
+            <BookOpen className="w-4 h-4 text-blue-500/50" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{midiasPorTipo.livros}</div>
+            <div className="text-2xl font-bold text-white leading-none">{midiasPorTipo.livros}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
               Filmes
             </CardTitle>
-            <Film className="w-4 h-4 text-teal-500" />
+            <Film className="w-4 h-4 text-pink-500/50" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{midiasPorTipo.filmes}</div>
+            <div className="text-2xl font-bold text-white leading-none">{midiasPorTipo.filmes}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
               Em Andamento
             </CardTitle>
+            <Activity className="w-4 h-4 text-blue-500/50" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-400">{midiasPorTipo.emAndamento}</div>
+            <div className="text-2xl font-bold text-blue-400 leading-none">{midiasPorTipo.emAndamento}</div>
           </CardContent>
         </Card>
 
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card className="border border-zinc-800/50">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-zinc-400">
+            <CardTitle className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">
               Concluídos
             </CardTitle>
+            <CheckCircle2 className="w-4 h-4 text-emerald-500/50" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-400">{midiasPorTipo.concluidos}</div>
+            <div className="text-2xl font-bold text-emerald-400 leading-none">{midiasPorTipo.concluidos}</div>
           </CardContent>
         </Card>
       </div>
@@ -254,7 +256,7 @@ export default function BibliotecaPage() {
                       return (
                         <Card
                           key={midia.id}
-                          className="bg-zinc-900 border-zinc-800 hover:border-zinc-700 cursor-pointer transition-colors w-64 flex-shrink-0"
+                          className="border border-zinc-800/50 hover:border-emerald-500/30 cursor-pointer transition-all hover:bg-zinc-900/60 w-64 flex-shrink-0 group"
                           onClick={() => window.location.href = `/dashboard/biblioteca/${midia.id}`}
                         >
                           <CardContent className="p-4 space-y-3">
@@ -278,8 +280,8 @@ export default function BibliotecaPage() {
                                 <BookOpen className="w-4 h-4" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h3 className="text-white font-semibold text-sm line-clamp-2">{midia.titulo}</h3>
-                                <p className="text-xs text-zinc-400 truncate mt-1">{midia.autor}</p>
+                                <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-emerald-400 transition-colors uppercase tracking-tight">{midia.titulo}</h3>
+                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1">{midia.autor}</p>
                               </div>
                             </div>
 
@@ -344,8 +346,8 @@ export default function BibliotecaPage() {
                                 <Film className="w-4 h-4" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h3 className="text-white font-semibold text-sm line-clamp-2">{midia.titulo}</h3>
-                                <p className="text-xs text-zinc-400 truncate mt-1">{midia.diretor}</p>
+                                <h3 className="text-white font-bold text-sm line-clamp-2 group-hover:text-emerald-400 transition-colors uppercase tracking-tight">{midia.titulo}</h3>
+                                <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mt-1">{midia.diretor}</p>
                               </div>
                             </div>
 

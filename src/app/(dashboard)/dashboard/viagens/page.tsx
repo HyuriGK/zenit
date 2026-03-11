@@ -37,6 +37,7 @@ import { Viagem, StatusViagem, PropostoViagem } from '@/types/viagem';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 const statusColors = {
   PLANEJADA: { bg: 'bg-blue-500/10', text: 'text-blue-400', border: 'border-blue-500/20' },
@@ -297,104 +298,95 @@ export default function ViagensPage() {
 
   if (loading) {
     return (
-      <div className="bg-zinc-950 min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zenit-500"></div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <Plane className="w-10 h-10 text-emerald-500 animate-bounce mx-auto mb-4" />
+          <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest animate-pulse">Carregando viagens...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-zinc-950 p-4 lg:p-6 space-y-4 sm:space-y-6">
+    <div className="p-4 lg:p-6 space-y-6 overflow-hidden">
       {/* Header */}
-      <div className="relative mb-8">
-        <div className="flex justify-between items-start mb-6">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-3 bg-zinc-900 border border-zinc-800 rounded-xl">
-                <Plane className="w-8 h-8 text-zenit-400" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold bg-gradient-to-r from-zenit-400 via-blue-400 to-green-400 bg-clip-text text-transparent">
-                  Minhas Viagens
-                </h1>
-                <p className="text-zinc-400">Planeje e gerencie suas aventuras</p>
-              </div>
-            </div>
-          </div>
+      <PageHeader 
+        title="Minhas Viagens"
+        description="Planeje e gerencie suas aventuras"
+        action={
           <Button
             onClick={() => setIsModalOpen(true)}
-            className="bg-green-600 hover:bg-green-700"
-            size="lg"
+            variant="premium"
           >
-            <Plus className="w-5 h-5 mr-2" />
+            <Plus className="w-4 h-4 mr-2" />
             Nova Viagem
           </Button>
-        </div>
+        }
+      />
 
         {/* Cards de Estatísticas */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="relative overflow-hidden bg-zinc-900/50 border-zinc-800 hover:border-zenit-500/40 transition-all">
-            <div className="relative p-6">
+          <Card className="border border-zinc-800/50 bg-zinc-900/40">
+            <div className="p-6">
               <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-zenit-500/10 rounded-lg">
-                  <Sparkles className="w-5 h-5 text-zenit-400" />
+                <div className="p-2 bg-emerald-500/10 rounded-lg">
+                  <Sparkles className="w-5 h-5 text-emerald-500" />
                 </div>
-                <span className="text-sm text-zinc-400">Viagens Ativas</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Viagens Ativas</span>
               </div>
-              <div className="text-3xl font-bold text-zenit-400 mb-1">
+              <div className="text-3xl font-bold text-white mb-1">
                 {viagensAtivas.length}
               </div>
-              <p className="text-xs text-zinc-500">
+              <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-tight">
                 {viagens.length - viagensAtivas.length} concluídas ou canceladas
               </p>
             </div>
           </Card>
 
-          <Card className="relative overflow-hidden bg-zinc-900/50 border-zinc-800 hover:border-green-500/40 transition-all">
-            <div className="relative p-6">
+          <Card className="border border-zinc-800/50 bg-zinc-900/40">
+            <div className="p-6">
               <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-green-500/10 rounded-lg">
-                  <DollarSign className="w-5 h-5 text-green-400" />
+                <div className="p-2 bg-blue-500/10 rounded-lg">
+                  <DollarSign className="w-5 h-5 text-blue-400" />
                 </div>
-                <span className="text-sm text-zinc-400">Total Investido</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Total Investido</span>
               </div>
-              <div className="text-3xl font-bold text-green-400 mb-1">
+              <div className="text-3xl font-bold text-white mb-1">
                 R$ {totalGasto.toFixed(2)}
               </div>
-              <p className="text-xs text-zinc-500">Em todas as viagens</p>
+              <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-tight">Em todas as viagens</p>
             </div>
           </Card>
 
-          <Card className="relative overflow-hidden bg-zinc-900/50 border-zinc-800 hover:border-blue-500/40 transition-all">
-            <div className="relative p-6">
+          <Card className="border border-zinc-800/50 bg-zinc-900/40">
+            <div className="p-6">
               <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-blue-500/10 rounded-lg">
-                  <Clock className="w-5 h-5 text-blue-400" />
+                <div className="p-2 bg-pink-500/10 rounded-lg">
+                  <Clock className="w-5 h-5 text-pink-400" />
                 </div>
-                <span className="text-sm text-zinc-400">Próxima Viagem</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Próxima Viagem</span>
               </div>
               {proximaViagem ? (
                 <>
-                  <div className="text-xl font-bold text-blue-400 mb-1 truncate">
+                  <div className="text-xl font-bold text-white mb-1 truncate">
                     {proximaViagem.nome}
                   </div>
-                  <p className="text-xs text-zinc-500">
+                  <p className="text-[10px] font-bold text-pink-500 uppercase tracking-tight">
                     {getCountdownText(proximaViagem.diasRestantes, proximaViagem.status)}
                   </p>
                 </>
               ) : (
                 <>
-                  <div className="text-2xl font-bold text-zinc-500 mb-1">—</div>
-                  <p className="text-xs text-zinc-500">Nenhuma viagem planejada</p>
+                  <div className="text-2xl font-bold text-zinc-700 mb-1">—</div>
+                  <p className="text-[10px] font-bold text-zinc-600 uppercase tracking-tight">Nenhuma planejada</p>
                 </>
               )}
             </div>
           </Card>
         </div>
-      </div>
 
       {/* Filtros */}
-      <Card className="p-4 bg-zinc-900/50 border-zinc-800">
+      <Card className="p-4 border border-zinc-800/50 bg-zinc-900/40">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />

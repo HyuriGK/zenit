@@ -1,5 +1,6 @@
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { HeaderWrapper } from '@/components/dashboard/HeaderWrapper';
+import { Footer } from '@/components/dashboard/Footer';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
 import { Toaster } from 'sonner';
 import { NotificationProvider } from '@/contexts/NotificationContext';
@@ -21,8 +22,13 @@ export default function DashboardLayout({
           <HeaderWrapper />
 
           {/* Page Content - Performance Optimized Scroll */}
-          <main className="flex-1 overflow-auto scroll-container">
-            {children}
+          <main className="flex-1 overflow-auto scroll-container flex flex-col">
+            <div className="flex-1">
+              {children}
+            </div>
+            
+            {/* Global Footer */}
+            <Footer />
           </main>
         </div>
 
