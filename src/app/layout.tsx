@@ -1,7 +1,7 @@
 import { SessionProvider } from '@/components/providers/SessionProvider';
 import { IntlProvider } from '@/components/providers/IntlProvider';
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, VT323 } from "next/font/google";
 import { getMessages } from 'next-intl/server';
 import { Toaster } from 'sonner';
 import "./globals.css";
@@ -13,6 +13,12 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const vt323 = VT323({
+  variable: "--font-vt323",
+  weight: "400",
   subsets: ["latin"],
 });
 
@@ -57,7 +63,7 @@ export default async function RootLayout({
   return (
     <html lang="pt" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${vt323.variable} antialiased`}
       >
         <SessionProvider>
           <IntlProvider initialMessages={messages}>

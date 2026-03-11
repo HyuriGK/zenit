@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Plus } from 'lucide-react';
+import { Plus, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -61,7 +61,8 @@ function AgendaPageContent() {
     } catch (error) {
       console.error('Erro ao buscar agenda:', error);
     } finally {
-      setLoading(false);
+      // Simulate slight delay for the immersive Minecraft loading feel
+      setTimeout(() => setLoading(false), 300);
     }
   };
 
@@ -178,10 +179,13 @@ function AgendaPageContent() {
       {/* Calendário - ocupa todo espaço restante */}
       <div className="flex-1 min-h-0 max-h-full bg-zinc-900/50 overflow-hidden flex flex-col">
         {loading ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-zenit-500 mx-auto mb-4"></div>
-              <p className="text-gray-400">{t('loadingCalendar')}</p>
+          <div className="flex items-center justify-center h-full bg-zinc-950/50">
+            <div className="text-center font-minecraft uppercase">
+              <Activity className="w-12 h-12 text-emerald-500 mx-auto mb-6 animate-pulse" />
+              <div className="w-48 h-2 bg-zinc-900 border-2 border-zinc-800 mx-auto overflow-hidden relative shadow-[4px_4px_0_rgba(0,0,0,0.3)]">
+                <div className="absolute inset-0 bg-emerald-500/50 animate-[loading-bar_2s_infinite_ease-in-out]"></div>
+              </div>
+              <p className="mt-4 text-xs font-black tracking-[0.3em] text-zinc-500 animate-pulse">{t('loadingCalendar')}</p>
             </div>
           </div>
         ) : view === 'day' ? (

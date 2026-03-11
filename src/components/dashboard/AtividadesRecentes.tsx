@@ -125,7 +125,7 @@ export function AtividadesRecentes() {
                 key={atividade.id}
                 className="group flex items-center gap-5 p-5 rounded-2xl border border-zinc-800/50 bg-zinc-900/40 hover:bg-zinc-800/40 hover:border-zinc-700/50 transition-all cursor-pointer shadow-sm"
               >
-                <div className="w-12 h-12 rounded-xl bg-zinc-950/50 flex items-center justify-center flex-shrink-0 border border-zinc-800/50">
+                <div className="w-12 h-12 rounded-none bg-zinc-950 flex items-center justify-center flex-shrink-0 border-2 border-zinc-800 shadow-[2px_2px_0_rgba(0,0,0,0.3)]">
                   <IconeComponent
                     className="w-5 h-5"
                     style={{ color: atividade.cor }}
@@ -133,16 +133,16 @@ export function AtividadesRecentes() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-black text-sm text-zinc-100 truncate group-hover:text-emerald-500 transition-colors uppercase tracking-tight">
+                  <div className="flex items-center justify-between mb-1 font-minecraft uppercase">
+                    <h4 className="font-black text-sm text-zinc-100 truncate group-hover:text-emerald-500 transition-colors tracking-widest">
                       {atividade.titulo}
                     </h4>
-                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full border ${tipoInfo.cor.split(' ').slice(1).join(' ')}`}>
+                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-none border-2 ${tipoInfo.cor.split(' ').slice(1).join(' ')}`}>
                       {tipoInfo.texto}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-zinc-600">
+                  <div className="flex items-center gap-4 text-[10px] font-black uppercase tracking-widest text-zinc-600 font-minecraft">
                     <div className="flex items-center gap-2">
                       <Clock className="w-3 h-3 text-zinc-800" />
                       <span>

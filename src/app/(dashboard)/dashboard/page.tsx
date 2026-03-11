@@ -100,10 +100,10 @@ export default function DashboardPage() {
     <div className="flex flex-col lg:h-[calc(100vh-theme(spacing.20))] space-y-4 sm:space-y-6 p-4 lg:p-6 lg:overflow-hidden">
       {/* Welcome Section */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+        <h1 className="text-3xl sm:text-4xl font-minecraft font-black text-white mb-2 uppercase tracking-widest">
           {t('greeting', { name: firstName })}
         </h1>
-        <p className="text-sm sm:text-base text-gray-400">
+        <p className="text-sm sm:text-base text-gray-400 font-minecraft uppercase tracking-wider">
           {t('daySummary')}
         </p>
       </div>
@@ -115,23 +115,23 @@ export default function DashboardPage() {
           className="cursor-pointer transition-all"
           onClick={handleIrParaAgenda}
         >
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 font-minecraft uppercase">
+            <CardTitle className="text-sm font-black text-zinc-500 tracking-widest">
               {t('appointmentsToday')}
             </CardTitle>
-            <div className="p-2 bg-zinc-800/50 rounded-lg">
+            <div className="p-2 bg-zinc-950 border-2 border-zinc-800 rounded-none shadow-[2px_2px_0_rgba(0,0,0,0.3)]">
               <Calendar className="w-4 h-4 text-zinc-400" />
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="font-minecraft">
             {loadingCompromissos ? (
               <div className="flex items-center gap-2">
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-zinc-500"></div>
+                <div className="animate-spin h-5 w-5 border-2 border-emerald-500/50"></div>
                 <span className="text-sm text-zinc-500">{tCommon('loading')}</span>
               </div>
             ) : (
               <>
-                <div className="text-3xl font-bold text-white leading-tight">{compromissosHoje}</div>
+                <div className="text-4xl font-black text-white leading-tight tracking-widest">{compromissosHoje}</div>
                 <p className="text-[10px] font-bold uppercase text-zinc-600 mt-1 tracking-widest">
                   {compromissosHoje === 0
                     ? t('noAppointments')
@@ -147,17 +147,17 @@ export default function DashboardPage() {
 
         {/* Card 2 - Saldo Mensal */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-semibold text-zinc-500 uppercase tracking-wider">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 font-minecraft uppercase">
+            <CardTitle className="text-sm font-black text-zinc-500 tracking-widest">
               {t('monthlyBalance')}
             </CardTitle>
-            <div className="p-2 bg-emerald-500/10 rounded-lg">
+            <div className="p-2 bg-emerald-500/10 border-2 border-emerald-500/20 rounded-none shadow-[2px_2px_0_rgba(0,0,0,0.2)]">
               <Wallet className="w-4 h-4 text-emerald-500" />
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-white leading-tight">R$ 0,00</div>
-            <p className="text-[10px] font-bold uppercase text-emerald-600 mt-1 tracking-widest flex items-center gap-1">
+          <CardContent className="font-minecraft">
+            <div className="text-4xl font-black text-white leading-tight tracking-widest">R$ 0,00</div>
+            <p className="text-[10px] font-black uppercase text-emerald-600 mt-1 tracking-widest flex items-center gap-1">
               {t('configureFinances')}
             </p>
           </CardContent>
@@ -207,8 +207,8 @@ export default function DashboardPage() {
 
         {/* Quick Actions */}
         <Card className="flex flex-col h-full bg-zinc-900/40">
-          <CardHeader className="flex-shrink-0 border-b border-zinc-800/50 mb-4 p-6">
-            <CardTitle className="text-white text-lg font-bold tracking-tight uppercase tracking-widest text-xs opacity-50">{t('quickActions')}</CardTitle>
+          <CardHeader className="flex-shrink-0 border-b-2 border-zinc-800 mb-4 p-6 font-minecraft uppercase">
+            <CardTitle className="text-white text-lg font-black tracking-[0.2em] text-xs opacity-50">{t('quickActions')}</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 overflow-y-auto space-y-3 min-h-0 p-6 pt-0">
             {/* Botão Novo Compromisso */}

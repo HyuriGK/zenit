@@ -49,7 +49,7 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
   }, [isCollapsed]);
 
   return (
-    <aside className={`${isMobile ? 'flex' : 'hidden lg:flex'} flex-col h-screen fixed left-0 top-0 border-r border-zinc-800 bg-zinc-900/50 backdrop-blur-xl transition-all duration-300 z-40 ${isCollapsed ? 'w-20' : 'w-64'}`}>
+    <aside className={`${isMobile ? 'flex' : 'hidden lg:flex'} flex-col h-screen fixed left-0 top-0 border-r-2 border-zinc-800 bg-zinc-950 transition-all duration-300 z-40 ${isCollapsed ? 'w-20' : 'w-64'}`}>
       {/* Logo */}
       <div className={`border-b border-zinc-800 flex items-center ${isCollapsed ? 'p-4 justify-center' : 'p-6 justify-between'}`}>
         {!isCollapsed && (
@@ -111,10 +111,10 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
               href={item.href}
               onClick={onNavigate}
               className={`
-                flex items-center gap-3 px-3 py-2 rounded-lg transition-all relative group
+                flex items-center gap-3 px-3 py-2 rounded-none transition-all relative group font-minecraft uppercase tracking-wider
                 ${isActive
-                  ? 'bg-zinc-100 text-zinc-950 font-semibold'
-                  : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/80'
+                  ? 'bg-emerald-600 text-white font-bold shadow-[2px_2px_0_rgba(0,0,0,0.3)]'
+                  : 'text-zinc-400 hover:text-zinc-100 hover:bg-zinc-900'
                 }
                 ${isCollapsed ? 'justify-center' : ''}
               `}
@@ -132,17 +132,17 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
       {/* Upgrade Card - Only show for free plan */}
       {ehFree && !isCollapsed && (
         <div className="p-4 border-t border-zinc-800">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+          <div className="bg-zinc-900 border-2 border-zinc-800 rounded-none p-4 font-minecraft uppercase">
             <div className="flex items-center gap-2 mb-2">
               <Crown className="w-4 h-4 text-emerald-500" />
-              <h3 className="font-bold text-xs uppercase tracking-wider">{t('freePlan')}</h3>
+              <h3 className="font-bold text-xs tracking-widest">{t('freePlan')}</h3>
             </div>
-            <p className="text-[11px] text-zinc-500 leading-relaxed mb-3">
+            <p className="text-[10px] text-zinc-500 leading-tight mb-3 tracking-wider">
               {t('unlockPremiumFeatures')}
             </p>
             <button
               onClick={() => router.push('/premium')}
-              className="w-full bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-bold py-2 rounded-lg transition-all uppercase tracking-widest">
+              className="w-full bg-zinc-100 hover:bg-white text-zinc-950 text-xs font-black py-2 rounded-none transition-all tracking-[0.2em] shadow-[2px_2px_0_rgba(0,0,0,0.3)] active:translate-y-[1px] active:shadow-none">
               {t('upgrade')}
             </button>
           </div>
@@ -153,7 +153,7 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
         <div className="p-4 border-t border-zinc-800 flex justify-center">
           <button
             onClick={() => router.push('/premium')}
-            className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100 p-2 rounded-lg transition-all"
+            className="bg-zinc-800 hover:bg-zinc-700 text-zinc-100 p-2 rounded-none transition-all shadow-[2px_2px_0_rgba(0,0,0,0.3)]"
             title={t('upgrade')}>
             <Crown className="w-5 h-5 text-emerald-500" />
           </button>
@@ -165,12 +165,12 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
         <Link
           href="/dashboard/settings"
           onClick={onNavigate}
-          className={`flex items-center rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800/80 transition-all ${isCollapsed ? 'justify-center p-2' : 'w-full gap-3 px-3 py-2'}`}
+          className={`flex items-center rounded-none text-zinc-500 hover:text-white hover:bg-zinc-900 transition-all font-minecraft uppercase tracking-widest ${isCollapsed ? 'justify-center p-2' : 'w-full gap-3 px-3 py-2'}`}
           title={isCollapsed ? t('settings') : ''}
         >
           <Settings className="w-5 h-5 shrink-0" />
           {!isCollapsed && (
-            <span className="font-medium text-sm">{t('settings')}</span>
+            <span className="font-bold text-sm">{t('settings')}</span>
           )}
         </Link>
       </div>

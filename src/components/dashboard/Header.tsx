@@ -47,7 +47,7 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b-2 border-zinc-800 bg-zinc-950 font-minecraft">
       <div className="flex items-center justify-between px-3 py-2 sm:px-4 sm:py-2.5 lg:px-6 lg:py-3">
         {/* Mobile Menu + Logo */}
         <div className="flex items-center gap-2 sm:gap-3">
@@ -90,19 +90,19 @@ export function Header() {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2 px-2 hover:bg-zinc-900 border border-transparent hover:border-zinc-800 h-9 rounded-xl transition-all">
-                <Avatar className="w-7 h-7">
+              <Button variant="ghost" className="gap-2 px-2 hover:bg-zinc-900 border-2 border-transparent hover:border-zinc-800 h-9 rounded-none transition-all shadow-none hover:shadow-[2px_2px_0_rgba(0,0,0,0.2)]">
+                <Avatar className="w-7 h-7 rounded-none">
                   <AvatarImage src={session?.user?.image || undefined} />
-                  <AvatarFallback className="bg-zinc-800 text-zinc-100 text-xs">
+                  <AvatarFallback className="bg-zinc-800 text-zinc-100 text-xs rounded-none">
                     {getInitials(session?.user?.name)}
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden md:block text-left mr-1">
-                  <p className="text-sm font-bold leading-none text-zinc-100">{session?.user?.name}</p>
+                  <p className="text-sm font-black leading-none text-zinc-100 uppercase tracking-widest">{session?.user?.name}</p>
                 </div>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80 bg-zinc-950 border-zinc-800 p-0 shadow-2xl rounded-2xl overflow-hidden">
+            <DropdownMenuContent align="end" className="w-80 bg-zinc-950 border-2 border-zinc-800 p-0 shadow-[8px_8px_0_rgba(0,0,0,0.5)] rounded-none overflow-hidden font-minecraft uppercase">
               {/* Header do Menu */}
               <div className="p-6 bg-zinc-900/50 border-b border-zinc-800">
                 <div className="flex items-center gap-4">

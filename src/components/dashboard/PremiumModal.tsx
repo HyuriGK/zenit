@@ -32,17 +32,16 @@ export function PremiumModal() {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className="sm:max-w-md bg-zinc-900 border-zinc-800 p-0 overflow-hidden text-white shadow-2xl">
-                <div className="absolute inset-0 bg-gradient-to-br from-zenit-500/10 via-blue-500/10 to-green-500/10 pointer-events-none" />
-                <div className="absolute top-[-20%] left-[-20%] w-[60%] h-[60%] bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
+            <DialogContent className="sm:max-w-md bg-zinc-950 border-4 border-zinc-800 p-0 overflow-hidden text-white shadow-[8px_8px_0_rgba(0,0,0,0.5)] rounded-none font-minecraft uppercase">
+                <div className="absolute inset-0 bg-emerald-500/5 pointer-events-none" />
 
                 <div className="relative p-6 sm:p-8 text-center flex flex-col items-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-zenit-500 to-blue-600 rounded-full flex items-center justify-center shadow-lg shadow-zenit-500/20 mb-6 animate-pulse-slow">
+                    <div className="w-16 h-16 bg-emerald-600 border-4 border-emerald-400/50 rounded-none flex items-center justify-center shadow-[4px_4px_0_rgba(0,0,0,0.3)] mb-6 animate-pulse">
                         <Sparkles className="w-8 h-8 text-white" />
                     </div>
 
                     <DialogHeader className="w-full mb-6">
-                        <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-300 bg-clip-text text-transparent mb-3">
+                        <DialogTitle className="text-3xl font-black text-white mb-3 tracking-widest">
                             {t('unlockPotential')}
                         </DialogTitle>
                         <DialogDescription className="text-zinc-400 text-sm sm:text-base px-2">
@@ -50,13 +49,14 @@ export function PremiumModal() {
                         </DialogDescription>
                     </DialogHeader>
 
-                    <div className="w-full flex flex-col gap-3">
+                    <div className="w-full flex flex-col gap-3 font-minecraft uppercase">
                         <Button
                             onClick={() => {
                                 setIsOpen(false);
                                 router.push('/premium');
                             }}
-                            className="w-full bg-gradient-to-r from-zenit-500 to-blue-500 hover:from-zenit-600 hover:to-blue-600 shadow-lg shadow-zenit-500/25 h-12 text-base rounded-xl transition-all active:scale-[0.98] border-0"
+                            variant="premium"
+                            className="w-full h-12 text-sm"
                         >
                             <CheckCircle2 className="w-5 h-5 mr-2" />
                             {t('upgradeToPremium')}
@@ -64,7 +64,7 @@ export function PremiumModal() {
                         <Button
                             variant="ghost"
                             onClick={() => setIsOpen(false)}
-                            className="w-full text-zinc-500 hover:text-white hover:bg-zinc-800/50 h-10 rounded-xl"
+                            className="w-full text-zinc-500 hover:text-white hover:bg-zinc-900 h-10 rounded-none tracking-widest"
                         >
                             Talvez mais tarde
                         </Button>
