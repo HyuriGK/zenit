@@ -27,8 +27,6 @@ export default function DashboardLayout({
               {children}
             </div>
             
-            {/* Global Footer */}
-            <Footer />
           </main>
         </div>
 

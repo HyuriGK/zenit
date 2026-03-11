@@ -458,9 +458,9 @@ export default function CursoDetalhePage() {
   }
 
   return (
-    <div className="bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 p-4 lg:p-6 space-y-4 sm:space-y-6">
+    <div className="h-[calc(100vh-4rem)] lg:h-[calc(100vh-5.5rem)] flex flex-col overflow-hidden bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
       {/* Header com gradiente */}
-      <div className="relative border-b border-zinc-800/50 backdrop-blur-xl bg-zinc-900/80 -mx-4 lg:-mx-6 overflow-x-hidden">
+      <div className="relative shrink-0 border-b border-zinc-800/50 backdrop-blur-xl bg-zinc-900/80 overflow-x-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-blue-500/5" />
         <div className="relative p-3 sm:p-4">
           <div className="flex flex-row items-start sm:items-center gap-2 sm:gap-4 w-full">
@@ -544,9 +544,9 @@ export default function CursoDetalhePage() {
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row h-auto lg:h-[calc(100vh-120px)]">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Sidebar Esquerda - Módulos */}
-        <div className={`${paginaAmpliada ? 'hidden' : 'w-full lg:w-80'} border-b lg:border-b-0 lg:border-r border-zinc-800/50 bg-zinc-900/30 backdrop-blur-sm overflow-y-auto max-h-96 lg:max-h-none`}>
+        <div className={`${paginaAmpliada ? 'hidden' : 'w-full lg:w-80'} shrink-0 border-b lg:border-b-0 lg:border-r border-zinc-800/50 bg-zinc-900/30 backdrop-blur-sm overflow-y-auto h-full`}>
           <div className="p-4">
             <Button
               onClick={() => setModalModuloAberto(true)}
@@ -632,7 +632,7 @@ export default function CursoDetalhePage() {
           {moduloSelecionado ? (
             <>
               {/* Lista de Páginas */}
-              <div className={`${paginaAmpliada ? 'hidden' : 'w-full lg:w-72'} border-b lg:border-b-0 lg:border-r border-zinc-800/50 bg-zinc-900/20 overflow-y-auto max-h-80 lg:max-h-none`}>
+              <div className={`${paginaAmpliada ? 'hidden' : 'w-full lg:w-72'} shrink-0 border-b lg:border-b-0 lg:border-r border-zinc-800/50 bg-zinc-900/20 overflow-y-auto h-full`}>
                 <div className="p-4 border-b border-zinc-800/50 bg-zinc-900/40">
                   <h2 className="font-bold text-white mb-1 text-lg">
                     {moduloSelecionado.nome}
