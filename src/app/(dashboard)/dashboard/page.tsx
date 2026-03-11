@@ -94,7 +94,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex flex-col lg:h-[calc(100vh-theme(spacing.20))] space-y-4 sm:space-y-6 p-4 lg:p-6 lg:overflow-hidden">
+    <div className="flex flex-col lg:h-[calc(100vh-theme(spacing.20))] space-y-4 sm:space-y-6 p-4 lg:p-6 overflow-hidden">
       {/* Welcome Section */}
       <PageHeader 
         title={t('greeting', { name: firstName })}

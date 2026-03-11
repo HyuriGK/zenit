@@ -134,7 +134,7 @@ function AgendaPageContent() {
       <div className="p-4 lg:p-6 pb-0">
         <PageHeader 
           title={t('title')}
-          description={t('subtitle') || 'Gerencie seus compromissos'}
+          description="Gerencie seus compromissos e eventos com facilidade"
           action={
             <Button
               onClick={() => {

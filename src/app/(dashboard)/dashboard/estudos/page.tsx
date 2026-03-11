@@ -517,7 +517,7 @@ export default function EstudosPage() {
               className="flex-1 sm:flex-none"
             >
               <Search className="w-4 h-4 mr-2" />
-              <span className="hidden xs:inline">{t('search')}</span>
+              <span>Procurar Anotação</span>
             </Button>
             <Button
               onClick={() => setModalAnotacaoAberto(true)}
@@ -525,7 +525,7 @@ export default function EstudosPage() {
               className="flex-1 sm:flex-none"
             >
               <StickyNote className="w-4 h-4 mr-2" />
-              <span className="hidden xs:inline">{t('newNote')}</span>
+              <span>Nova Anotação</span>
             </Button>
             <Button
               onClick={() => setModalCursoAberto(true)}
@@ -533,7 +533,7 @@ export default function EstudosPage() {
               className="flex-1 sm:flex-none"
             >
               <Plus className="w-4 h-4 mr-2" />
-              <span className="hidden xs:inline">{t('newCourse')}</span>
+              <span>Novo Curso</span>
             </Button>
           </div>
         }

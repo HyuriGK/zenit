@@ -4,9 +4,22 @@ import { useTranslations } from 'next-intl';
 import MarketOverview from '@/components/investimentos/MarketOverview';
 import PersonalPortfolio from '@/components/investimentos/PersonalPortfolio';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { LoadingScreen } from '@/components/ui/LoadingScreen';
+import { useState, useEffect } from 'react';
 
 export default function InvestimentosPage() {
     const t = useTranslations('investments');
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        // Simular carregamento inicial
+        const timer = setTimeout(() => setLoading(false), 800);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (loading) {
+        return <LoadingScreen message="Carregando seus investimentos..." />;
+    }
 
     return (
         <div className="flex flex-col h-full overflow-hidden p-4 lg:p-6 space-y-6">

@@ -100,70 +100,61 @@ export function CalendarToolbar({ currentDate, view, onDateChange, onViewChange,
   return (
     <div className="flex flex-col gap-3 p-4 bg-zinc-950 border-b border-zinc-800 sticky top-0 z-30 shrink-0">
       {/* Primeira linha: Navegação e data */}
-      <div className="flex items-center justify-between gap-4 w-full">
-        {/* Botões de navegação */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handlePrevious}
-            className="h-10 w-10 rounded-xl"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleNext}
-            className="h-10 w-10 rounded-xl"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </Button>
-        </div>
+        {/* Botões de navegação e Data */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
+          <div className="flex items-center gap-2 order-2 sm:order-1">
+            <div className="flex items-center bg-zinc-900 border border-zinc-800 rounded-2xl p-1 gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handlePrevious}
+                className="h-9 w-9 rounded-xl hover:bg-zinc-800"
+                title={t('previous')}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onToday}
+                className="px-4 h-9 rounded-xl font-bold uppercase tracking-widest text-[9px] hover:bg-zinc-800 text-zinc-400 hover:text-white"
+                title={t('today')}
+              >
+                {t('today')}
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleNext}
+                className="h-9 w-9 rounded-xl hover:bg-zinc-800"
+                title={t('next')}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </Button>
+            </div>
 
-        {/* Data central */}
-        <div className="flex-1 text-center">
-          <h2 className="text-lg md:text-xl font-bold text-white uppercase tracking-tight truncate">
-            {getDateLabel()}
-          </h2>
-        </div>
+            {onRefresh && (
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleSync}
+                disabled={isSyncing}
+                className="h-10 w-10 rounded-2xl border-zinc-800/50 bg-zinc-900/50"
+                title={isSyncing ? t('synchronizing') : t('synchronize')}
+              >
+                <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+              </Button>
+            )}
+          </div>
 
-        {/* Botões de ação */}
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onToday}
-            className="hidden sm:flex rounded-xl font-bold uppercase tracking-widest text-[10px]"
-            title={t('today')}
-          >
-            <Calendar className="w-3.5 h-3.5 mr-2" />
-            {t('today')}
-          </Button>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onToday}
-            className="sm:hidden h-10 w-10 rounded-xl"
-            title={t('today')}
-          >
-            <Calendar className="w-5 h-5" />
-          </Button>
-
-          {onRefresh && (
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleSync}
-              disabled={isSyncing}
-              className="h-10 w-10 rounded-xl"
-              title={isSyncing ? t('synchronizing') : t('synchronize')}
-            >
-              <RefreshCw className={`w-5 h-5 ${isSyncing ? 'animate-spin' : ''}`} />
-            </Button>
-          )}
+          <div className="flex-1 text-center order-1 sm:order-2">
+            <h2 className="text-lg md:text-xl font-black text-white uppercase tracking-widest truncate">
+              {getDateLabel()}
+            </h2>
+          </div>
+          
+          <div className="hidden sm:block sm:w-[140px] order-3"></div>
         </div>
-      </div>
 
       {/* Segunda linha: Filtros de Visualização - Estilo Segmented Control */}
       <div className="flex items-center gap-1 bg-zinc-900/50 border border-zinc-800/50 rounded-2xl p-1.5 w-full max-w-md mx-auto sm:mx-0">

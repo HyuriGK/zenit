@@ -273,25 +273,16 @@ export default function FinanceiroDashboardPage() {
         title="Painel Financeiro"
         description={`Acompanhe seu desempenho em ${dashboard.mes}`}
         action={
-          <div className="flex gap-3">
-            <Button
-              onClick={() => setModalTransacaoAberto(true)}
-              variant="premium"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Nova Transação
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              className="rounded-xl font-bold uppercase tracking-widest text-[10px]"
-            >
-              <Link href="/dashboard/financeiro/transacoes">
-                <List className="w-4 h-4 mr-2" />
-                Registros
-              </Link>
-            </Button>
-          </div>
+          <Button
+            asChild
+            variant="outline"
+            className="rounded-xl font-bold uppercase tracking-widest text-[10px]"
+          >
+            <Link href="/dashboard/financeiro/transacoes">
+              <List className="w-4 h-4 mr-2" />
+              Registros
+            </Link>
+          </Button>
         }
       />
 
