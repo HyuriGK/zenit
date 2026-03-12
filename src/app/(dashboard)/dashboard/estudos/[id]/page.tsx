@@ -326,6 +326,30 @@ export default function CursoDetalhePage() {
     }
   };
 
+  const handleBack = () => {
+    if (paginaAmpliada) {
+      setPaginaAmpliada(false);
+      return;
+    }
+
+    if (paginaSelecionada) {
+      if (isPaginaEdicaoDirty) {
+        setNavegacaoPendente(null); // No specific destination, just clear
+        setModalConfirmarSaidaEdicao(true);
+        return;
+      }
+      setPaginaSelecionada(null);
+      return;
+    }
+
+    if (moduloSelecionado) {
+      setModuloSelecionado(null);
+      return;
+    }
+
+    router.push('/dashboard/estudos');
+  };
+
   const salvarPagina = async () => {
     if (!paginaSelecionada || salvandoPagina) return;
 
@@ -466,7 +490,7 @@ export default function CursoDetalhePage() {
           <div className="flex flex-row items-start sm:items-center gap-2 sm:gap-4 w-full">
             <Button
               variant="ghost"
-              onClick={() => router.push('/dashboard/estudos')}
+              onClick={handleBack}
               className="text-zinc-400 hover:text-white hover:bg-zinc-800/50 rounded-xl h-auto py-2 px-3 text-sm flex-shrink-0"
             >
               <ChevronLeft className="w-4 h-4 mr-1 sm:mr-2" />
