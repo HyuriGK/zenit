@@ -1,4 +1,5 @@
 import { SessionProvider } from '@/components/providers/SessionProvider';
+import { InactivityTracker } from '@/components/auth/InactivityTracker';
 import { IntlProvider } from '@/components/providers/IntlProvider';
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, VT323 } from "next/font/google";
@@ -66,6 +67,7 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${vt323.variable} antialiased`}
       >
         <SessionProvider>
+          <InactivityTracker />
           <IntlProvider initialMessages={messages}>
             {children}
           </IntlProvider>
