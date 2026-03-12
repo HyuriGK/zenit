@@ -120,7 +120,7 @@ export function CalendarToolbar({ currentDate, view, onDateChange, onViewChange,
                 className="px-4 h-9 rounded-xl font-bold uppercase tracking-widest text-[9px] hover:bg-zinc-800 text-zinc-400 hover:text-white"
                 title={t('today')}
               >
-                {t('today')}
+                Mês
               </Button>
               <Button
                 variant="ghost"
