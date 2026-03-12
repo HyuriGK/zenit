@@ -30,6 +30,8 @@ import {
   Settings2,
   ChevronDown,
   Tag,
+  Sparkles,
+  Zap,
 } from 'lucide-react';
 import { StreakCalendar } from './components/StreakCalendar';
 import { TrendChart } from './components/TrendChart';
@@ -931,137 +933,171 @@ export default function HabitosPage() {
           </div>
         )}
 
-        {/* Modal Novo Hábito - Simplificado */}
+        {/* Modal Novo Hábito - Redesenhado Premium */}
         <Dialog open={modalHabitoAberto} onOpenChange={setModalHabitoAberto}>
-          <DialogContent className="bg-zinc-900 border-zinc-800 max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-white">{t('newHabit')}</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-5">
-              {/* Nome */}
-              <div>
-                <Label htmlFor="nome-habito" className="text-zinc-300">{t('habitName')}</Label>
-                <Input
-                  id="nome-habito"
-                  value={novoHabito.nome}
-                  onChange={(e) => setNovoHabito({ ...novoHabito, nome: e.target.value })}
-                  className="bg-zinc-800 border-zinc-700 text-white mt-1.5"
-                  placeholder={t('habitNamePlaceholder')}
-                  autoFocus
-                />
+          <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1000px] w-[95vw] max-h-[90vh] overflow-visible p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 sm:rounded-[32px] border-zinc-800/30">
+            <div className="flex flex-col h-full overflow-visible">
+              {/* Header com Gradiente */}
+              <div className="bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-900/50 p-6 border-b border-zinc-800/50 sm:rounded-t-[32px]">
+                <DialogHeader className="gap-1">
+                  <DialogTitle className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400">
+                      <Target className="w-6 h-6" />
+                    </div>
+                    {t('newHabit')}
+                  </DialogTitle>
+                  <DialogDescription className="text-zinc-500 font-medium text-base ml-12">
+                     Projete sua nova rotina de alta performance e assuma o controle do seu destino.
+                  </DialogDescription>
+                </DialogHeader>
               </div>
 
-              {/* Horário */}
-              <div>
-                <Label htmlFor="horario-habito" className="text-zinc-300">{t('time')} <span className="text-zinc-500">({t('optional')})</span></Label>
-                <Input
-                  id="horario-habito"
-                  type="time"
-                  value={novoHabito.horario}
-                  onChange={(e) => setNovoHabito({ ...novoHabito, horario: e.target.value })}
-                  className="bg-zinc-800 border-zinc-700 text-white mt-1.5"
-                />
-              </div>
+              <div className="p-8 space-y-8 overflow-y-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  {/* Coluna Esquerda: Definição e Identidade */}
+                  <div className="space-y-6">
+                    <div>
+                      <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-3 block ml-1">{t('habitName')}</Label>
+                      <Input
+                        value={novoHabito.nome}
+                        onChange={(e) => setNovoHabito({ ...novoHabito, nome: e.target.value })}
+                        className="bg-zinc-900/50 border-zinc-800 text-white h-14 px-5 rounded-2xl placeholder:text-zinc-700 focus:border-emerald-500/50 focus-visible:ring-0 focus:ring-0 focus:outline-none transition-all text-lg font-bold"
+                        placeholder={t('habitNamePlaceholder')}
+                      />
+                    </div>
 
-              {/* Categoria */}
-              {categorias.length > 0 && (
-                <div>
-                  <Label className="text-zinc-300">{t('categories.title')} <span className="text-zinc-500">({t('optional')})</span></Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    <button
-                      type="button"
-                      onClick={() => setNovoHabito({ ...novoHabito, categoriaId: null })}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${novoHabito.categoriaId === null
-                        ? 'bg-zinc-700 text-white'
-                        : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
-                        }`}
-                    >
-                      {t('categories.none')}
-                    </button>
-                    {categorias.map((cat) => (
-                      <button
-                        key={cat.id}
-                        type="button"
-                        onClick={() => setNovoHabito({ ...novoHabito, categoriaId: cat.id })}
-                        className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${novoHabito.categoriaId === cat.id
-                          ? 'text-white'
-                          : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
-                          }`}
-                        style={novoHabito.categoriaId === cat.id ? { backgroundColor: cat.cor } : undefined}
-                      >
-                        <span
-                          className="w-2.5 h-2.5 rounded-full"
-                          style={{ backgroundColor: novoHabito.categoriaId === cat.id ? 'white' : cat.cor }}
+                    <div>
+                      <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-3 block ml-1">Descrição do Hábito</Label>
+                      <textarea
+                        value={novoHabito.descricao}
+                        onChange={(e) => setNovoHabito({ ...novoHabito, descricao: e.target.value })}
+                        rows={3}
+                        className="w-full bg-zinc-900/50 border-zinc-800 text-white p-5 rounded-2xl placeholder:text-zinc-700 focus:border-emerald-500/50 focus-visible:ring-0 focus:ring-0 focus:outline-none transition-all text-base resize-none border-2"
+                        placeholder="Por que este hábito é importante para você?"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-3 block ml-1">{t('time')}</Label>
+                        <Input
+                          type="time"
+                          value={novoHabito.horario}
+                          onChange={(e) => setNovoHabito({ ...novoHabito, horario: e.target.value })}
+                          className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl focus:border-emerald-500/50 focus-visible:ring-0 focus:ring-0 transition-all font-bold"
                         />
-                        {cat.nome}
-                      </button>
-                    ))}
+                      </div>
+                      <div>
+                        <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-3 block ml-1">{t('color')}</Label>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {CORES.slice(0, 5).map((cor) => (
+                            <button
+                              key={cor}
+                              type="button"
+                              onClick={() => setNovoHabito({ ...novoHabito, cor })}
+                              className={`w-8 h-8 rounded-full transition-all ${novoHabito.cor === cor ? 'ring-2 ring-white ring-offset-2 ring-offset-zinc-950 scale-110 shadow-[0_0_15px_rgba(255,255,255,0.2)]' : 'hover:scale-105 opacity-50'
+                                }`}
+                              style={{ backgroundColor: cor }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Coluna Direita: Frequência e Categorização */}
+                  <div className="space-y-8">
+                    {/* Categorias - Estilo Badges Profissionais */}
+                    <div>
+                      <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-4 block ml-1">Categorização</Label>
+                      <div className="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setNovoHabito({ ...novoHabito, categoriaId: null })}
+                          className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all border-2 ${novoHabito.categoriaId === null
+                            ? 'bg-zinc-100 text-black border-white shadow-lg shadow-white/10'
+                            : 'bg-zinc-900/50 text-zinc-500 border-zinc-800 hover:border-zinc-700 hover:text-zinc-300'
+                            }`}
+                        >
+                          Sem Categoria
+                        </button>
+                        {categorias.map((cat) => (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => setNovoHabito({ ...novoHabito, categoriaId: cat.id })}
+                            className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all border-2 flex items-center gap-2 ${novoHabito.categoriaId === cat.id
+                              ? 'text-white shadow-lg transition-colors'
+                              : 'bg-zinc-900/50 text-zinc-500 border-zinc-800 hover:border-zinc-700 hover:text-zinc-300'
+                              }`}
+                            style={novoHabito.categoriaId === cat.id ? { backgroundColor: cat.cor, borderColor: cat.cor } : {}}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${novoHabito.categoriaId === cat.id ? 'bg-white' : ''}`} style={novoHabito.categoriaId !== cat.id ? { backgroundColor: cat.cor } : {}} />
+                            {cat.nome}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Frequência de Repetição */}
+                    <div>
+                      <div className="flex items-center justify-between mb-4 ml-1">
+                        <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 block">{t('repeatOn')}</Label>
+                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-tighter">{t('leaveEmptyForEveryday')}</span>
+                      </div>
+                      <div className="grid grid-cols-7 gap-2">
+                        {DIAS_SEMANA.map((dia) => (
+                          <button
+                            key={dia.valor}
+                            type="button"
+                            onClick={() => toggleDiaSemana(dia.valor)}
+                            className={`aspect-square flex flex-col items-center justify-center rounded-xl border-2 transition-all group ${novoHabito.diasSemana.includes(dia.valor)
+                              ? 'bg-emerald-500 border-emerald-400 text-black shadow-lg shadow-emerald-500/20'
+                              : 'bg-zinc-900/50 border-zinc-800 text-zinc-600 hover:border-zinc-700 hover:text-zinc-400'
+                              }`}
+                          >
+                            <span className="text-sm font-black">{dia.label}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Info Card Gamificado */}
+                    <div className="p-5 bg-gradient-to-br from-emerald-500/10 to-blue-500/10 rounded-3xl border border-emerald-500/20 flex gap-4 items-center animate-in fade-in zoom-in-95 duration-700">
+                      <div className="w-12 h-12 bg-emerald-500 text-black rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
+                        <Zap className="w-6 h-6 fill-black" />
+                      </div>
+                      <div>
+                        <p className="text-white font-black text-sm uppercase tracking-tight">Potencializador de Hábitos</p>
+                        <p className="text-zinc-500 text-xs leading-relaxed mt-0.5">Ao completar este hábito por 21 dias seguidos, você reprograma seu cérebro para o sucesso.</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              )}
 
-              {/* Dias da Semana */}
-              <div>
-                <Label className="text-zinc-300">{t('repeatOn')}</Label>
-                <p className="text-xs text-zinc-500 mb-2">{t('leaveEmptyForEveryday')}</p>
-                <div className="flex gap-2">
-                  {DIAS_SEMANA.map((dia) => (
-                    <button
-                      key={dia.valor}
-                      type="button"
-                      onClick={() => toggleDiaSemana(dia.valor)}
-                      className={`w-10 h-10 rounded-full text-sm font-medium transition-colors ${novoHabito.diasSemana.includes(dia.valor)
-                        ? 'bg-green-600 text-white'
-                        : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
-                        }`}
-                      title={dia.nome}
-                    >
-                      {dia.label}
-                    </button>
-                  ))}
+                {/* Footer Actions */}
+                <div className="flex gap-4 pt-10 border-t border-zinc-800/50">
+                  <Button
+                    variant="outline"
+                    onClick={() => setModalHabitoAberto(false)}
+                    className="flex-1 h-14 rounded-2xl border-zinc-800 bg-transparent text-zinc-500 font-black uppercase tracking-widest hover:bg-zinc-900 hover:text-white transition-all text-xs"
+                  >
+                    Descartar Projeto
+                  </Button>
+                  <Button
+                    onClick={criarHabito}
+                    disabled={!novoHabito.nome || criandoHabito}
+                    className="flex-[2] h-14 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-900/20 hover:scale-[1.01] transition-all text-xs group"
+                  >
+                    {criandoHabito ? (
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        Ativar Novo Hábito <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+                      </span>
+                    )}
+                  </Button>
                 </div>
-              </div>
-
-              {/* Cor */}
-              <div>
-                <Label className="text-zinc-300">{t('color')}</Label>
-                <div className="flex gap-2 mt-2">
-                  {CORES.map((cor) => (
-                    <button
-                      key={cor}
-                      type="button"
-                      onClick={() => setNovoHabito({ ...novoHabito, cor })}
-                      className={`w-8 h-8 rounded-full transition-transform ${novoHabito.cor === cor ? 'ring-2 ring-white ring-offset-2 ring-offset-zinc-900 scale-110' : 'hover:scale-105'
-                        }`}
-                      style={{ backgroundColor: cor }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              {/* Botões */}
-              <div className="flex gap-2 justify-end pt-2">
-                <Button
-                  variant="ghost"
-                  onClick={() => setModalHabitoAberto(false)}
-                  className="text-zinc-400 hover:text-white"
-                >
-                  {t('cancel')}
-                </Button>
-                <Button
-                  onClick={criarHabito}
-                  disabled={!novoHabito.nome || criandoHabito}
-                  className="bg-green-600 hover:bg-green-700"
-                >
-                  {criandoHabito ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      {t('creating')}
-                    </>
-                  ) : (
-                    t('create')
-                  )}
-                </Button>
               </div>
             </div>
           </DialogContent>
