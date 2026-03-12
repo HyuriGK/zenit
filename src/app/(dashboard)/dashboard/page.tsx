@@ -232,23 +232,6 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Card 4 - Metas do Mês */}
-        <Card className="flex-1 min-w-[240px] border border-zinc-800/50">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
-              {t('monthlyGoals')}
-            </CardTitle>
-            <div className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg">
-              <Target className="w-4 h-4 text-zinc-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-4xl font-bold text-white leading-tight">0/0</div>
-            <p className="text-[10px] font-medium uppercase text-zinc-500 mt-1 tracking-wider">
-              {t('defineGoals')}
-            </p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Main Content Grid */}

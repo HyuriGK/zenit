@@ -318,15 +318,6 @@ export default function FinanceiroDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-zinc-800/50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Target className="w-4 h-4 text-zinc-500" />
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Sobra</span>
-            </div>
-            <div className="text-3xl font-bold text-white leading-none">{formatarMoeda(dashboard.resumoMensal.sobra)}</div>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Row 1: Gastos e Receitas por Categoria */}

@@ -130,8 +130,8 @@ function AgendaPageContent() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <div className="p-4 lg:p-6 pb-0">
+    <div className="flex flex-col h-[calc(100vh-theme(spacing.16))] lg:h-[calc(100vh-theme(spacing.20))] overflow-hidden">
+      <div className="flex-shrink-0 p-4 lg:p-6 pb-0">
         <PageHeader 
           title={t('title')}
           description="Gerencie seus compromissos e eventos com facilidade"
@@ -154,7 +154,7 @@ function AgendaPageContent() {
         />
       </div>
 
-      <div className="flex-1 min-h-0 max-h-full bg-zinc-900/50 overflow-hidden flex flex-col">
+      <div className="flex-1 min-h-0 bg-zinc-900/50 overflow-hidden flex flex-col">
         {loading ? (
           <LoadingScreen message={t('loadingCalendar')} />
         ) : view === 'day' ? (
