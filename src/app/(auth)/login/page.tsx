@@ -1,5 +1,3 @@
-'use client';
-
 import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -7,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, Loader2, LogIn, Github, Mail } from 'lucide-react';
+import { Sparkles, Loader2, LogIn, Github, Mail, Target, Zap, Clock, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
@@ -43,66 +41,111 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-[#0a0a0a] relative overflow-hidden font-sans">
-            {/* Mesh Gradient Background */}
-            <div className="absolute inset-0 z-0">
-                <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-500/10 rounded-full blur-[120px] animate-pulse delay-700" />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[30%] h-[30%] bg-green-500/5 rounded-full blur-[100px]" />
-            </div>
+        <div className="min-h-screen w-full flex bg-[#0a0a0a] text-white selection:bg-emerald-500/30 overflow-hidden font-sans">
+            {/* Left Panel: Aspirational/Productivity Visuals */}
+            <div className="hidden lg:flex flex-col justify-between w-[55%] p-12 bg-[#0d0d0d] relative overflow-hidden border-r border-zinc-800/50">
+                {/* Background Decoration */}
+                <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-blue-500/10 rounded-full blur-[120px] animate-pulse delay-1000" />
+                
+                {/* Animated Grid */}
+                <div className="absolute inset-0 opacity-[0.05]" 
+                     style={{ backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
 
-            {/* Subtle Grid Pattern */}
-            <div className="absolute inset-0 z-0 opacity-[0.03] pointer-events-none" 
-                 style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
-
-            <div className="w-full max-w-[440px] px-6 relative z-10">
-                <div className="text-center mb-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                    <div className="mx-auto w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-600 rounded-3xl flex items-center justify-center shadow-[0_0_40px_rgba(52,211,153,0.2)] mb-6 ring-1 ring-white/20">
-                        <Sparkles className="w-10 h-10 text-white" />
+                {/* Logo Section */}
+                <div className="relative z-10 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
+                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-green-600 rounded-xl flex items-center justify-center shadow-[0_0_30px_rgba(52,211,153,0.3)]">
+                        <Sparkles className="w-6 h-6 text-white" />
                     </div>
-                    <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">
-                        Zênit
-                    </h1>
-                    <p className="text-zinc-400 text-lg font-medium">
-                        Sua produtividade em um novo nível.
+                    <span className="text-2xl font-black tracking-tighter bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">ZÊNIT</span>
+                </div>
+
+                {/* Main Content Area */}
+                <div className="relative z-10 max-w-xl">
+                    <h2 className="text-6xl font-black tracking-tight leading-[0.9] mb-8 animate-in fade-in slide-in-from-left-8 duration-700 delay-200">
+                        Assuma o <span className="text-emerald-500 italic">controle</span> do seu <span className="underline decoration-emerald-500/30 underline-offset-8">tempo</span>.
+                    </h2>
+                    
+                    <div className="grid grid-cols-2 gap-6 mt-12 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-500">
+                        <div className="p-6 bg-zinc-900/40 rounded-3xl border border-zinc-800/50 backdrop-blur-sm group hover:border-emerald-500/30 transition-all">
+                            <Target className="w-10 h-10 text-emerald-400 mb-4 group-hover:scale-110 transition-transform" />
+                            <h3 className="font-bold text-lg mb-1">Metas Claras</h3>
+                            <p className="text-zinc-500 text-sm leading-relaxed">Visualize seus objetivos e atinja o próximo nível com ferramentas de precisão.</p>
+                        </div>
+                        <div className="p-6 bg-zinc-900/40 rounded-3xl border border-zinc-800/50 backdrop-blur-sm group hover:border-blue-500/30 transition-all">
+                            <Clock className="w-10 h-10 text-blue-400 mb-4 group-hover:scale-110 transition-transform" />
+                            <h3 className="font-bold text-lg mb-1">Gestão Eficiente</h3>
+                            <p className="text-zinc-500 text-sm leading-relaxed">Organize sua rotina de forma intuitiva e recupere horas preciosas do seu dia.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Footer Brand */}
+                <div className="relative z-10 flex items-center gap-6 animate-in fade-in duration-1000 delay-1000">
+                    <div className="flex -space-x-3">
+                        {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="w-10 h-10 rounded-full border-2 border-zinc-900 bg-zinc-800 flex items-center justify-center text-[10px] font-bold">
+                                {String.fromCharCode(64 + i)}
+                            </div>
+                        ))}
+                    </div>
+                    <p className="text-zinc-500 text-xs font-medium max-w-xs">
+                        Junte-se a centenas de usuários que transformaram suas vidas com o Zênit.
                     </p>
                 </div>
 
-                <Card className="bg-zinc-900/40 border-zinc-800/50 backdrop-blur-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.6)] rounded-[2.5rem] overflow-hidden border-t-zinc-700/30 animate-in fade-in zoom-in-95 duration-700 delay-200">
-                    <CardHeader className="space-y-1 pt-10 pb-6 px-10">
-                        <CardTitle className="text-2xl font-bold text-white">Login</CardTitle>
-                        <CardDescription className="text-zinc-500">
-                            Insira suas credenciais para continuar
-                        </CardDescription>
-                    </CardHeader>
+                {/* Decorative floating element */}
+                <div className="absolute right-[-10%] top-[40%] w-64 h-64 bg-emerald-500/20 rounded-full blur-[100px] animate-pulse" />
+            </div>
 
-                    <CardContent className="px-10 pb-8">
-                        <form onSubmit={handleLogin} className="space-y-5">
-                            <div className="space-y-2.5">
-                                <Label htmlFor="email" className="text-zinc-300 ml-1 text-sm font-semibold">Email</Label>
-                                <div className="relative group">
-                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-emerald-500 transition-colors">
-                                        <Mail className="w-5 h-5" />
-                                    </div>
-                                    <Input
-                                        id="email"
-                                        type="email"
-                                        placeholder="nome@exemplo.com"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        required
-                                        className="bg-zinc-800/30 border-zinc-700/50 text-white h-14 pl-12 rounded-2xl focus:ring-emerald-500/20 focus:border-emerald-500/50 transition-all placeholder:text-zinc-600"
-                                    />
-                                </div>
+            {/* Right Panel: Login Form */}
+            <div className="flex-1 flex flex-col justify-center items-center p-8 relative">
+                {/* Mobile Background Decoration */}
+                <div className="lg:hidden absolute inset-0 z-0">
+                    <div className="absolute top-[-10%] left-[-10%] w-[80%] h-[80%] bg-emerald-500/10 rounded-full blur-[120px]" />
+                    <div className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[80%] bg-blue-500/10 rounded-full blur-[120px]" />
+                </div>
+
+                <div className="w-full max-w-[420px] relative z-10 animate-in fade-in zoom-in-95 duration-500">
+                    {/* Header Mobile Only */}
+                    <div className="lg:hidden mb-8 text-center">
+                        <div className="mx-auto w-14 h-14 bg-gradient-to-br from-emerald-400 to-green-600 rounded-2xl flex items-center justify-center shadow-lg mb-4">
+                            <Sparkles className="w-7 h-7 text-white" />
+                        </div>
+                        <h1 className="text-3xl font-black tracking-tight">ZÊNIT</h1>
+                    </div>
+
+                    <div className="mb-10 text-left lg:block hidden">
+                        <h1 className="text-4xl font-extrabold tracking-tight mb-2">Bem-vindo</h1>
+                        <p className="text-zinc-500 text-lg">Acesse sua jornada de produtividade.</p>
+                    </div>
+
+                    <form onSubmit={handleLogin} className="space-y-6">
+                        <div className="space-y-2.5">
+                            <Label htmlFor="email" className="text-zinc-400 ml-1 text-sm font-semibold uppercase tracking-wider">Email</Label>
+                            <div className="relative group">
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" />
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    placeholder="seu@exemplo.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    required
+                                    className="bg-zinc-900/50 border-zinc-800 text-white h-14 pl-12 rounded-2xl focus:ring-emerald-500/20 focus:border-emerald-500/50 transition-all border-2"
+                                />
                             </div>
+                        </div>
 
-                            <div className="space-y-2.5">
-                                <div className="flex items-center justify-between ml-1">
-                                    <Label htmlFor="password" className="text-zinc-300 text-sm font-semibold">Senha</Label>
-                                    <Link href="#" className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors">
-                                        Esqueceu a senha?
-                                    </Link>
-                                </div>
+                        <div className="space-y-2.5">
+                            <div className="flex items-center justify-between ml-1">
+                                <Label htmlFor="password" className="text-zinc-400 text-sm font-semibold uppercase tracking-wider">Senha</Label>
+                                <Link href="#" className="text-xs font-bold text-emerald-500 hover:text-emerald-400 transition-colors tracking-wide">
+                                    RECUPERAR SENHA
+                                </Link>
+                            </div>
+                            <div className="relative group">
+                                <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-600 group-focus-within:text-emerald-500 transition-colors" />
                                 <Input
                                     id="password"
                                     type="password"
@@ -110,59 +153,57 @@ export default function LoginPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    className="bg-zinc-800/30 border-zinc-700/50 text-white h-14 rounded-2xl focus:ring-emerald-500/20 focus:border-emerald-500/50 transition-all placeholder:text-zinc-600"
+                                    className="bg-zinc-900/50 border-zinc-800 text-white h-14 pl-12 rounded-2xl focus:ring-emerald-500/20 focus:border-emerald-500/50 transition-all border-2"
                                 />
                             </div>
-
-                            <Button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full h-14 bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-white font-bold rounded-2xl transition-all active:scale-[0.98] shadow-[0_8px_20px_-4px_rgba(16,185,129,0.4)] mt-4 border-none text-lg"
-                            >
-                                {loading ? (
-                                    <Loader2 className="w-6 h-6 animate-spin" />
-                                ) : (
-                                    <span className="flex items-center gap-2">
-                                        Entrar <LogIn className="w-5 h-5" />
-                                    </span>
-                                )}
-                            </Button>
-                        </form>
-
-                        <div className="relative my-10">
-                            <div className="absolute inset-0 flex items-center">
-                                <span className="w-full border-t border-zinc-800/60" />
-                            </div>
-                            <div className="relative flex justify-center text-[10px] items-center gap-2 uppercase font-black tracking-widest text-zinc-600">
-                                <span className="bg-[#0f0f0f] px-4 rounded-full border border-zinc-800/60 py-1">Ou continuar com</span>
-                            </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                            <Button variant="outline" className="h-12 bg-zinc-800/20 border-zinc-700/50 hover:bg-zinc-800/50 text-zinc-300 rounded-xl hover:text-white transition-all duration-300" onClick={() => toast.info('Integração com GitHub em breve')}>
-                                <Github size={20} className="mr-2" /> GitHub
-                            </Button>
-                            <Button variant="outline" className="h-12 bg-zinc-800/20 border-zinc-700/50 hover:bg-zinc-800/50 text-zinc-300 rounded-xl hover:text-white transition-all duration-300" onClick={() => toast.info('Integração com Google em breve')}>
-                                <Github size={20} className="mr-2" /> Google
-                            </Button>
-                        </div>
-                    </CardContent>
+                        <Button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full h-14 bg-emerald-500 hover:bg-emerald-400 text-black font-black rounded-2xl transition-all active:scale-[0.98] shadow-[0_10px_20px_-5px_rgba(16,185,129,0.4)] mt-4 border-none text-lg uppercase tracking-widest group"
+                        >
+                            {loading ? (
+                                <Loader2 className="w-6 h-6 animate-spin" />
+                            ) : (
+                                <span className="flex items-center gap-2">
+                                    Acessar Painel <Zap className="w-5 h-5 group-hover:scale-125 transition-transform" />
+                                </span>
+                            )}
+                        </Button>
+                    </form>
 
-                    <CardFooter className="flex flex-col gap-6 pb-10 px-10">
+                    <div className="relative my-10">
+                        <div className="absolute inset-0 flex items-center">
+                            <span className="w-full border-t border-zinc-800" />
+                        </div>
+                        <div className="relative flex justify-center text-[10px] items-center gap-2 uppercase font-black tracking-widest text-zinc-500">
+                            <span className="bg-[#0a0a0a] px-4">Métodos Alternativos</span>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4">
+                        <Button variant="outline" className="flex-1 h-12 bg-transparent border-zinc-800 hover:bg-zinc-900 hover:border-zinc-700 text-white rounded-xl transition-all" onClick={() => toast.info('GitHub em breve')}>
+                            <Github size={20} className="mr-2" /> GitHub
+                        </Button>
+                        <Button variant="outline" className="flex-1 h-12 bg-transparent border-zinc-800 hover:bg-zinc-900 hover:border-zinc-700 text-white rounded-xl transition-all" onClick={() => toast.info('Google em breve')}>
+                            <Github size={20} className="mr-2" /> Google
+                        </Button>
+                    </div>
+
+                    <div className="mt-12 text-center">
                         <p className="text-zinc-500 text-sm font-medium">
-                            Novo por aqui?{' '}
-                            <Link href="/register" className="text-emerald-400 font-bold hover:text-emerald-300 transition-colors underline-offset-4 hover:underline">
-                                Criar conta gratuita
+                            Novo no ecossistema?{' '}
+                            <Link href="/register" className="text-white font-bold hover:text-emerald-400 transition-colors">
+                                Crie sua conta gratuita
                             </Link>
                         </p>
-                    </CardFooter>
-                </Card>
+                    </div>
+                </div>
 
-                {/* Footer Text */}
-                <div className="text-center mt-8 animate-in fade-in duration-1000 delay-500">
-                    <p className="text-zinc-600 text-xs font-medium tracking-wide flex items-center justify-center gap-1.5 uppercase">
-                        &copy; 2025 Zênit <span className="w-1 h-1 rounded-full bg-zinc-800" /> Transformando sua produtividade
-                    </p>
+                {/* Desktop Version Text */}
+                <div className="absolute bottom-8 text-zinc-600 text-[10px] font-black tracking-[0.2em] uppercase lg:block hidden">
+                    Zênit Platform &copy; 2025 // Professional Performance System
                 </div>
             </div>
         </div>
