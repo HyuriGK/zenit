@@ -293,13 +293,13 @@ export function CompromissoForm({ onClose, onSave, initialDate, initialHour, ini
           {/* Coluna Direita: Recorrência e Configurações */}
           <div className="space-y-6">
             {/* Recorrência */}
-            <div className="p-5 bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
+            <div className={`bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm transition-all duration-300 ${isRecorrente ? 'p-5 space-y-4' : 'h-12 flex items-center px-4'}`}>
+              <div className="flex items-center justify-between w-full">
+                <div className="flex flex-col">
                   <Label className={`font-black text-xs uppercase tracking-widest ${isRecorrente ? 'text-green-500' : 'text-zinc-400'}`}>
                     {t('recurringAppointment')}
                   </Label>
-                  <p className="text-[10px] text-zinc-600 font-bold uppercase mt-0.5">Repetir compromisso</p>
+                  {isRecorrente && <p className="text-[10px] text-zinc-600 font-bold uppercase mt-0.5">Repetir compromisso</p>}
                 </div>
                 <Switch
                   checked={isRecorrente}

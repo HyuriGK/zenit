@@ -111,6 +111,7 @@
     "dateLabel": "Data (data inicial)*",
     "startTimeLabel": "Início *",
     "endTimeLabel": "Término",
+    "category": "Categoria",
     "categoryLabel": "Categoria *",
     "work": "Trabalho",
     "personal": "Pessoal",

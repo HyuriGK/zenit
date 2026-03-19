@@ -109,6 +109,7 @@
     "dateLabel": "Date (start date)*",
     "startTimeLabel": "Start *",
     "endTimeLabel": "End",
+    "category": "Category",
     "categoryLabel": "Category *",
     "work": "Work",
     "personal": "Personal",
