@@ -250,20 +250,8 @@ function AgendaPageContent() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen} modal={false}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white w-[95vw] max-w-[600px] sm:max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-base sm:text-lg">
-              {isEditMode
-                ? t('editAppointment')
-                : selectedDate && selectedHour !== null
-                  ? `${t('newAppointment')} - ${format(selectedDate, 'dd/MM/yyyy')} ${t('startTimeLabel').replace(' *', '')} ${String(selectedHour).padStart(2, '0')}:00`
-                  : t('newAppointment')}
-            </DialogTitle>
-            <DialogDescription className="text-gray-400 text-xs sm:text-sm">
-              {isEditMode ? t('updateInfo') : t('fillDetails')}
-            </DialogDescription>
-          </DialogHeader>
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen} modal={true}>
+        <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1000px] w-[95vw] max-h-[90vh] overflow-y-auto p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 sm:rounded-[32px]">
           <CompromissoForm
             onClose={() => {
               setIsModalOpen(false);
