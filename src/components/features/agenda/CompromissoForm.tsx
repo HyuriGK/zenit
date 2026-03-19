@@ -290,8 +290,12 @@ export function CompromissoForm({ onClose, onSave, initialDate, initialHour, ini
             </div>
           </div>
 
-          {/* Coluna Direita: Recorrência e Configurações */}
           <div className="space-y-6">
+            {/* Espaçador para alinhar com o campo de Título da esquerda */}
+            <Label className="text-[11px] font-black uppercase tracking-[0.1em] hidden md:block mb-2 opacity-0 pointer-events-none" aria-hidden="true">
+              &nbsp;
+            </Label>
+            
             {/* Recorrência */}
             <div className={`bg-zinc-900/40 rounded-2xl border border-zinc-800 shadow-sm transition-all duration-300 ${isRecorrente ? 'p-5 space-y-4' : 'h-12 flex items-center px-4'}`}>
               <div className="flex items-center justify-between w-full">
