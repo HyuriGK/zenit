@@ -287,17 +287,7 @@ export default function FinanceiroDashboardPage() {
       />
 
       {/* KPIs Minimalistas */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <Card className="border border-zinc-800/50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-2">
-              <Wallet className="w-4 h-4 text-zinc-500" />
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Saldo Mensal</span>
-            </div>
-            <div className="text-3xl font-bold text-white leading-none">{formatarMoeda(dashboard.resumoMensal.saldo)}</div>
-          </CardContent>
-        </Card>
-
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="border border-zinc-800/50">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-2">
@@ -318,6 +308,15 @@ export default function FinanceiroDashboardPage() {
           </CardContent>
         </Card>
 
+        <Card className="border border-zinc-800/50">
+          <CardContent className="p-6">
+            <div className="flex items-center gap-2 mb-2">
+              <Wallet className="w-4 h-4 text-zinc-500" />
+              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Saldo Mensal</span>
+            </div>
+            <div className="text-3xl font-bold text-white leading-none">{formatarMoeda(dashboard.resumoMensal.saldo)}</div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Row 1: Gastos e Receitas por Categoria */}
