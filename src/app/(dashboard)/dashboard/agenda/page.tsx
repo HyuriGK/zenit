@@ -213,32 +213,36 @@ function AgendaPageContent() {
       </div>
 
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen} modal={true}>
-        <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[800px] w-[95vw] max-h-[90vh] overflow-y-auto p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 sm:rounded-[32px]">
-          {selectedCompromisso && (
-            <CompromissoDetails
-              compromisso={selectedCompromisso}
-              onEdit={handleEdit}
-              onDelete={handleDeleteSuccess}
-              onClose={() => setIsDetailsOpen(false)}
-              onStatusChange={handleStatusChange}
-            />
-          )}
+        <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[800px] w-[95vw] max-h-[90vh] overflow-hidden p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 sm:rounded-[32px]">
+          <div className="overflow-y-auto max-h-[90vh] modal-scrollbar rounded-[inherit]">
+            {selectedCompromisso && (
+              <CompromissoDetails
+                compromisso={selectedCompromisso}
+                onEdit={handleEdit}
+                onDelete={handleDeleteSuccess}
+                onClose={() => setIsDetailsOpen(false)}
+                onStatusChange={handleStatusChange}
+              />
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen} modal={true}>
-        <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1000px] w-[95vw] max-h-[90vh] overflow-y-auto p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 sm:rounded-[32px]">
-          <CompromissoForm
-            onClose={() => {
-              setIsModalOpen(false);
-              setIsEditMode(false);
-              setSelectedCompromisso(null);
-            }}
-            onSave={handleSave}
-            initialData={isEditMode ? selectedCompromisso : undefined}
-            initialDate={selectedDate || undefined}
-            initialHour={selectedHour !== null ? String(selectedHour).padStart(2, '0') + ':00' : undefined}
-          />
+        <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1000px] w-[95vw] max-h-[90vh] overflow-hidden p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 sm:rounded-[32px]">
+          <div className="overflow-y-auto max-h-[90vh] modal-scrollbar rounded-[inherit]">
+            <CompromissoForm
+              onClose={() => {
+                setIsModalOpen(false);
+                setIsEditMode(false);
+                setSelectedCompromisso(null);
+              }}
+              onSave={handleSave}
+              initialData={isEditMode ? selectedCompromisso : undefined}
+              initialDate={selectedDate || undefined}
+              initialHour={selectedHour !== null ? String(selectedHour).padStart(2, '0') + ':00' : undefined}
+            />
+          </div>
         </DialogContent>
       </Dialog>
     </div>
