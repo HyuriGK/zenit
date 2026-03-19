@@ -154,7 +154,7 @@ function AgendaPageContent() {
         />
       </div>
 
-      <div className="flex-1 min-h-0 bg-zinc-900/50 overflow-hidden flex flex-col">
+      <div className="flex-1 min-h-0 bg-zinc-900/50 overflow-auto flex flex-col">
         {loading ? (
           <LoadingScreen message={t('loadingCalendar')} />
         ) : view === 'day' ? (

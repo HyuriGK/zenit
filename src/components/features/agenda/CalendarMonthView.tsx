@@ -78,7 +78,7 @@ export function CalendarMonthView({
     };
 
     return (
-        <div className="flex flex-col h-full bg-zinc-900 overflow-hidden">
+        <div className="flex flex-col h-full bg-zinc-900 overflow-auto">
             {/* Weekday Headers */}
             <div className="grid grid-cols-7 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
                 {weekDays.map((day, i) => (
@@ -125,7 +125,7 @@ export function CalendarMonthView({
                                     )}
                                 </div>
 
-                                <div className="flex flex-col gap-1 overflow-y-auto max-h-[80px] sm:max-h-[calc(100%-30px)] scrollbar-hide">
+                                <div className="flex flex-col gap-1 overflow-y-auto max-h-[80px] sm:max-h-[calc(100%-30px)]">
                                     {dayEvents.map(event => (
                                         <div
                                             key={event.id}

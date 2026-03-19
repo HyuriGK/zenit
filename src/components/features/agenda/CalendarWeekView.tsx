@@ -131,7 +131,7 @@ export function CalendarWeekView({ compromissos, onSlotClick, onCompromissoClick
 
       {/* Grid de horários - SCROLLÁVEL */}
       <div
-        className="flex-1 overflow-y-scroll overflow-x-hidden"
+        className="flex-1 overflow-y-auto overflow-x-hidden"
         ref={scrollContainerRef}
         style={{ height: '0px' }}
       >
