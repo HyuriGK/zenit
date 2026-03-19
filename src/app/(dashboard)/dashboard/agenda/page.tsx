@@ -131,7 +131,7 @@ function AgendaPageContent() {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-theme(spacing.16))] lg:h-[calc(100vh-theme(spacing.20))] overflow-hidden bg-zinc-950">
+    <div className="flex flex-col h-[calc(100vh-theme(spacing.16))] lg:h-[calc(100vh-theme(spacing.20))] overflow-y-auto bg-zinc-950 custom-scrollbar">
       <div className="flex-shrink-0 p-2 lg:p-4 pb-0">
         <PageHeader 
           title={t('title')}
@@ -164,7 +164,7 @@ function AgendaPageContent() {
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto bg-zinc-900/50 flex flex-col custom-scrollbar">
+      <div className="flex-1 bg-zinc-900/50 flex flex-col">
         {loading ? (
           <LoadingScreen message={t('loadingCalendar')} />
         ) : view === 'day' ? (
