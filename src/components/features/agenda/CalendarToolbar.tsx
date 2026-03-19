@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 
-type ViewType = 'day' | 'week' | 'month' | 'year';
+type ViewType = 'day' | 'week' | 'month';
 
 interface CalendarToolbarProps {
   currentDate: Date;
@@ -57,9 +57,6 @@ export function CalendarToolbar({ currentDate, view, onDateChange, onViewChange,
       case 'month':
         onDateChange(subMonths(currentDate, 1));
         break;
-      case 'year':
-        onDateChange(subYears(currentDate, 1));
-        break;
     }
   };
 
@@ -77,9 +74,6 @@ export function CalendarToolbar({ currentDate, view, onDateChange, onViewChange,
       case 'month':
         onDateChange(addMonths(currentDate, 1));
         break;
-      case 'year':
-        onDateChange(addYears(currentDate, 1));
-        break;
     }
   };
 
@@ -92,8 +86,6 @@ export function CalendarToolbar({ currentDate, view, onDateChange, onViewChange,
         return format(weekStart, "MMMM 'de' yyyy", { locale: dateLocale });
       case 'month':
         return format(startOfMonth(currentDate), "MMMM 'de' yyyy", { locale: dateLocale });
-      case 'year':
-        return format(startOfYear(currentDate), 'yyyy');
     }
   };
 
@@ -193,18 +185,6 @@ export function CalendarToolbar({ currentDate, view, onDateChange, onViewChange,
           }`}
         >
           {t('month')}
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => onViewChange('year')}
-          className={`flex-1 text-[10px] font-black uppercase tracking-[0.15em] h-10 rounded-xl transition-all hidden sm:flex ${
-            view === 'year'
-              ? 'bg-zinc-800 text-emerald-500 shadow-sm'
-              : 'text-zinc-500 hover:text-white hover:bg-zinc-800/50'
-          }`}
-        >
-          {t('year')}
         </Button>
       </div>
     </div>

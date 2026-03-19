@@ -26,7 +26,7 @@ import { db } from '@/lib/dexie';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
-type ViewType = 'day' | 'week' | 'month' | 'year';
+type ViewType = 'day' | 'week' | 'month';
 
 function AgendaPageContent() {
   const searchParams = useSearchParams();
@@ -127,6 +127,7 @@ function AgendaPageContent() {
 
   const handleToday = () => {
     setCurrentDate(new Date());
+    setView('month');
   };
 
   return (
@@ -191,7 +192,7 @@ function AgendaPageContent() {
               currentDate={currentDate}
             />
           </>
-        ) : view === 'month' ? (
+        ) : (
           <>
             <CalendarToolbar
               currentDate={currentDate}
@@ -208,36 +209,11 @@ function AgendaPageContent() {
               currentDate={currentDate}
             />
           </>
-        ) : (
-          <>
-            <CalendarToolbar
-              currentDate={currentDate}
-              view={view}
-              onDateChange={setCurrentDate}
-              onViewChange={setView}
-              onToday={handleToday}
-              onRefresh={() => { }}
-            />
-            <div className="flex items-center justify-center h-full">
-              <div className="text-center">
-                <p className="text-xl font-semibold text-white mb-2">
-                  {t('yearView')}
-                </p>
-                <p className="text-gray-400">{tCommon('comingSoon')}</p>
-              </div>
-            </div>
-          </>
         )}
       </div>
 
-      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen} modal={false}>
-        <DialogContent className="bg-zinc-900 border-zinc-800 text-white w-[95vw] max-w-[500px] sm:max-w-md max-h-[90vh] overflow-y-auto rounded-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-base sm:text-lg">{t('appointmentDetails')}</DialogTitle>
-            <DialogDescription className="text-gray-400 text-xs sm:text-sm">
-              {t('viewAndManage')}
-            </DialogDescription>
-          </DialogHeader>
+      <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen} modal={true}>
+        <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[800px] w-[95vw] max-h-[90vh] overflow-y-auto p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 sm:rounded-[32px]">
           {selectedCompromisso && (
             <CompromissoDetails
               compromisso={selectedCompromisso}
