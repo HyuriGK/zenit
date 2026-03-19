@@ -78,7 +78,7 @@ export function CalendarMonthView({
     };
 
     return (
-        <div className="flex flex-col h-full bg-zinc-900 overflow-auto">
+        <div className="flex flex-col h-auto bg-zinc-900 overflow-visible">
             {/* Weekday Headers */}
             <div className="grid grid-cols-7 border-b border-zinc-800 bg-zinc-900/50 shrink-0">
                 {weekDays.map((day, i) => (
@@ -89,7 +89,7 @@ export function CalendarMonthView({
             </div>
 
             {/* Calendar Grid */}
-            <div className="flex-1 overflow-y-auto min-h-0 bg-zinc-900 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900">
+            <div className="min-h-0 bg-zinc-900 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900">
                 <div className="grid grid-cols-7 auto-rows-[minmax(100px,1fr)] min-h-full">
                     {days.map((day, i) => {
                         const dateKey = format(day, 'yyyy-MM-dd');
