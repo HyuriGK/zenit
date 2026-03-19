@@ -1,73 +1,17 @@
 'use client';
 
 import { useSession } from '@/lib/auth-mock';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
 import {
-  Calendar,
-  Wallet,
-  BookOpen,
-  TrendingUp,
-  Target,
-  CheckCircle2,
-  Library,
-  TrendingDown,
+  Activity,
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { startOfDay, endOfDay, parseISO, isWithinInterval } from 'date-fns';
-import { AtividadesRecentes } from '@/components/dashboard/AtividadesRecentes';
-import { PremiumModal } from '@/components/dashboard/PremiumModal';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useTranslations } from 'next-intl';
-import { usePlano } from '@/hooks/usePlano';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/dexie';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 
 export default function DashboardPage() {
   const t = useTranslations('dashboard');
   const tCommon = useTranslations('common');
-  const tSidebar = useTranslations('sidebar');
   const { data: session, status } = useSession();
-  const router = useRouter();
-  const { ehFree } = usePlano();
-
-  const compromissosList = useLiveQuery(async () => {
-    if (!session) return [];
-    const hoje = new Date();
-    const inicioHoje = startOfDay(hoje);
-    const fimHoje = endOfDay(hoje);
-    return await db.compromissos
-      .where('data').between(inicioHoje, fimHoje)
-      .toArray();
-  }, [session]);
-
-  const saldoMensal = useLiveQuery(async () => {
-    if (!session) return 0;
-    const agora = new Date();
-    const inicioMes = new Date(agora.getFullYear(), agora.getMonth(), 1);
-    const fimMes = new Date(agora.getFullYear(), agora.getMonth() + 1, 0);
-    
-    const transacoes = await db.transacoes
-      .where('data').between(inicioMes, fimMes)
-      .toArray();
-      
-    return transacoes.reduce((acc, t) => {
-      return t.tipo === 'RECEITA' ? acc + t.valor : acc - t.valor;
-    }, 0);
-  }, [session]);
-
-  const cursosAtivos = useLiveQuery(async () => {
-    if (!session) return 0;
-    return await db.cursos.count();
-  }, [session]);
-
-  const loadingCompromissos = compromissosList === undefined;
-  const compromissosHoje = compromissosList?.length || 0;
-  const loadingSaldo = saldoMensal === undefined;
-  const loadingCursos = cursosAtivos === undefined;
 
   if (status === 'loading') {
     return (
@@ -81,41 +25,6 @@ export default function DashboardPage() {
 
   const firstName = session.user.name?.split(' ')[0] || 'Usuário';
 
-  // Função para ir para a agenda e abrir modal de novo compromisso
-  const handleNovoCompromisso = () => {
-    router.push('/dashboard/agenda?novo=true');
-  };
-
-  // Função para ir para a agenda
-  const handleIrParaAgenda = () => {
-    router.push('/dashboard/agenda');
-  };
-
-  // Função para ir para o financeiro e abrir modal de nova transação
-  const handleNovaTransacao = () => {
-    router.push('/dashboard/financeiro?nova=true');
-  };
-
-  // Função para ir para estudos e abrir modal de novo curso
-  const handleNovoCurso = () => {
-    router.push('/dashboard/estudos?novo=true');
-  };
-
-  // Função para ir para o financeiro
-  const handleIrParaFinanceiro = () => {
-    router.push('/dashboard/financeiro');
-  };
-
-  // Função para ir para estudos
-  const handleIrParaEstudos = () => {
-    router.push('/dashboard/estudos');
-  };
-
-  // Função para ir para biblioteca
-  const handleIrParaBiblioteca = () => {
-    router.push('/dashboard/biblioteca');
-  };
-
   return (
     <div className="flex flex-col lg:h-[calc(100vh-theme(spacing.20))] space-y-4 sm:space-y-6 p-4 lg:p-6 overflow-hidden">
       {/* Welcome Section */}
@@ -124,172 +33,27 @@ export default function DashboardPage() {
         description={t('daySummary')}
       />
 
-      {/* Stats Cards */}
-      <div className="flex flex-wrap gap-4">
-        {/* Card 1 - Compromissos Hoje */}
-        <Card
-          className="flex-1 min-w-[240px] cursor-pointer transition-all border border-zinc-800/50 hover:border-emerald-500/30"
-          onClick={handleIrParaAgenda}
-        >
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
-              {t('appointmentsToday')}
-            </CardTitle>
-            <div className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg">
-              <Calendar className="w-4 h-4 text-zinc-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loadingCompromissos ? (
-              <div className="flex items-center gap-2">
-                <div className="animate-spin h-5 w-5 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full"></div>
-                <span className="text-sm text-zinc-500">{tCommon('loading')}</span>
-              </div>
-            ) : (
-              <>
-                <div className="text-4xl font-bold text-white leading-tight">{compromissosHoje}</div>
-                <p className="text-[10px] font-medium uppercase text-zinc-500 mt-1 tracking-wider">
-                  {compromissosHoje === 0
-                    ? t('noAppointments')
-                    : compromissosHoje === 1
-                      ? t('oneAppointment')
-                      : t('manyAppointments', { count: compromissosHoje })
-                  }
-                </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Card 2 - Saldo Mensal */}
-        <Card className="flex-1 min-w-[240px] border border-zinc-800/50">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
-              {t('monthlyBalance')}
-            </CardTitle>
-            <div className="p-2 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-              <Wallet className="w-4 h-4 text-emerald-500" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loadingSaldo ? (
-              <div className="flex items-center gap-2">
-                <div className="animate-spin h-5 w-5 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full"></div>
-                <span className="text-sm text-zinc-500">{tCommon('loading')}</span>
-              </div>
-            ) : (
-              <>
-                <div className={`text-4xl font-bold leading-tight ${saldoMensal! >= 0 ? 'text-white' : 'text-red-500'}`}>
-                  {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(saldoMensal || 0)}
-                </div>
-                <div className="mt-2 flex items-center gap-2">
-                  {saldoMensal! >= 0 ? (
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
-                      <TrendingUp className="w-3 h-3 text-emerald-500" />
-                      <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-wider">Positivo</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-red-500/10 border border-red-500/20 rounded-full">
-                      <TrendingDown className="w-3 h-3 text-red-500" />
-                      <span className="text-[10px] font-bold text-red-500 uppercase tracking-wider">Negativo</span>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Card 3 - Cursos Ativos */}
-        <Card className="flex-1 min-w-[240px] border border-zinc-800/50" onClick={handleIrParaEstudos}>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
-              {t('activeCourses')}
-            </CardTitle>
-            <div className="p-2 bg-zinc-900 border border-zinc-800 rounded-lg">
-              <BookOpen className="w-4 h-4 text-zinc-400" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loadingCursos ? (
-              <div className="flex items-center gap-2">
-                <div className="animate-spin h-5 w-5 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full"></div>
-                <span className="text-sm text-zinc-500">{tCommon('loading')}</span>
-              </div>
-            ) : (
-              <>
-                <div className="text-4xl font-bold text-white leading-tight">{cursosAtivos}</div>
-                <p className="text-[10px] font-medium uppercase text-zinc-500 mt-1 tracking-wider">
-                  {cursosAtivos === 0
-                    ? t('startStudies')
-                    : cursosAtivos === 1
-                      ? '1 Curso em andamento'
-                      : `${cursosAtivos} Cursos em andamento`
-                  }
-                </p>
-              </>
-            )}
-          </CardContent>
-        </Card>
-
+      {/* Placeholder de Métricas */}
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        <div className="w-24 h-24 bg-zinc-900/50 border border-zinc-800/50 rounded-[32px] flex items-center justify-center mb-8 shadow-2xl relative overflow-hidden group">
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+          <Activity className="w-12 h-12 text-emerald-500/40 relative z-10" />
+        </div>
+        <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-[0.2em] mb-4">
+          Métricas de Desempenho
+        </h2>
+        <p className="text-zinc-500 max-w-lg text-xs md:text-sm font-bold leading-relaxed uppercase tracking-[0.15em]">
+          Estamos preparando uma visão detalhada do seu progresso. <br className="hidden md:block" />
+          Em breve, suas métricas e indicadores de desempenho pessoal estarão disponíveis aqui.
+        </p>
+        
+        <div className="mt-12 flex gap-4 opacity-20">
+          <div className="w-24 h-1 bg-zinc-800 rounded-full" />
+          <div className="w-12 h-1 bg-emerald-500/50 rounded-full" />
+          <div className="w-24 h-1 bg-zinc-800 rounded-full" />
+        </div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 min-h-0 pb-2">
-        {/* Atividades Recentes */}
-        <AtividadesRecentes />
-
-        {/* Quick Actions */}
-        <Card className="flex flex-col h-full bg-zinc-900/20 border border-zinc-800/50 overflow-hidden">
-          <CardHeader className="flex-shrink-0 border-b border-zinc-800 mb-4 p-6">
-            <CardTitle className="text-zinc-500 text-[10px] font-black uppercase tracking-[0.3em]">{t('quickActions')}</CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 overflow-y-auto space-y-3 min-h-0 p-6 pt-0">
-            {/* Botão Novo Compromisso */}
-            <Button
-              onClick={handleNovoCompromisso}
-              variant="default"
-              className="w-full justify-start h-12"
-            >
-              <Calendar className="w-5 h-5 mr-3" />
-              {t('newAppointment')}
-            </Button>
-
-            {/* Nova Transação */}
-            <Button
-              onClick={handleNovaTransacao}
-              variant="secondary"
-              className="w-full justify-start h-12"
-            >
-              <Wallet className="w-5 h-5 mr-3" />
-              {t('newTransaction')}
-            </Button>
-
-            {/* Adicionar no Planner */}
-            <Button
-              onClick={handleNovoCurso}
-              variant="outline"
-              className="w-full justify-start h-12"
-            >
-              <BookOpen className="w-5 h-5 mr-3" />
-              Adicionar no Planner
-            </Button>
-            <Button
-              disabled
-              variant="ghost"
-              className="w-full justify-start h-12 opacity-30"
-            >
-              <Target className="w-5 h-5 mr-3" />
-              {t('createGoal')}
-              <Badge variant="secondary" className="ml-auto text-[10px] uppercase font-black">{tCommon('premium')}</Badge>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-
-      {/* Premium Upgrade Modal */}
-      <PremiumModal />
     </div>
   );
 }
