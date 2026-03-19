@@ -935,8 +935,8 @@ export default function HabitosPage() {
 
         {/* Modal Novo Hábito - Redesenhado Premium */}
         <Dialog open={modalHabitoAberto} onOpenChange={setModalHabitoAberto}>
-          <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1000px] w-[95vw] max-h-[90vh] overflow-visible p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 sm:rounded-[32px] border-zinc-800/30">
-            <div className="flex flex-col h-full overflow-visible">
+          <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1000px] w-[95vw] max-h-[90vh] overflow-hidden p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 sm:rounded-[32px] border-zinc-800/30">
+            <div className="flex flex-col h-full overflow-hidden">
               {/* Header com Gradiente */}
               <div className="bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-900/50 p-6 border-b border-zinc-800/50 sm:rounded-t-[32px]">
                 <DialogHeader className="gap-1">
@@ -952,7 +952,7 @@ export default function HabitosPage() {
                 </DialogHeader>
               </div>
 
-              <div className="flex-1 min-h-0 overflow-y-auto p-6 sm:p-8 space-y-8">
+              <div className="flex-1 min-h-0 overflow-y-auto p-6 sm:p-8 space-y-8 modal-scrollbar">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
                   {/* Coluna Esquerda: Definição e Identidade */}
                   <div className="flex flex-col gap-6">

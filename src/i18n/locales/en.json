@@ -458,6 +458,7 @@
   },
   "investments": {
     "pageTitle": "Investments",
+    "title": "Investment",
     "subtitle": "Track your portfolio and the market",
     "marketOverview": "Market Overview",
     "myPortfolio": "My Portfolio",
