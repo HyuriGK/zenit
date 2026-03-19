@@ -34,7 +34,7 @@ export default function DashboardPage() {
 
       {/* Placeholder de Métricas (Minimalista) */}
       <div className="flex-1 flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-1000">
-        <p className="text-zinc-600 text-[10px] md:text-xs font-black uppercase tracking-[0.4em] max-w-sm leading-loose opacity-40">
+        <p className="text-zinc-400 text-[10px] md:text-xs font-black uppercase tracking-[0.4em] max-w-sm leading-loose opacity-60">
           Em breve suas métricas de desempenho pessoal estarão aqui
         </p>
       </div>
