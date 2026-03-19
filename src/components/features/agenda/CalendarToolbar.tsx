@@ -90,7 +90,7 @@ export function CalendarToolbar({ currentDate, view, onDateChange, onViewChange,
   };
 
   return (
-    <div className="flex flex-col gap-3 p-4 bg-zinc-950 border-b border-zinc-800 sticky top-0 z-30 shrink-0">
+    <div className="flex flex-col gap-3 p-4 bg-zinc-950 border-b border-zinc-800 shrink-0">
       {/* Primeira linha: Navegação e data */}
         {/* Botões de navegação e Data */}
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full">
