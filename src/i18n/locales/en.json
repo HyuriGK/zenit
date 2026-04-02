@@ -29,6 +29,7 @@
     "habits": "Habits",
     "agenda": "Calendar",
     "financial": "Financial",
+    "vehicles": "Vehicles",
     "investments": "Investments",
     "studies": "Studies",
     "library": "Library",
@@ -495,6 +496,56 @@
       "RENDA_FIXA": "Fixed Income",
       "CRIPTO": "Cryptocurrencies",
       "OUTRO": "Other"
+    }
+  },
+  "vehicles": {
+    "pageTitle": "Vehicles",
+    "subtitle": "Manage your cars, maintenance, and fuel",
+    "newVehicle": "New Vehicle",
+    "noVehicles": "No vehicles registered",
+    "startAdding": "Start by registering your first vehicle to track expenses and averages.",
+    "addFirst": "Register First Vehicle",
+    "name": "Name/Nickname",
+    "model": "Model",
+    "brand": "Brand",
+    "plate": "Plate",
+    "year": "Year",
+    "color": "Color",
+    "initialKM": "Initial KM",
+    "currentKM": "Current KM",
+    "fuelType": "Fuel Type",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleteConfirm": "Are you sure you want to delete this vehicle and all its records?",
+    "stats": {
+      "totalKM": "Total Distance Traveled",
+      "avgDay": "Avg KM/Day",
+      "avgMonth": "Avg KM/Month",
+      "avgYear": "Avg KM/Year"
+    },
+    "transactions": {
+      "title": "Records",
+      "new": "New Record",
+      "maintenance": "Maintenance",
+      "refuel": "Refuel",
+      "investment": "Investment",
+      "value": "Value",
+      "date": "Date",
+      "km": "KM at time",
+      "description": "Description",
+      "liters": "Liters",
+      "station": "Station",
+      "pricePerLiter": "Price/Liter",
+      "noRecords": "No records found"
+    },
+    "types": {
+      "GASOLINA": "Gasoline",
+      "ETANOL": "Ethanol",
+      "DIESEL": "Diesel",
+      "FLEX": "Flex",
+      "ELETRICO": "Electric",
+      "HIBRIDO": "Hybrid"
     }
   }
 }

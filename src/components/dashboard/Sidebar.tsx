@@ -15,7 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Heart,
-  TrendingUp
+  TrendingUp,
+  Car
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { usePlano } from '@/hooks/usePlano';
@@ -37,6 +38,7 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
     { icon: Heart, label: t('habits'), href: '/dashboard/habitos' },
     { icon: Calendar, label: t('agenda'), href: '/dashboard/agenda' },
     { icon: Wallet, label: t('financial'), href: '/dashboard/financeiro' },
+    { icon: Car, label: t('vehicles'), href: '/dashboard/veiculos' },
     { icon: TrendingUp, label: t('investments'), href: '/dashboard/investimentos' },
     { icon: BookOpen, label: t('studies'), href: '/dashboard/estudos' },
     { icon: Library, label: t('library'), href: '/dashboard/biblioteca' },

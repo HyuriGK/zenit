@@ -29,6 +29,7 @@
     "habits": "Hábitos",
     "agenda": "Agenda",
     "financial": "Financeiro",
+    "vehicles": "Veículos",
     "investments": "Investimentos",
     "studies": "Planner",
     "library": "Biblioteca",
@@ -497,6 +498,56 @@
       "RENDA_FIXA": "Renda Fixa",
       "CRIPTO": "Criptomoedas",
       "OUTRO": "Outro"
+    }
+  },
+  "vehicles": {
+    "pageTitle": "Veículos",
+    "subtitle": "Gerencie seus carros, manutenções e combustível",
+    "newVehicle": "Novo Veículo",
+    "noVehicles": "Nenhum veículo cadastrado",
+    "startAdding": "Comece cadastrando seu primeiro veículo para acompanhar gastos e médias.",
+    "addFirst": "Cadastrar Primeiro Veículo",
+    "name": "Nome/Apelido",
+    "model": "Modelo",
+    "brand": "Marca",
+    "plate": "Placa",
+    "year": "Ano",
+    "color": "Cor",
+    "initialKM": "KM Inicial",
+    "currentKM": "KM Atual",
+    "fuelType": "Combustível",
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "deleteConfirm": "Tem certeza que deseja excluir este veículo e todos os seus registros?",
+    "stats": {
+      "totalKM": "KM Total Percorrido",
+      "avgDay": "Média KM/Dia",
+      "avgMonth": "Média KM/Mês",
+      "avgYear": "Média KM/Ano"
+    },
+    "transactions": {
+      "title": "Registros",
+      "new": "Novo Registro",
+      "maintenance": "Manutenção",
+      "refuel": "Abastecimento",
+      "investment": "Investimento",
+      "value": "Valor",
+      "date": "Data",
+      "km": "KM no momento",
+      "description": "Descrição",
+      "liters": "Litros",
+      "station": "Posto",
+      "pricePerLiter": "Preço/Litro",
+      "noRecords": "Nenhum registro encontrado"
+    },
+    "types": {
+      "GASOLINA": "Gasolina",
+      "ETANOL": "Etanol",
+      "DIESEL": "Diesel",
+      "FLEX": "Flex",
+      "ELETRICO": "Elétrico",
+      "HIBRIDO": "Híbrido"
     }
   }
 }

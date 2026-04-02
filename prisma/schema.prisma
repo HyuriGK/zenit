@@ -37,6 +37,7 @@ model User {
   midias               Midia[]
   cursos               Curso[]
   ativosInvestimento   AtivoInvestimento[]
+  veiculos             Veiculo[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -544,4 +545,43 @@ model AtivoInvestimento {
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Veiculo {
+  id                    String   @id @default(uuid())
+  nome                  String
+  modelo                String?
+  marca                 String?
+  placa                 String?
+  ano                   Int?
+  cor                   String?
+  quilometragemInicial  Float    @default(0)
+  quilometragemAtual    Float    @default(0)
+  tipoCombustivel      String?  // GASOLINA, ETANOL, DIESEL, FLEX, ELETRICO, HIBRIDO
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transacoes TransacaoVeiculo[]
+}
+
+model TransacaoVeiculo {
+  id             String   @id @default(uuid())
+  tipo           String   // MANUTENCAO, ABASTECIMENTO, INVESTIMENTO
+  valor          Float
+  data           DateTime @db.Date
+  quilometragem  Float?
+  descricao      String?
+  
+  // Específicos para abastecimento
+  litros         Float?
+  posto          String?
+  precoPorLitro  Float?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  veiculoId String
+  veiculo   Veiculo @relation(fields: [veiculoId], references: [id], onDelete: Cascade)
 }
