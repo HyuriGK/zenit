@@ -6,15 +6,15 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await auth();
         if (!session?.user?.id) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
         const userId = session.user.id;
-        const { id } = params;
 
         const result = await sql`
             SELECT * FROM "Veiculo"
@@ -34,15 +34,15 @@ export async function GET(
 
 export async function PUT(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await auth();
         if (!session?.user?.id) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
         const userId = session.user.id;
-        const { id } = params;
         const data = await request.json();
 
         // Update fields if provided
@@ -74,15 +74,15 @@ export async function PUT(
 
 export async function DELETE(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id } = await params;
         const session = await auth();
         if (!session?.user?.id) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
         const userId = session.user.id;
-        const { id } = params;
 
         const result = await sql`
             DELETE FROM "Veiculo"

@@ -6,14 +6,14 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id: veiculoId } = await params;
         const session = await auth();
         if (!session?.user?.id) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
-        const { id: veiculoId } = params;
 
         const transacoes = await sql`
             SELECT * FROM "TransacaoVeiculo"
@@ -32,14 +32,14 @@ export async function GET(
 
 export async function POST(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
+        const { id: veiculoId } = await params;
         const session = await auth();
         if (!session?.user?.id) {
             return NextResponse.json({ error: 'Não autorizado' }, { status: 401 });
         }
-        const { id: veiculoId } = params;
         const data = await request.json();
 
         const id = crypto.randomUUID();
