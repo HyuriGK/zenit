@@ -38,6 +38,7 @@ model User {
   cursos               Curso[]
   ativosInvestimento   AtivoInvestimento[]
   veiculos             Veiculo[]
+  notificacoes         Notificacao[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -584,4 +585,18 @@ model TransacaoVeiculo {
 
   veiculoId String
   veiculo   Veiculo @relation(fields: [veiculoId], references: [id], onDelete: Cascade)
+}
+
+model Notificacao {
+  id        String   @id @default(uuid())
+  tipo      String   // LEMRETE_HABITO, RESUMO_DIARIO, SEQUENCIA_RISCO, CONQUISTA, SISTEMA
+  titulo    String
+  mensagem  String
+  dados     Json?
+  lida      Boolean  @default(false)
+  lidaEm    DateTime?
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
