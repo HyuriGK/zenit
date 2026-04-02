@@ -60,7 +60,7 @@ export default function VehicleCard({ veiculo, onEdit, onAddTransaction, onViewH
     const diffTime = Math.abs(today.getTime() - startOfYear.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) || 1;
     
-    const avgDay = totalKM / diffDays;
+    const avgDay = (veiculo.quilometragemAtual || 0) / diffDays;
     const avgMonth = avgDay * 30.44;
     const avgYear = avgDay * 365.25;
 
