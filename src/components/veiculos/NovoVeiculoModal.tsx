@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,17 +12,18 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Car, Plus } from 'lucide-react';
+import { Loader2, Car, PenTool } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
-interface NovoVeiculoModalProps {
+interface VeiculoModalProps {
     aberto: boolean;
     onFechar: () => void;
     onSucesso: () => void;
+    veiculoParaEditar?: any;
 }
 
-export default function NovoVeiculoModal({ aberto, onFechar, onSucesso }: NovoVeiculoModalProps) {
+export default function NovoVeiculoModal({ aberto, onFechar, onSucesso, veiculoParaEditar }: VeiculoModalProps) {
     const t = useTranslations('vehicles');
     const [carregando, setCarregando] = useState(false);
 
@@ -35,6 +36,21 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso }: NovoVe
     const [quilometragemInicial, setQuilometragemInicial] = useState('');
     const [tipoCombustivel, setTipoCombustivel] = useState('FLEX');
 
+    useEffect(() => {
+        if (veiculoParaEditar && aberto) {
+            setNome(veiculoParaEditar.nome || '');
+            setModelo(veiculoParaEditar.modelo || '');
+            setMarca(veiculoParaEditar.marca || '');
+            setPlaca(veiculoParaEditar.placa || '');
+            setAno(veiculoParaEditar.ano?.toString() || new Date().getFullYear().toString());
+            setCor(veiculoParaEditar.cor || '');
+            setQuilometragemInicial(veiculoParaEditar.quilometragemInicial?.toString() || '');
+            setTipoCombustivel(veiculoParaEditar.tipoCombustivel || 'FLEX');
+        } else if (!veiculoParaEditar && aberto) {
+            limparFormulario();
+        }
+    }, [veiculoParaEditar, aberto]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -44,11 +60,14 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso }: NovoVe
         }
 
         setCarregando(true);
-        const loadingToast = toast.loading('Salvando veículo...');
+        const loadingToast = toast.loading(veiculoParaEditar ? 'Atualizando veículo...' : 'Salvando veículo...');
 
         try {
-            const response = await fetch('/api/veiculos', {
-                method: 'POST',
+            const url = veiculoParaEditar ? `/api/veiculos/${veiculoParaEditar.id}` : '/api/veiculos';
+            const method = veiculoParaEditar ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     nome,
@@ -64,13 +83,12 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso }: NovoVe
 
             if (!response.ok) throw new Error('Falha ao salvar veículo');
 
-            limparFormulario();
-            toast.success('Veículo cadastrado com sucesso!', { id: loadingToast });
+            toast.success(veiculoParaEditar ? 'Veículo atualizado!' : 'Veículo cadastrado!', { id: loadingToast });
             onSucesso();
             onFechar();
         } catch (error) {
             console.error('Erro:', error);
-            toast.error('Erro ao cadastrar veículo.', { id: loadingToast });
+            toast.error('Erro ao processar solicitação.', { id: loadingToast });
         } finally {
             setCarregando(false);
         }
@@ -92,11 +110,11 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso }: NovoVe
             <DialogContent className="bg-zinc-900/90 backdrop-blur-xl border-zinc-800/50 max-w-2xl rounded-3xl p-8 scrollbar-thin scrollbar-thumb-zinc-800 overflow-y-auto max-h-[90vh]">
                 <DialogHeader className="mb-8">
                     <DialogTitle className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 flex items-center gap-2">
-                        <Car className="w-4 h-4 text-emerald-500" />
-                        {t('newVehicle')}
+                        {veiculoParaEditar ? <PenTool className="w-4 h-4 text-blue-500" /> : <Car className="w-4 h-4 text-emerald-500" />}
+                        {veiculoParaEditar ? 'Editar Veículo' : t('newVehicle')}
                     </DialogTitle>
                     <DialogDescription className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest mt-2">
-                        {t('startAdding')}
+                        {veiculoParaEditar ? 'Atualize as informações do seu veículo' : t('startAdding')}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -202,15 +220,12 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso }: NovoVe
                             type="submit"
                             variant="premium"
                             disabled={carregando}
-                            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest"
+                            className={`flex-1 h-12 text-[10px] font-black uppercase tracking-widest ${veiculoParaEditar ? 'bg-blue-600 hover:bg-blue-700' : ''}`}
                         >
                             {carregando ? (
-                                <>
-                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                    ...
-                                </>
+                                <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
-                                t('save')
+                                veiculoParaEditar ? 'Salvar Alterações' : t('save')
                             )}
                         </Button>
                     </div>

@@ -2,27 +2,31 @@
 
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { 
     Fuel, 
     PenTool, 
     TrendingUp, 
     History, 
-    Calendar,
     Hash,
     MapPin,
-    Droplets
+    Droplets,
+    Edit2,
+    Trash2
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { formatarMoeda } from '@/lib/financeiro-helper';
+import { toast } from 'sonner';
 
 interface ListaTransacoesModalProps {
     aberto: boolean;
     veiculoId: string;
     onFechar: () => void;
+    onEdit: (transacao: any) => void;
+    onRefresh: () => void;
 }
 
-export default function ListaTransacoesModal({ aberto, veiculoId, onFechar }: ListaTransacoesModalProps) {
+export default function ListaTransacoesModal({ aberto, veiculoId, onFechar, onEdit, onRefresh }: ListaTransacoesModalProps) {
     const t = useTranslations('vehicles');
     const [transacoes, setTransacoes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -47,6 +51,26 @@ export default function ListaTransacoesModal({ aberto, veiculoId, onFechar }: Li
             carregarTransacoes();
         }
     }, [aberto, veiculoId]);
+
+    const handleDelete = async (transacaoId: string) => {
+        if (!confirm('Tem certeza que deseja excluir este registro?')) return;
+
+        try {
+            const res = await fetch(`/api/veiculos/${veiculoId}/transacoes/${transacaoId}`, {
+                method: 'DELETE'
+            });
+
+            if (res.ok) {
+                toast.success('Registro excluído!');
+                carregarTransacoes();
+                onRefresh();
+            } else {
+                toast.error('Erro ao excluir registro.');
+            }
+        } catch (error) {
+            toast.error('Erro ao conectar com o servidor.');
+        }
+    };
 
     const getIcon = (tipo: string) => {
         switch (tipo) {
@@ -101,18 +125,38 @@ export default function ListaTransacoesModal({ aberto, veiculoId, onFechar }: Li
                                                     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-400">{getTipoLabel(tr.tipo)}</span>
                                                     <span className="text-[10px] font-bold text-zinc-600">•</span>
                                                     <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">
-                                                        {new Date(tr.data).toLocaleDateString('pt-BR')}
+                                                        {new Date(tr.data + "T00:00:00").toLocaleDateString('pt-BR')}
                                                     </span>
                                                 </div>
                                                 <div className="text-xl font-black text-white mt-0.5">{formatarMoeda(tr.valor)}</div>
                                             </div>
                                         </div>
-                                        {tr.quilometragem && (
-                                            <div className="flex items-center gap-2 bg-zinc-900/50 px-3 py-1.5 rounded-lg border border-zinc-800/50">
-                                                <Hash className="w-3 h-3 text-emerald-500/50" />
-                                                <span className="text-[10px] font-black text-zinc-400">{tr.quilometragem.toLocaleString()} KM</span>
+                                        <div className="flex gap-2">
+                                            {tr.quilometragem && (
+                                                <div className="flex items-center gap-2 bg-zinc-900/50 px-3 py-1.5 rounded-lg border border-zinc-800/50">
+                                                    <Hash className="w-3 h-3 text-emerald-500/50" />
+                                                    <span className="text-[10px] font-black text-zinc-400">{tr.quilometragem.toLocaleString()} KM</span>
+                                                </div>
+                                            )}
+                                            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="h-8 w-8 text-zinc-600 hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg"
+                                                    onClick={() => onEdit(tr)}
+                                                >
+                                                    <Edit2 className="w-3.5 h-3.5" />
+                                                </Button>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    className="h-8 w-8 text-zinc-600 hover:text-red-500 hover:bg-red-500/10 rounded-lg"
+                                                    onClick={() => handleDelete(tr.id)}
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </Button>
                                             </div>
-                                        )}
+                                        </div>
                                     </div>
 
                                     {/* Additional info for refuel */}

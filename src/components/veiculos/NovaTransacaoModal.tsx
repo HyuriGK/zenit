@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,14 +17,15 @@ import { Loader2, Plus, PenTool, Fuel, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
-interface NovaTransacaoModalProps {
+interface TransacaoVeiculoModalProps {
     aberto: boolean;
     veiculoId: string;
     onFechar: () => void;
     onSucesso: () => void;
+    transacaoParaEditar?: any;
 }
 
-export default function NovaTransacaoModal({ aberto, veiculoId, onFechar, onSucesso }: NovaTransacaoModalProps) {
+export default function NovaTransacaoModal({ aberto, veiculoId, onFechar, onSucesso, transacaoParaEditar }: TransacaoVeiculoModalProps) {
     const t = useTranslations('vehicles');
     const [carregando, setCarregando] = useState(false);
 
@@ -39,6 +40,21 @@ export default function NovaTransacaoModal({ aberto, veiculoId, onFechar, onSuce
     const [posto, setPosto] = useState('');
     const [precoPorLitro, setPrecoPorLitro] = useState('');
 
+    useEffect(() => {
+        if (transacaoParaEditar && aberto) {
+            setTipo(transacaoParaEditar.tipo);
+            setValor(transacaoParaEditar.valor?.toString() || '');
+            setData(new Date(transacaoParaEditar.data).toISOString().split('T')[0]);
+            setQuilometragem(transacaoParaEditar.quilometragem?.toString() || '');
+            setDescricao(transacaoParaEditar.descricao || '');
+            setLitros(transacaoParaEditar.litros?.toString() || '');
+            setPosto(transacaoParaEditar.posto || '');
+            setPrecoPorLitro(transacaoParaEditar.precoPorLitro?.toString() || '');
+        } else if (!transacaoParaEditar && aberto) {
+            limparFormulario();
+        }
+    }, [transacaoParaEditar, aberto]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -48,11 +64,16 @@ export default function NovaTransacaoModal({ aberto, veiculoId, onFechar, onSuce
         }
 
         setCarregando(true);
-        const loadingToast = toast.loading('Salvando registro...');
+        const loadingToast = toast.loading(transacaoParaEditar ? 'Atualizando registro...' : 'Salvando registro...');
 
         try {
-            const response = await fetch(`/api/veiculos/${veiculoId}/transacoes`, {
-                method: 'POST',
+            const url = transacaoParaEditar 
+                ? `/api/veiculos/${veiculoId}/transacoes/${transacaoParaEditar.id}`
+                : `/api/veiculos/${veiculoId}/transacoes`;
+            const method = transacaoParaEditar ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     tipo,
@@ -68,13 +89,12 @@ export default function NovaTransacaoModal({ aberto, veiculoId, onFechar, onSuce
 
             if (!response.ok) throw new Error('Falha ao salvar registro');
 
-            limparFormulario();
-            toast.success('Registro adicionado com sucesso!', { id: loadingToast });
+            toast.success(transacaoParaEditar ? 'Registro atualizado!' : 'Registro adicionado!', { id: loadingToast });
             onSucesso();
             onFechar();
         } catch (error) {
             console.error('Erro:', error);
-            toast.error('Erro ao salvar registro.', { id: loadingToast });
+            toast.error('Erro ao processar solicitação.', { id: loadingToast });
         } finally {
             setCarregando(false);
         }
@@ -105,8 +125,8 @@ export default function NovaTransacaoModal({ aberto, veiculoId, onFechar, onSuce
             <DialogContent className="bg-zinc-900/90 backdrop-blur-xl border-zinc-800/50 max-w-xl rounded-3xl p-8 scrollbar-thin scrollbar-thumb-zinc-800 overflow-y-auto max-h-[90vh]">
                 <DialogHeader className="mb-8">
                     <DialogTitle className="text-xs font-black uppercase tracking-[0.3em] text-zinc-500 flex items-center gap-2">
-                        {getIcon()}
-                        {t('transactions.new')}
+                        {transacaoParaEditar ? <PenTool className="w-4 h-4 text-emerald-500" /> : getIcon()}
+                        {transacaoParaEditar ? 'Editar Registro' : t('transactions.new')}
                     </DialogTitle>
                 </DialogHeader>
 
@@ -223,12 +243,12 @@ export default function NovaTransacaoModal({ aberto, veiculoId, onFechar, onSuce
                             type="submit"
                             variant="premium"
                             disabled={carregando}
-                            className="flex-1 h-12 text-[10px] font-black uppercase tracking-widest"
+                            className={`flex-1 h-12 text-[10px] font-black uppercase tracking-widest ${transacaoParaEditar ? 'bg-emerald-600 hover:bg-emerald-700' : ''}`}
                         >
                             {carregando ? (
                                 <Loader2 className="w-4 h-4 animate-spin" />
                             ) : (
-                                t('save')
+                                transacaoParaEditar ? 'Salvar Alterações' : t('save')
                             )}
                         </Button>
                     </div>

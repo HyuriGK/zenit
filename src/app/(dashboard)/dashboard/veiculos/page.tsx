@@ -5,40 +5,69 @@ import { useTranslations } from 'next-intl';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { Button } from '@/components/ui/button';
-import { Plus, Car, Fuel, PenTool, TrendingUp, Wallet } from 'lucide-react';
+import { Plus, Car, Fuel, PenTool, Wallet } from 'lucide-react';
 import NovoVeiculoModal from '@/components/veiculos/NovoVeiculoModal';
 import NovaTransacaoModal from '@/components/veiculos/NovaTransacaoModal';
 import VehicleCard from '@/components/veiculos/VehicleCard';
 import ListaTransacoesModal from '@/components/veiculos/ListaTransacoesModal';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
+import { formatarMoeda } from '@/lib/financeiro-helper';
 
 export default function VeiculosPage() {
     const t = useTranslations('vehicles');
     const [loading, setLoading] = useState(true);
     const [veiculos, setVeiculos] = useState<any[]>([]);
-    const [modalNovoAberto, setModalNovoAberto] = useState(false);
+    
+    // Modals State
+    const [modalVeiculoAberto, setModalVeiculoAberto] = useState(false);
     const [modalTransacaoAberto, setModalTransacaoAberto] = useState(false);
     const [modalHistoricoAberto, setModalHistoricoAberto] = useState(false);
+    
+    // Selection State
     const [veiculoSelecionadoId, setVeiculoSelecionadoId] = useState<string | null>(null);
+    const [veiculoParaEditar, setVeiculoParaEditar] = useState<any | null>(null);
+    const [transacaoParaEditar, setTransacaoParaEditar] = useState<any | null>(null);
 
-    const carregarVeiculos = async () => {
+    // Stats State
+    const [totalGasto, setTotalGasto] = useState(0);
+    const [totalManutencoes, setTotalManutencoes] = useState(0);
+
+    const carregarDados = async () => {
         try {
             const res = await fetch('/api/veiculos');
             if (res.ok) {
                 const json = await res.json();
-                setVeiculos(json.data || []);
+                const list = json.data || [];
+                setVeiculos(list);
+
+                // Calculate some basic global stats from vehicles
+                let gasto = 0;
+                let manutencoes = 0;
+                
+                // Fetch stats for each vehicle (this could be optimized in a single API call in the future)
+                for (const v of list) {
+                    const transRes = await fetch(`/api/veiculos/${v.id}/transacoes`);
+                    if (transRes.ok) {
+                        const transJson = await transRes.json();
+                        const trans = transJson.data || [];
+                        gasto += trans.reduce((acc: number, curr: any) => acc + (parseFloat(curr.valor) || 0), 0);
+                        manutencoes += trans.filter((tr: any) => tr.tipo === 'MANUTENCAO').length;
+                    }
+                }
+                setTotalGasto(gasto);
+                setTotalManutencoes(manutencoes);
             }
         } catch (error) {
-            console.error('Erro ao buscar veículos:', error);
-            toast.error('Erro ao carregar veículos');
+            console.error('Erro ao carregar dados:', error);
+            toast.error('Erro ao carregar informações');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        carregarVeiculos();
+        carregarDados();
     }, []);
 
     const handleDeleteVeiculo = async (id: string) => {
@@ -46,7 +75,7 @@ export default function VeiculosPage() {
             const res = await fetch(`/api/veiculos/${id}`, { method: 'DELETE' });
             if (res.ok) {
                 toast.success('Veículo removido');
-                carregarVeiculos();
+                carregarDados();
             } else {
                 toast.error('Erro ao remover veículo');
             }
@@ -55,8 +84,19 @@ export default function VeiculosPage() {
         }
     };
 
+    const handleEditVeiculo = (veiculo: any) => {
+        setVeiculoParaEditar(veiculo);
+        setModalVeiculoAberto(true);
+    };
+
     const handleOpenAddTransaction = (id: string) => {
         setVeiculoSelecionadoId(id);
+        setTransacaoParaEditar(null);
+        setModalTransacaoAberto(true);
+    };
+
+    const handleEditTransaction = (transacao: any) => {
+        setTransacaoParaEditar(transacao);
         setModalTransacaoAberto(true);
     };
 
@@ -77,7 +117,10 @@ export default function VeiculosPage() {
                     description={t('subtitle')}
                 />
                 <Button 
-                    onClick={() => setModalNovoAberto(true)}
+                    onClick={() => {
+                        setVeiculoParaEditar(null);
+                        setModalVeiculoAberto(true);
+                    }}
                     variant="premium"
                     className="rounded-2xl h-12 px-6"
                 >
@@ -96,9 +139,9 @@ export default function VeiculosPage() {
                                     <div className="w-8 h-8 rounded-xl bg-orange-500/10 flex items-center justify-center border border-orange-500/20">
                                         <Fuel className="w-4 h-4 text-orange-500" />
                                     </div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Média Consumo</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Consumo Médio</span>
                                 </div>
-                                <div className="text-3xl font-black text-white">-- <span className="text-sm font-bold text-zinc-500">km/l</span></div>
+                                <div className="text-3xl font-black text-white italic">-- <span className="text-sm font-bold text-zinc-500 not-italic">km/l</span></div>
                             </CardContent>
                         </Card>
                         <Card className="bg-zinc-900/40 border-zinc-800/50">
@@ -109,7 +152,7 @@ export default function VeiculosPage() {
                                     </div>
                                     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Manutenções</span>
                                 </div>
-                                <div className="text-3xl font-black text-white">-- <span className="text-sm font-bold text-zinc-500">registradas</span></div>
+                                <div className="text-3xl font-black text-white italic">{totalManutencoes} <span className="text-sm font-bold text-zinc-500 not-italic">realizadas</span></div>
                             </CardContent>
                         </Card>
                         <Card className="bg-zinc-900/40 border-zinc-800/50">
@@ -120,7 +163,7 @@ export default function VeiculosPage() {
                                     </div>
                                     <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Gasto Total</span>
                                 </div>
-                                <div className="text-3xl font-black text-white">R$ 0,00</div>
+                                <div className="text-3xl font-black text-emerald-500 italic">{formatarMoeda(totalGasto)}</div>
                             </CardContent>
                         </Card>
                     </div>
@@ -137,7 +180,7 @@ export default function VeiculosPage() {
                             {t('startAdding')}
                         </p>
                         <Button 
-                            onClick={() => setModalNovoAberto(true)}
+                            onClick={() => setModalVeiculoAberto(true)}
                             variant="outline" 
                             className="mt-8 rounded-2xl border-emerald-500/20 text-emerald-500 hover:bg-emerald-500/10 font-black uppercase tracking-widest text-[10px] h-12 px-8"
                         >
@@ -150,6 +193,7 @@ export default function VeiculosPage() {
                             <VehicleCard 
                                 key={v.id} 
                                 veiculo={v} 
+                                onEdit={handleEditVeiculo}
                                 onAddTransaction={handleOpenAddTransaction}
                                 onViewHistory={handleOpenHistory}
                                 onDelete={handleDeleteVeiculo}
@@ -160,9 +204,13 @@ export default function VeiculosPage() {
             </div>
 
             <NovoVeiculoModal 
-                aberto={modalNovoAberto} 
-                onFechar={() => setModalNovoAberto(false)} 
-                onSucesso={carregarVeiculos} 
+                aberto={modalVeiculoAberto} 
+                onFechar={() => {
+                    setModalVeiculoAberto(false);
+                    setVeiculoParaEditar(null);
+                }} 
+                onSucesso={carregarDados} 
+                veiculoParaEditar={veiculoParaEditar}
             />
 
             {veiculoSelecionadoId && (
@@ -170,13 +218,19 @@ export default function VeiculosPage() {
                     <NovaTransacaoModal 
                         aberto={modalTransacaoAberto}
                         veiculoId={veiculoSelecionadoId}
-                        onFechar={() => setModalTransacaoAberto(false)}
-                        onSucesso={carregarVeiculos}
+                        onFechar={() => {
+                            setModalTransacaoAberto(false);
+                            setTransacaoParaEditar(null);
+                        }}
+                        onSucesso={carregarDados}
+                        transacaoParaEditar={transacaoParaEditar}
                     />
                     <ListaTransacoesModal 
                         aberto={modalHistoricoAberto}
                         veiculoId={veiculoSelecionadoId}
                         onFechar={() => setModalHistoricoAberto(false)}
+                        onEdit={handleEditTransaction}
+                        onRefresh={carregarDados}
                     />
                 </>
             )}

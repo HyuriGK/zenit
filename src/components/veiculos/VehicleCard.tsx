@@ -20,12 +20,13 @@ import { toast } from 'sonner';
 
 interface VehicleCardProps {
     veiculo: any;
+    onEdit: (veiculo: any) => void;
     onAddTransaction: (id: string) => void;
     onViewHistory: (id: string) => void;
     onDelete: (id: string) => void;
 }
 
-export default function VehicleCard({ veiculo, onAddTransaction, onViewHistory, onDelete }: VehicleCardProps) {
+export default function VehicleCard({ veiculo, onEdit, onAddTransaction, onViewHistory, onDelete }: VehicleCardProps) {
     const t = useTranslations('vehicles');
 
     const calculateAge = (year: number) => {
@@ -89,6 +90,14 @@ export default function VehicleCard({ veiculo, onAddTransaction, onViewHistory, 
                         </div>
                     </div>
                     <div className="flex gap-2">
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => onEdit(veiculo)}
+                            className="h-8 w-8 text-zinc-600 hover:text-blue-500 hover:bg-blue-500/10 rounded-xl"
+                        >
+                            <Settings className="w-4 h-4" />
+                        </Button>
                         <Button
                             variant="ghost"
                             size="icon"
