@@ -57,6 +57,7 @@ export async function PUT(
                 "quilometragemInicial" = COALESCE(${data.quilometragemInicial ? parseFloat(data.quilometragemInicial) : null}, "quilometragemInicial"),
                 "quilometragemAtual" = COALESCE(${data.quilometragemAtual ? parseFloat(data.quilometragemAtual) : null}, "quilometragemAtual"),
                 "tipoCombustivel" = COALESCE(${data.tipoCombustivel}, "tipoCombustivel"),
+                "valorFipe" = COALESCE(${data.valorFipe}, "valorFipe"),
                 "updatedAt" = NOW()
             WHERE id = ${id} AND "userId" = ${userId}
             RETURNING *;

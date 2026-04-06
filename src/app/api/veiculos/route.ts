@@ -46,15 +46,16 @@ export async function POST(request: Request) {
         const quilometragemInicial = parseFloat(data.quilometragemInicial || 0);
         const quilometragemAtual = parseFloat(data.quilometragemAtual || quilometragemInicial);
         const tipoCombustivel = data.tipoCombustivel || 'FLEX';
+        const valorFipe = data.valorFipe || null;
 
         const result = await sql`
             INSERT INTO "Veiculo" (
                 id, "nome", "modelo", "marca", "placa", "ano", "cor",
-                "quilometragemInicial", "quilometragemAtual", "tipoCombustivel",
+                "quilometragemInicial", "quilometragemAtual", "tipoCombustivel", "valorFipe",
                 "userId", "createdAt", "updatedAt"
             ) VALUES (
                 ${id}, ${nome}, ${modelo}, ${marca}, ${placa}, ${ano}, ${cor},
-                ${quilometragemInicial}, ${quilometragemAtual}, ${tipoCombustivel},
+                ${quilometragemInicial}, ${quilometragemAtual}, ${tipoCombustivel}, ${valorFipe},
                 ${userId}, NOW(), NOW()
             )
             RETURNING *;

@@ -66,6 +66,7 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso, veiculoP
             setQuilometragemInicial(veiculoParaEditar.quilometragemInicial?.toString() || '');
             setQuilometragemAtual(veiculoParaEditar.quilometragemAtual?.toString() || '');
             setTipoCombustivel(veiculoParaEditar.tipoCombustivel || 'FLEX');
+            setValorFipe(veiculoParaEditar.valorFipe || '');
         } else if (!veiculoParaEditar && aberto) {
             limparFormulario();
         }
@@ -151,7 +152,8 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso, veiculoP
                     cor,
                     quilometragemInicial,
                     quilometragemAtual: veiculoParaEditar ? quilometragemAtual : quilometragemInicial,
-                    tipoCombustivel
+                    tipoCombustivel,
+                    valorFipe
                 }),
             });
 

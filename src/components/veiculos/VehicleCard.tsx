@@ -141,6 +141,23 @@ export default function VehicleCard({ veiculo, onEdit, onAddTransaction, onViewH
                     </div>
                 </div>
 
+                {/* Market Value Section (FIPE) */}
+                {veiculo.valorFipe && (
+                    <div className="bg-emerald-500/5 border-b border-zinc-800/30 p-5 group/fipe hover:bg-emerald-500/10 transition-colors">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                    <TrendingUp className="w-3.5 h-3.5" />
+                                </div>
+                                <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Valor de Mercado (FIPE)</span>
+                            </div>
+                            <div className="text-xl font-black text-emerald-400 italic tracking-tight group-hover/fipe:scale-105 transition-transform duration-500">
+                                {veiculo.valorFipe}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
                 {/* Calculation Stats (Averages) */}
                 <div className="p-6 space-y-5">
                     <div className="grid grid-cols-3 gap-4">
