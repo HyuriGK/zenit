@@ -18,7 +18,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { Loader2, Car, PenTool, X } from 'lucide-react';
+import { Loader2, Car, PenTool, X, TrendingUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
 
@@ -40,7 +40,20 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso, veiculoP
     const [ano, setAno] = useState(new Date().getFullYear().toString());
     const [cor, setCor] = useState('');
     const [quilometragemInicial, setQuilometragemInicial] = useState('');
+    const [quilometragemAtual, setQuilometragemAtual] = useState('');
     const [tipoCombustivel, setTipoCombustivel] = useState('FLEX');
+    const [valorFipe, setValorFipe] = useState('');
+
+    // FIPE States
+    const [usarFipe, setUsarFipe] = useState(false);
+    const [marcas, setMarcas] = useState<any[]>([]);
+    const [modelos, setModelos] = useState<any[]>([]);
+    const [anos, setAnos] = useState<any[]>([]);
+    const [fipeLoading, setFipeLoading] = useState(false);
+    
+    const [fipeMarca, setFipeMarca] = useState('');
+    const [fipeModelo, setFipeModelo] = useState('');
+    const [fipeAno, setFipeAno] = useState('');
 
     useEffect(() => {
         if (veiculoParaEditar && aberto) {
@@ -51,11 +64,65 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso, veiculoP
             setAno(veiculoParaEditar.ano?.toString() || new Date().getFullYear().toString());
             setCor(veiculoParaEditar.cor || '');
             setQuilometragemInicial(veiculoParaEditar.quilometragemInicial?.toString() || '');
+            setQuilometragemAtual(veiculoParaEditar.quilometragemAtual?.toString() || '');
             setTipoCombustivel(veiculoParaEditar.tipoCombustivel || 'FLEX');
         } else if (!veiculoParaEditar && aberto) {
             limparFormulario();
         }
     }, [veiculoParaEditar, aberto]);
+
+    // FIPE Fetching
+    useEffect(() => {
+        if (usarFipe && marcas.length === 0) {
+            fetch('https://parallelum.com.br/fipe/api/v1/carros/marcas')
+                .then(res => res.json())
+                .then(data => setMarcas(data))
+                .catch(err => console.error('Erro fipe marcas:', err));
+        }
+    }, [usarFipe]);
+
+    useEffect(() => {
+        if (fipeMarca) {
+            setFipeLoading(true);
+            fetch(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${fipeMarca}/modelos`)
+                .then(res => res.json())
+                .then(data => {
+                    setModelos(data.modelos);
+                    setFipeModelo('');
+                    setFipeAno('');
+                })
+                .finally(() => setFipeLoading(false));
+        }
+    }, [fipeMarca]);
+
+    useEffect(() => {
+        if (fipeMarca && fipeModelo) {
+            setFipeLoading(true);
+            fetch(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${fipeMarca}/modelos/${fipeModelo}/anos`)
+                .then(res => res.json())
+                .then(data => {
+                    setAnos(data);
+                    setFipeAno('');
+                })
+                .finally(() => setFipeLoading(false));
+        }
+    }, [fipeMarca, fipeModelo]);
+
+    useEffect(() => {
+        if (fipeMarca && fipeModelo && fipeAno) {
+            setFipeLoading(true);
+            fetch(`https://parallelum.com.br/fipe/api/v1/carros/marcas/${fipeMarca}/modelos/${fipeModelo}/anos/${fipeAno}`)
+                .then(res => res.json())
+                .then(data => {
+                    setValorFipe(data.Valor);
+                    setMarca(data.Marca);
+                    setModelo(data.Modelo);
+                    setAno(data.AnoModelo.toString());
+                    setTipoCombustivel(data.Combustivel === 'Gasolina' ? 'GASOLINA' : (data.Combustivel === 'Álcool' ? 'ETANOL' : 'FLEX'));
+                })
+                .finally(() => setFipeLoading(false));
+        }
+    }, [fipeMarca, fipeModelo, fipeAno]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -83,6 +150,7 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso, veiculoP
                     ano,
                     cor,
                     quilometragemInicial,
+                    quilometragemAtual: veiculoParaEditar ? quilometragemAtual : quilometragemInicial,
                     tipoCombustivel
                 }),
             });
@@ -108,7 +176,10 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso, veiculoP
         setAno(new Date().getFullYear().toString());
         setCor('');
         setQuilometragemInicial('');
+        setQuilometragemAtual('');
         setTipoCombustivel('FLEX');
+        setValorFipe('');
+        setUsarFipe(false);
     };
 
     return (
@@ -129,6 +200,17 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso, veiculoP
                 </SheetHeader>
 
                 <div className="flex-1 overflow-y-auto px-8 pb-20 scroll-container">
+                    <div className="mb-6">
+                        <Button 
+                            variant="outline" 
+                            onClick={() => setUsarFipe(!usarFipe)}
+                            className={`w-full h-12 rounded-2xl border-dashed border-zinc-800 flex items-center justify-center gap-2 transition-all ${usarFipe ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-500' : 'text-zinc-500 hover:text-white hover:border-zinc-700'}`}
+                        >
+                            <TrendingUp className="w-4 h-4" />
+                            <span className="text-[10px] font-black uppercase tracking-widest">{usarFipe ? 'Modo Manual' : 'Consultar Tabela FIPE'}</span>
+                        </Button>
+                    </div>
+
                     <form onSubmit={handleSubmit} id="veiculo-form" className="space-y-8 mt-4">
                         <div className="space-y-6">
                             <div className="space-y-2">
@@ -142,49 +224,98 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso, veiculoP
                                 />
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('brand')}</Label>
-                                    <Input
-                                        value={marca}
-                                        onChange={(e) => setMarca(e.target.value)}
-                                        placeholder="Ex: Toyota"
-                                        className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('model')}</Label>
-                                    <Input
-                                        value={modelo}
-                                        onChange={(e) => setModelo(e.target.value)}
-                                        placeholder="Ex: Corolla"
-                                        className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
-                                    />
-                                </div>
-                            </div>
+                            {usarFipe ? (
+                                <div className="space-y-4 p-6 rounded-3xl bg-zinc-900/30 border border-zinc-800/50">
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Marca</Label>
+                                        <Select value={fipeMarca} onValueChange={setFipeMarca}>
+                                            <SelectTrigger className="bg-zinc-900 border-zinc-800 h-14 rounded-2xl text-white font-bold">
+                                                <SelectValue placeholder="Selecione a marca" />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-zinc-900 border-zinc-800 rounded-2xl max-h-60">
+                                                {marcas.map(m => <SelectItem key={m.codigo} value={m.codigo}>{m.nome}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('plate')}</Label>
-                                    <Input
-                                        value={placa}
-                                        onChange={(e) => setPlaca(e.target.value.toUpperCase())}
-                                        placeholder="ABC-1234"
-                                        className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:border-emerald-500/50 transition-all placeholder:text-zinc-700 uppercase"
-                                    />
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Modelo</Label>
+                                        <Select value={fipeModelo} onValueChange={setFipeModelo} disabled={!fipeMarca || fipeLoading}>
+                                            <SelectTrigger className="bg-zinc-900 border-zinc-800 h-14 rounded-2xl text-white font-bold">
+                                                <SelectValue placeholder="Selecione o modelo" />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-zinc-900 border-zinc-800 rounded-2xl max-h-60">
+                                                {modelos.map(m => <SelectItem key={m.codigo} value={m.codigo.toString()}>{m.nome}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">Ano</Label>
+                                        <Select value={fipeAno} onValueChange={setFipeAno} disabled={!fipeModelo || fipeLoading}>
+                                            <SelectTrigger className="bg-zinc-900 border-zinc-800 h-14 rounded-2xl text-white font-bold">
+                                                <SelectValue placeholder="Selecione o ano" />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-zinc-900 border-zinc-800 rounded-2xl max-h-60">
+                                                {anos.map(a => <SelectItem key={a.codigo} value={a.codigo}>{a.nome}</SelectItem>)}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    {valorFipe && (
+                                        <div className="mt-4 p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-center animate-in fade-in slide-in-from-top-2">
+                                            <p className="text-[10px] font-black uppercase text-emerald-500/70 tracking-widest">Valor FIPE Atual</p>
+                                            <p className="text-2xl font-black text-emerald-400 mt-1">{valorFipe}</p>
+                                        </div>
+                                    )}
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('year')} *</Label>
-                                    <Input
-                                        type="number"
-                                        value={ano}
-                                        onChange={(e) => setAno(e.target.value)}
-                                        placeholder="2024"
-                                        required
-                                        className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
-                                    />
-                                </div>
-                            </div>
+                            ) : (
+                                <>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('brand')}</Label>
+                                            <Input
+                                                value={marca}
+                                                onChange={(e) => setMarca(e.target.value)}
+                                                placeholder="Ex: Toyota"
+                                                className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('model')}</Label>
+                                            <Input
+                                                value={modelo}
+                                                onChange={(e) => setModelo(e.target.value)}
+                                                placeholder="Ex: Corolla"
+                                                className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('plate')}</Label>
+                                            <Input
+                                                value={placa}
+                                                onChange={(e) => setPlaca(e.target.value.toUpperCase())}
+                                                placeholder="ABC-1234"
+                                                className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:border-emerald-500/50 transition-all placeholder:text-zinc-700 uppercase"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('year')} *</Label>
+                                            <Input
+                                                type="number"
+                                                value={ano}
+                                                onChange={(e) => setAno(e.target.value)}
+                                                placeholder="2024"
+                                                required
+                                                className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
+                                            />
+                                        </div>
+                                    </div>
+                                </>
+                            )}
 
                             <div className="space-y-2">
                                 <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('color')}</Label>
@@ -196,16 +327,30 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso, veiculoP
                                 />
                             </div>
 
-                            <div className="space-y-2">
-                                <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{t('initialKM')} *</Label>
-                                <Input
-                                    type="number"
-                                    value={quilometragemInicial}
-                                    onChange={(e) => setQuilometragemInicial(e.target.value)}
-                                    placeholder="0"
-                                    required
-                                    className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
-                                />
+                            <div className={`grid ${veiculoParaEditar ? 'grid-cols-2' : 'grid-cols-1'} gap-4`}>
+                                <div className="space-y-2">
+                                    <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">{veiculoParaEditar ? 'KM Inicial' : t('initialKM')} *</Label>
+                                    <Input
+                                        type="number"
+                                        value={quilometragemInicial}
+                                        onChange={(e) => setQuilometragemInicial(e.target.value)}
+                                        placeholder="0"
+                                        required
+                                        className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
+                                    />
+                                </div>
+                                {veiculoParaEditar && (
+                                    <div className="space-y-2">
+                                        <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1">KM Atual</Label>
+                                        <Input
+                                            type="number"
+                                            value={quilometragemAtual}
+                                            onChange={(e) => setQuilometragemAtual(e.target.value)}
+                                            placeholder="0"
+                                            className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:border-emerald-500/50 transition-all placeholder:text-zinc-700"
+                                        />
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-2">

@@ -54,6 +54,7 @@ export async function PUT(
                 "placa" = COALESCE(${data.placa}, "placa"),
                 "ano" = COALESCE(${data.ano ? parseInt(data.ano) : null}, "ano"),
                 "cor" = COALESCE(${data.cor}, "cor"),
+                "quilometragemInicial" = COALESCE(${data.quilometragemInicial ? parseFloat(data.quilometragemInicial) : null}, "quilometragemInicial"),
                 "quilometragemAtual" = COALESCE(${data.quilometragemAtual ? parseFloat(data.quilometragemAtual) : null}, "quilometragemAtual"),
                 "tipoCombustivel" = COALESCE(${data.tipoCombustivel}, "tipoCombustivel"),
                 "updatedAt" = NOW()

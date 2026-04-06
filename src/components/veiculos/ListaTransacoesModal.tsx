@@ -120,85 +120,85 @@ export default function ListaTransacoesModal({ aberto, veiculoId, onFechar, onEd
     return (
         <Dialog open={aberto} onOpenChange={onFechar}>
             <DialogContent className="bg-zinc-950 border-none sm:max-w-none w-screen h-screen m-0 p-0 rounded-none flex flex-col overflow-hidden max-h-none">
-                {/* Custom Large Header */}
-                <div className="bg-zinc-900/50 border-b border-zinc-800/50 p-6 lg:p-10 shrink-0">
-                    <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                        <div className="space-y-1">
-                            <div className="flex items-center gap-3">
-                                <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                                    <History className="w-6 h-6" />
-                                </div>
-                                <h2 className="text-3xl font-black text-white tracking-tight uppercase italic">{t('transactions.title')}</h2>
-                            </div>
-                            <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] text-[10px] ml-16">Histórico completo e detalhamento de gastos</p>
-                        </div>
-                        
-                        <Button 
-                            variant="outline" 
-                            size="icon" 
-                            onClick={onFechar}
-                            className="absolute top-6 right-6 lg:top-10 lg:right-10 rounded-2xl border-zinc-800 bg-zinc-900 hover:bg-zinc-800 hover:text-white"
-                        >
-                            <X className="w-5 h-5" />
-                        </Button>
-                    </div>
-
-                    {/* Stats Summary Panel */}
-                    {!loading && transacoes.length > 0 && (
-                        <div className="max-w-7xl mx-auto mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <Card className="bg-zinc-900 border-zinc-800/50 overflow-hidden group hover:border-emerald-500/30 transition-all">
-                                <CardContent className="p-5">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                                            <Wallet className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Gasto Total</span>
-                                    </div>
-                                    <div className="text-2xl font-black text-white group-hover:text-emerald-500 transition-colors">{formatarMoeda(stats.TOTAL)}</div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="bg-zinc-900 border-zinc-800/50 overflow-hidden group hover:border-orange-500/30 transition-all">
-                                <CardContent className="p-5">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500 border border-orange-500/20">
-                                            <Fuel className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t('transactions.refuel')}</span>
-                                    </div>
-                                    <div className="text-2xl font-black text-white group-hover:text-orange-500 transition-colors">{formatarMoeda(stats.ABASTECIMENTO)}</div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="bg-zinc-900 border-zinc-800/50 overflow-hidden group hover:border-blue-500/30 transition-all">
-                                <CardContent className="p-5">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20">
-                                            <PenTool className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t('transactions.maintenance')}</span>
-                                    </div>
-                                    <div className="text-2xl font-black text-white group-hover:text-blue-500 transition-colors">{formatarMoeda(stats.MANUTENCAO)}</div>
-                                </CardContent>
-                            </Card>
-
-                            <Card className="bg-zinc-900 border-zinc-800/50 overflow-hidden group hover:border-emerald-500/30 transition-all">
-                                <CardContent className="p-5">
-                                    <div className="flex items-center justify-between mb-3">
-                                        <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                                            <TrendingUp className="w-4 h-4" />
-                                        </div>
-                                        <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t('transactions.investment')}</span>
-                                    </div>
-                                    <div className="text-2xl font-black text-white group-hover:text-emerald-400 transition-colors">{formatarMoeda(stats.INVESTIMENTO)}</div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    )}
-                </div>
-
                 {/* Main Content Area - Scrollable */}
                 <div className="flex-1 overflow-y-auto bg-zinc-950 scroll-container">
+                    {/* Custom Large Header */}
+                    <div className="bg-zinc-900/50 border-b border-zinc-800/50 p-6 lg:p-10 shrink-0">
+                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                        <History className="w-6 h-6" />
+                                    </div>
+                                    <h2 className="text-3xl font-black text-white tracking-tight uppercase italic">{t('transactions.title')}</h2>
+                                </div>
+                                <p className="text-zinc-500 font-bold uppercase tracking-[0.2em] text-[10px] ml-16">Histórico completo e detalhamento de gastos</p>
+                            </div>
+                            
+                            <Button 
+                                variant="outline" 
+                                size="icon" 
+                                onClick={onFechar}
+                                className="absolute top-6 right-6 lg:top-10 lg:right-10 rounded-2xl border-zinc-800 bg-zinc-900 hover:bg-zinc-800 hover:text-white"
+                            >
+                                <X className="w-5 h-5" />
+                            </Button>
+                        </div>
+
+                        {/* Stats Summary Panel */}
+                        {!loading && transacoes.length > 0 && (
+                            <div className="max-w-7xl mx-auto mt-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                <Card className="bg-zinc-900 border-zinc-800/50 overflow-hidden group hover:border-emerald-500/30 transition-all">
+                                    <CardContent className="p-5">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                                <Wallet className="w-4 h-4" />
+                                            </div>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Gasto Total</span>
+                                        </div>
+                                        <div className="text-2xl font-black text-white group-hover:text-emerald-500 transition-colors">{formatarMoeda(stats.TOTAL)}</div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="bg-zinc-900 border-zinc-800/50 overflow-hidden group hover:border-orange-500/30 transition-all">
+                                    <CardContent className="p-5">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="p-2 rounded-lg bg-orange-500/10 text-orange-500 border border-orange-500/20">
+                                                <Fuel className="w-4 h-4" />
+                                            </div>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t('transactions.refuel')}</span>
+                                        </div>
+                                        <div className="text-2xl font-black text-white group-hover:text-orange-500 transition-colors">{formatarMoeda(stats.ABASTECIMENTO)}</div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="bg-zinc-900 border-zinc-800/50 overflow-hidden group hover:border-blue-500/30 transition-all">
+                                    <CardContent className="p-5">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="p-2 rounded-lg bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                                                <PenTool className="w-4 h-4" />
+                                            </div>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t('transactions.maintenance')}</span>
+                                        </div>
+                                        <div className="text-2xl font-black text-white group-hover:text-blue-500 transition-colors">{formatarMoeda(stats.MANUTENCAO)}</div>
+                                    </CardContent>
+                                </Card>
+
+                                <Card className="bg-zinc-900 border-zinc-800/50 overflow-hidden group hover:border-emerald-500/30 transition-all">
+                                    <CardContent className="p-5">
+                                        <div className="flex items-center justify-between mb-3">
+                                            <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                <TrendingUp className="w-4 h-4" />
+                                            </div>
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">{t('transactions.investment')}</span>
+                                        </div>
+                                        <div className="text-2xl font-black text-white group-hover:text-emerald-400 transition-colors">{formatarMoeda(stats.INVESTIMENTO)}</div>
+                                    </CardContent>
+                                </Card>
+                            </div>
+                        )}
+                    </div>
+                    
                     <div className="max-w-7xl mx-auto p-6 lg:p-10">
                         {loading ? (
                             <div className="flex flex-col items-center justify-center py-40">
