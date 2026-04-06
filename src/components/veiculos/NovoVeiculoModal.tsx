@@ -66,7 +66,7 @@ export default function NovoVeiculoModal({ aberto, onFechar, onSucesso, veiculoP
             setQuilometragemInicial(veiculoParaEditar.quilometragemInicial?.toString() || '');
             setQuilometragemAtual(veiculoParaEditar.quilometragemAtual?.toString() || '');
             setTipoCombustivel(veiculoParaEditar.tipoCombustivel || 'FLEX');
-            setValorFipe(veiculoParaEditar.valorFipe || '');
+            setValorFipe(veiculoParaEditar.valorFipe || veiculoParaEditar.valorfipe || '');
         } else if (!veiculoParaEditar && aberto) {
             limparFormulario();
         }
