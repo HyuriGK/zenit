@@ -230,7 +230,7 @@ export default function GestaoSenhas() {
     const [carregando, setCarregando] = useState(true);
     const [salvando, setSalvando] = useState(false);
     const [busca, setBusca] = useState('');
-    const [filtroCategoria, setFiltroCategoria] = useState('');
+    const [filtroCategoria, setFiltroCategoria] = useState('_all');
     const [sheetAberto, setSheetAberto] = useState(false);
     const [senhaParaEditar, setSenhaParaEditar] = useState<Senha | null>(null);
     const [revelarFormSenha, setRevelarFormSenha] = useState(false);
@@ -335,7 +335,7 @@ export default function GestaoSenhas() {
             s.nome.toLowerCase().includes(busca.toLowerCase()) ||
             s.usuario.toLowerCase().includes(busca.toLowerCase()) ||
             (s.url || '').toLowerCase().includes(busca.toLowerCase());
-        const matchCategoria = !filtroCategoria || s.categoria === filtroCategoria;
+        const matchCategoria = filtroCategoria === '_all' || s.categoria === filtroCategoria;
         return matchBusca && matchCategoria;
     });
 
@@ -357,7 +357,7 @@ export default function GestaoSenhas() {
                         <SelectValue placeholder="Todas categorias" />
                     </SelectTrigger>
                     <SelectContent className="bg-zinc-900 border-zinc-800 rounded-xl">
-                        <SelectItem value="" className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">Todas</SelectItem>
+                        <SelectItem value="_all" className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">Todas</SelectItem>
                         {CATEGORIAS.map(c => (
                             <SelectItem key={c.valor} value={c.valor} className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">
                                 {c.emoji} {c.label}
