@@ -39,6 +39,7 @@ model User {
   ativosInvestimento   AtivoInvestimento[]
   veiculos             Veiculo[]
   notificacoes         Notificacao[]
+  senhasArmazenadas    SenhaArmazenada[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -597,6 +598,22 @@ model Notificacao {
   lida      Boolean  @default(false)
   lidaEm    DateTime?
   createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SenhaArmazenada {
+  id        String   @id @default(uuid())
+  nome      String
+  url       String?
+  usuario   String
+  senha     String
+  categoria String?
+  notas     String?
+  cor       String   @default("#059669")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
