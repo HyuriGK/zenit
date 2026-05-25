@@ -1,17 +1,15 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db, initCategoriasPadrao } from '@/lib/dexie';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, TrendingUp, TrendingDown, Target, Plus, Loader2, AlertCircle, ChevronDown, Calendar, ArrowUpRight, ArrowDownRight, CreditCard, Info, DollarSign, Activity, List } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, Target, Plus, Loader2, ChevronDown, Calendar, ArrowUpRight, ArrowDownRight, CreditCard, Info, DollarSign, Activity, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { formatarMoeda } from '@/lib/financeiro-helper';
 import NovaTransacaoModal from '@/components/financeiro/NovaTransacaoModal';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
-import { format, subMonths, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
+import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
   ResponsiveContainer,
@@ -68,11 +66,10 @@ interface DashboardData {
 }
 
 export default function FinanceiroDashboardPage() {
-  // Buscar dados do Dexie
-  const contasData = useLiveQuery(() => db.contasBancarias.toArray(), []);
-  const transacoesData = useLiveQuery(() => db.transacoes.toArray(), []);
-  const categoriasData = useLiveQuery(() => db.categorias.toArray(), []);
-  const objetivosData = useLiveQuery(() => db.objetivosFinanceiros.toArray(), []);
+  const [contasData, setContasData] = useState<any[] | null>(null);
+  const [transacoesData, setTransacoesData] = useState<any[] | null>(null);
+  const [categoriasData, setCategoriasData] = useState<any[] | null>(null);
+  const [objetivosData, setObjetivosData] = useState<any[] | null>(null);
 
   const [modalTransacaoAberto, setModalTransacaoAberto] = useState(false);
   const [indicadores, setIndicadores] = useState<{
@@ -89,27 +86,32 @@ export default function FinanceiroDashboardPage() {
     loading: true
   });
 
-  useEffect(() => {
-    initCategoriasPadrao();
+  const recarregarDados = useCallback(async () => {
+    const [rC, rT, rCat, rO] = await Promise.all([
+      fetch('/api/financeiro/contas').then(r => r.json()),
+      fetch('/api/financeiro/transacoes').then(r => r.json()),
+      fetch('/api/financeiro/categorias').then(r => r.json()),
+      fetch('/api/financeiro/objetivos').then(r => r.json()),
+    ]);
+    setContasData(rC.data || []);
+    setTransacoesData(rT.data || []);
+    setCategoriasData(rCat.data || []);
+    setObjetivosData(rO.data || []);
   }, []);
 
-  // Buscar Indicadores Econômicos (Brapi)
+  useEffect(() => { recarregarDados(); }, [recarregarDados]);
+
   useEffect(() => {
     const fetchIndicadores = async () => {
       try {
         const token = 'u6eKiojA48yU4cMkdLqT8V';
-
-        // 1. Buscar Moedas
         const resMoedas = await fetch(`https://brapi.dev/api/quote/USDBRL=X,EURBRL=X?token=${token}`);
         const dataMoedas = await resMoedas.json();
-
-        // 2. Buscar Índices (SELIC/IPCA)
         const resIndices = await fetch(`https://brapi.dev/api/v2/prime-rate?country=brazil&token=${token}`);
         const dataIndices = await resIndices.json();
 
         const usd = dataMoedas.results?.find((r: any) => r.symbol === 'USDBRL=X')?.regularMarketPrice;
         const eur = dataMoedas.results?.find((r: any) => r.symbol === 'EURBRL=X')?.regularMarketPrice;
-
         const selic = dataIndices['prime-rate']?.find((i: any) => i.name === 'Selic')?.value;
         const ipca = dataIndices['prime-rate']?.find((i: any) => i.name === 'IPCA')?.value;
 
@@ -120,14 +122,12 @@ export default function FinanceiroDashboardPage() {
           ipca: ipca ? `${ipca}%` : 'N/A',
           loading: false
         });
-      } catch (error) {
-        console.error('Erro ao buscar indicadores Brapi:', error);
+      } catch {
         setIndicadores(prev => ({ ...prev, loading: false }));
       }
     };
 
     fetchIndicadores();
-    // Atualizar a cada 1 hora
     const interval = setInterval(fetchIndicadores, 3600000);
     return () => clearInterval(interval);
   }, []);
@@ -140,26 +140,19 @@ export default function FinanceiroDashboardPage() {
     const fimMes = endOfMonth(hoje);
 
     const transacoesMes = transacoesData.filter(t => {
-      const d = t.data instanceof Date ? t.data : new Date(t.data);
+      const d = new Date(t.data);
       return d >= inicioMes && d <= fimMes;
     });
 
     const inicioMesAnterior = startOfMonth(subMonths(hoje, 1));
     const fimMesAnterior = endOfMonth(subMonths(hoje, 1));
     const transacoesMesAnterior = transacoesData.filter(t => {
-      const d = t.data instanceof Date ? t.data : new Date(t.data);
+      const d = new Date(t.data);
       return d >= inicioMesAnterior && d <= fimMesAnterior;
     });
 
-    let receitas = 0;
-    let despesas = 0;
-    let despesasFixas = 0;
-    let despesasVariaveis = 0;
-    let gastoCartao = 0;
-
-    let receitasAnterior = 0;
-    let despesasAnterior = 0;
-
+    let receitas = 0, despesas = 0, despesasFixas = 0, despesasVariaveis = 0, gastoCartao = 0;
+    let receitasAnterior = 0, despesasAnterior = 0;
     const gastosPorCatMap: Record<string, number> = {};
     const receitasPorCatMap: Record<string, number> = {};
 
@@ -167,18 +160,13 @@ export default function FinanceiroDashboardPage() {
       const valor = Number(t.valor);
       if (t.tipo === 'RECEITA') {
         receitas += valor;
-        if (t.categoriaId) {
-          receitasPorCatMap[t.categoriaId] = (receitasPorCatMap[t.categoriaId] || 0) + valor;
-        }
+        if (t.categoriaId) receitasPorCatMap[t.categoriaId] = (receitasPorCatMap[t.categoriaId] || 0) + valor;
       } else {
         despesas += valor;
         if (t.isFixa) despesasFixas += valor;
         else despesasVariaveis += valor;
         if (t.cartaoId) gastoCartao += valor;
-
-        if (t.categoriaId) {
-          gastosPorCatMap[t.categoriaId] = (gastosPorCatMap[t.categoriaId] || 0) + valor;
-        }
+        if (t.categoriaId) gastosPorCatMap[t.categoriaId] = (gastosPorCatMap[t.categoriaId] || 0) + valor;
       }
     });
 
@@ -200,15 +188,14 @@ export default function FinanceiroDashboardPage() {
 
     const em7Dias = new Date(hoje.getTime() + 7 * 24 * 60 * 60 * 1000);
     const proximas = transacoesData.filter(t => {
-      const d = t.data instanceof Date ? t.data : new Date(t.data);
+      const d = new Date(t.data);
       return d > hoje && d <= em7Dias && t.tipo === 'DESPESA' && !t.paga;
     }).sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
 
     const diasMes = fimMes.getDate();
     const fluxoCaixa = Array.from({ length: diasMes }, (_, i) => {
       const dia = i + 1;
-      let rDia = 0;
-      let dDia = 0;
+      let rDia = 0, dDia = 0;
       transacoesMes.forEach(t => {
         if (new Date(t.data).getDate() === dia) {
           if (t.tipo === 'RECEITA') rDia += Number(t.valor);
@@ -218,9 +205,9 @@ export default function FinanceiroDashboardPage() {
       return { dia: String(dia), receita: rDia, despesa: dDia };
     });
 
-    const parseCategorias = (map: Record<string, number>, totalBase: number) => {
-      return Object.keys(map).map(catId => {
-        const cat = categoriasData.find(c => c.id === catId);
+    const parseCategorias = (map: Record<string, number>, totalBase: number) =>
+      Object.keys(map).map(catId => {
+        const cat = categoriasData.find((c: any) => c.id === catId);
         const total = map[catId];
         return {
           categoriaId: catId,
@@ -230,19 +217,10 @@ export default function FinanceiroDashboardPage() {
           porcentagem: totalBase > 0 ? (total / totalBase) * 100 : 0
         };
       }).sort((a, b) => b.total - a.total);
-    };
 
     return {
       mes: format(hoje, 'MMMM yyyy', { locale: ptBR }),
-      resumoMensal: {
-        receitas,
-        despesas,
-        saldo: receitas - despesas,
-        despesasFixas,
-        despesasVariaveis,
-        sobra: receitas - despesasFixas,
-        gastoCartao
-      },
+      resumoMensal: { receitas, despesas, saldo: receitas - despesas, despesasFixas, despesasVariaveis, sobra: receitas - despesasFixas, gastoCartao },
       gastosPorCategoria: parseCategorias(gastosPorCatMap, despesas),
       receitasPorCategoria: parseCategorias(receitasPorCatMap, receitas),
       comparativo: {
@@ -252,32 +230,25 @@ export default function FinanceiroDashboardPage() {
       saudeFinanceira: { score, status: statusSaude },
       proximos7Dias: proximas,
       fluxoCaixa,
-      totalObjetivos: objetivosData.reduce((acc, o) => acc + Number(o.valorAtual), 0),
+      totalObjetivos: objetivosData.reduce((acc: number, o: any) => acc + Number(o.valorAtual), 0),
       saldoContas: receitas - despesas,
-      saldoLivre: (receitas - despesas) - objetivosData.reduce((acc, o) => acc + Number(o.valorAtual), 0)
+      saldoLivre: (receitas - despesas) - objetivosData.reduce((acc: number, o: any) => acc + Number(o.valorAtual), 0)
     };
   }, [contasData, transacoesData, categoriasData, objetivosData]);
 
   const loading = !dashboard;
 
   if (loading) {
-    return (
-      <LoadingScreen message="Carregando módulo financeiro..." />
-    );
+    return <LoadingScreen message="Carregando módulo financeiro..." />;
   }
 
   return (
     <div className="flex flex-col space-y-6 p-4 lg:p-6 overflow-hidden">
-      {/* Header */}
-      <PageHeader 
+      <PageHeader
         title="Painel Financeiro"
         description={`Acompanhe seu desempenho em ${dashboard.mes}`}
         action={
-          <Button
-            asChild
-            variant="outline"
-            className="rounded-xl font-bold uppercase tracking-widest text-[10px]"
-          >
+          <Button asChild variant="outline" className="rounded-xl font-bold uppercase tracking-widest text-[10px]">
             <Link href="/dashboard/financeiro/transacoes">
               <List className="w-4 h-4 mr-2" />
               Registros
@@ -286,7 +257,6 @@ export default function FinanceiroDashboardPage() {
         }
       />
 
-      {/* KPIs Minimalistas */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="border border-zinc-800/50">
           <CardContent className="p-6">
@@ -319,7 +289,6 @@ export default function FinanceiroDashboardPage() {
         </Card>
       </div>
 
-      {/* Row 1: Gastos e Receitas por Categoria */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="border border-zinc-800/50 overflow-hidden">
           <CardHeader className="flex flex-row items-center justify-between py-4 px-6 border-b border-zinc-800/50">
@@ -330,9 +299,7 @@ export default function FinanceiroDashboardPage() {
           </CardHeader>
           <CardContent className="p-6">
             {dashboard.gastosPorCategoria.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-zinc-600 italic text-sm">
-                Nenhum gasto este mês.
-              </div>
+              <div className="flex flex-col items-center justify-center py-12 text-zinc-600 italic text-sm">Nenhum gasto este mês.</div>
             ) : (
               <div className="space-y-4">
                 {dashboard.gastosPorCategoria.slice(0, 5).map((cat) => (
@@ -360,9 +327,7 @@ export default function FinanceiroDashboardPage() {
           </CardHeader>
           <CardContent className="p-6">
             {dashboard.receitasPorCategoria.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-zinc-600 italic text-sm">
-                Nenhuma receita este mês.
-              </div>
+              <div className="flex flex-col items-center justify-center py-12 text-zinc-600 italic text-sm">Nenhuma receita este mês.</div>
             ) : (
               <div className="space-y-4">
                 {dashboard.receitasPorCategoria.slice(0, 5).map((cat) => (
@@ -382,7 +347,6 @@ export default function FinanceiroDashboardPage() {
         </Card>
       </div>
 
-      {/* Row 2: Balanço e Meus Cartões */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader className="py-4 px-6 border-b border-zinc-800/50">
@@ -440,9 +404,7 @@ export default function FinanceiroDashboardPage() {
         </Card>
       </div>
 
-      {/* Row 3: Saúde, Próximos 7 Dias e Comparativo */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Saúde Financeira */}
         <Card className="p-6">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-2 text-[10px] font-black text-zinc-100 uppercase tracking-[0.2em]">
@@ -454,13 +416,7 @@ export default function FinanceiroDashboardPage() {
             <div className="relative w-24 h-24 flex items-center justify-center">
               <svg className="w-full h-full transform -rotate-90">
                 <circle cx="48" cy="48" r="40" fill="none" stroke="currentColor" strokeWidth="8" className="text-zinc-800/50" />
-                <circle
-                  cx="48"
-                  cy="48"
-                  r="40"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="8"
+                <circle cx="48" cy="48" r="40" fill="none" stroke="currentColor" strokeWidth="8"
                   strokeDasharray={`${2.5 * dashboard.saudeFinanceira.score} 251`}
                   className={dashboard.saudeFinanceira.status === 'EXCELENTE' ? 'text-emerald-500' : 'text-red-500'}
                 />
@@ -481,7 +437,6 @@ export default function FinanceiroDashboardPage() {
           </div>
         </Card>
 
-        {/* Próximos 7 Dias */}
         <Card className="p-6 flex flex-col items-center justify-center text-center">
           <div className="flex items-center gap-2 text-[10px] font-black text-zinc-100 uppercase tracking-[0.2em] self-start mb-auto">
             <Calendar className="w-4 h-4 text-zinc-500" /> Próximos 7 Dias
@@ -512,7 +467,6 @@ export default function FinanceiroDashboardPage() {
           </Button>
         </Card>
 
-        {/* Comparativo Mensal */}
         <Card className="p-6">
           <div className="flex items-center gap-2 text-[10px] font-black text-zinc-100 uppercase tracking-[0.2em] mb-8">
             <TrendingUp className="w-4 h-4 text-emerald-500" /> Comparativo Mensal
@@ -538,7 +492,6 @@ export default function FinanceiroDashboardPage() {
         </Card>
       </div>
 
-      {/* Row 4: Fluxo de Caixa Diário */}
       <Card>
         <CardHeader className="py-6 px-6 border-b border-zinc-800/50">
           <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Fluxo de Caixa Diário — {dashboard.mes}</CardTitle>
@@ -566,7 +519,6 @@ export default function FinanceiroDashboardPage() {
         </CardContent>
       </Card>
 
-      {/* Row 5: Indicadores Econômicos */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
         <Card className="p-5">
           <div className="flex items-center gap-4">
@@ -614,12 +566,11 @@ export default function FinanceiroDashboardPage() {
         </Card>
       </div>
 
-      {/* Modal de Nova Transação */}
       <NovaTransacaoModal
         aberto={modalTransacaoAberto}
         onFechar={() => setModalTransacaoAberto(false)}
-        onSucesso={() => { }}
+        onSucesso={recarregarDados}
       />
-    </div >
+    </div>
   );
 }

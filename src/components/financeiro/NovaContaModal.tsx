@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Loader2 } from 'lucide-react';
-import { db } from '@/lib/dexie';
+import { toast } from 'sonner';
 
 interface NovaContaModalProps {
   aberto: boolean;
@@ -59,14 +59,19 @@ export default function NovaContaModal({ aberto, onFechar, onSucesso }: NovaCont
         updatedAt: new Date(),
       };
 
-      await db.contasBancarias.add(novaConta);
-
+      const res = await fetch('/api/financeiro/contas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novaConta),
+      });
+      if (!res.ok) throw new Error('Falha ao criar conta');
+      toast.success('Conta criada com sucesso!');
       limparFormulario();
       onSucesso();
       onFechar();
     } catch (error) {
       console.error('Erro:', error);
-      alert('Erro ao criar conta');
+      toast.error('Erro ao criar conta.');
     } finally {
       setCarregando(false);
     }

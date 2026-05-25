@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Loader2, TrendingUp, TrendingDown } from 'lucide-react';
-import { db } from '@/lib/dexie';
+import { toast } from 'sonner';
 
 interface NovaCategoriaModalProps {
   aberto: boolean;
@@ -53,14 +53,19 @@ export default function NovaCategoriaModal({ aberto, onFechar, onSucesso }: Nova
         updatedAt: new Date(),
       };
 
-      await db.categorias.add(novaCategoria);
-
+      const res = await fetch('/api/financeiro/categorias', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novaCategoria),
+      });
+      if (!res.ok) throw new Error('Falha ao criar categoria');
+      toast.success('Categoria criada com sucesso!');
       limparFormulario();
       onSucesso();
       onFechar();
     } catch (error) {
       console.error('Erro:', error);
-      alert('Erro ao criar categoria');
+      toast.error('Erro ao criar categoria.');
     } finally {
       setCarregando(false);
     }

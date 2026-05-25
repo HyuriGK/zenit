@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2 } from 'lucide-react';
-import { db } from '@/lib/dexie';
+import { toast } from 'sonner';
 
 interface NovoCartaoModalProps {
   aberto: boolean;
@@ -55,14 +55,19 @@ export default function NovoCartaoModal({ aberto, onFechar, onSucesso }: NovoCar
         updatedAt: new Date(),
       };
 
-      await db.cartoes.add(novoCartao);
-
+      const res = await fetch('/api/financeiro/cartoes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novoCartao),
+      });
+      if (!res.ok) throw new Error('Falha ao criar cartão');
+      toast.success('Cartão criado com sucesso!');
       limparFormulario();
       onSucesso();
       onFechar();
     } catch (error) {
       console.error('Erro:', error);
-      alert('Erro ao criar cartão');
+      toast.error('Erro ao criar cartão.');
     } finally {
       setCarregando(false);
     }

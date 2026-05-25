@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useLiveQuery } from 'dexie-react-hooks';
-import { db } from '@/lib/dexie';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +14,7 @@ import {
 } from '@/components/ui/select';
 import { Loader2, Target, TrendingUp } from 'lucide-react';
 import { formatarMoeda } from '@/lib/financeiro-helper';
+import { toast } from 'sonner';
 
 interface ContribuirObjetivoModalProps {
   aberto: boolean;
@@ -31,98 +30,45 @@ interface ContribuirObjetivoModalProps {
   } | null;
 }
 
-interface Conta {
-  id: string;
-  nome: string;
-}
-
-export default function ContribuirObjetivoModal({
-  aberto,
-  onFechar,
-  onSucesso,
-  objetivo
-}: ContribuirObjetivoModalProps) {
+export default function ContribuirObjetivoModal({ aberto, onFechar, onSucesso, objetivo }: ContribuirObjetivoModalProps) {
   const [carregando, setCarregando] = useState(false);
   const [valor, setValor] = useState('');
   const [descricao, setDescricao] = useState('');
   const [contaBancariaId, setContaBancariaId] = useState('');
-  // Use LiveQuery instead of fetch for accounts
-  const contasData = useLiveQuery(() => db.contasBancarias.toArray(), []);
-  const contas = contasData || [];
+  const [contas, setContas] = useState<{ id: string; nome: string }[]>([]);
 
-  useState(() => {
+  useEffect(() => {
     if (aberto) {
       setDescricao(objetivo ? `Contribuição para ${objetivo.nome}` : '');
+      fetch('/api/financeiro/contas')
+        .then(r => r.json())
+        .then(j => setContas(j.data || []));
     }
-  });
+  }, [aberto, objetivo]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!objetivo) return;
-
     setCarregando(true);
-
+    const t = toast.loading('Registrando contribuição...');
     try {
-      const valorNumerico = parseFloat(valor.replace(',', '.'));
-
-      // Update Goal Balance
-      const obj = await db.objetivosFinanceiros.get(objetivo.id);
-      if (obj) {
-        const newValor = Number(obj.valorAtual) + valorNumerico;
-        const isConcluido = newValor >= Number(obj.valorMeta);
-
-        await db.objetivosFinanceiros.update(objetivo.id, {
-          valorAtual: newValor,
-          status: isConcluido ? 'CONCLUIDO' : 'EM_ANDAMENTO',
-          updatedAt: new Date()
-        });
-
-        // Register Transaction (Expense)
-        await db.transacoes.add({
-          id: crypto.randomUUID(),
-          descricao,
-          valor: valorNumerico,
-          data: new Date(),
-          tipo: 'DESPESA',
-          isFixa: false,
-          isParcela: false,
-          contaBancariaId: contaBancariaId || contas[0]?.id || 'offline-account',
-          objetivoId: objetivo.id,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-
-        // Deduct from Account Balance
-        if (contaBancariaId && contaBancariaId !== 'caixa-geral') {
-          const conta = await db.contasBancarias.get(contaBancariaId);
-          if (conta) {
-            await db.contasBancarias.update(contaBancariaId, {
-              saldoAtual: Number(conta.saldoAtual) - valorNumerico,
-              updatedAt: new Date(),
-            });
-          }
-        }
-
-        limparFormulario();
-        onSucesso();
-        onFechar();
-
-        if (isConcluido) {
-          alert(`🎉 Parabéns! Objetivo "${objetivo.nome}" concluído!`);
-        }
-      }
+      const res = await fetch(`/api/financeiro/objetivos/${objetivo.id}/contribuir`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ valor: parseFloat(valor.replace(',', '.')), descricao, contaBancariaId }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Erro');
+      toast.success('Contribuição registrada!', { id: t });
+      if (json.concluido) toast.success(`🎉 Objetivo "${objetivo.nome}" concluído!`);
+      setValor(''); setDescricao(''); setContaBancariaId('');
+      onSucesso();
+      onFechar();
     } catch (error) {
-      console.error('Erro:', error);
-      alert('Erro ao contribuir');
+      toast.error('Erro ao contribuir.', { id: t });
     } finally {
       setCarregando(false);
     }
-  };
-
-  const limparFormulario = () => {
-    setValor('');
-    setDescricao('');
-    setContaBancariaId('');
   };
 
   if (!objetivo) return null;
@@ -143,30 +89,15 @@ export default function ContribuirObjetivoModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Informações do Objetivo */}
-          <div
-            className="p-4 rounded-lg border"
-            style={{
-              backgroundColor: `${objetivo.cor}10`,
-              borderColor: `${objetivo.cor}30`
-            }}
-          >
+          <div className="p-4 rounded-lg border" style={{ backgroundColor: `${objetivo.cor}10`, borderColor: `${objetivo.cor}30` }}>
             <h3 className="font-semibold text-white mb-2">{objetivo.nome}</h3>
             <div className="space-y-1 text-sm">
               <div className="flex justify-between text-zinc-400">
                 <span>Progresso atual:</span>
-                <span className="font-medium text-white">
-                  {formatarMoeda(objetivo.valorAtual)} de {formatarMoeda(objetivo.valorMeta)}
-                </span>
+                <span className="font-medium text-white">{formatarMoeda(objetivo.valorAtual)} de {formatarMoeda(objetivo.valorMeta)}</span>
               </div>
               <div className="w-full bg-zinc-800 rounded-full h-2 mt-2">
-                <div
-                  className="h-2 rounded-full transition-all"
-                  style={{
-                    width: `${porcentagemAtual}%`,
-                    backgroundColor: objetivo.cor
-                  }}
-                />
+                <div className="h-2 rounded-full transition-all" style={{ width: `${porcentagemAtual}%`, backgroundColor: objetivo.cor }} />
               </div>
               <div className="flex justify-between text-zinc-500 text-xs mt-1">
                 <span>{Math.round(porcentagemAtual)}%</span>
@@ -175,18 +106,9 @@ export default function ContribuirObjetivoModal({
             </div>
           </div>
 
-          {/* Valor */}
           <div>
             <Label className="text-zinc-300">Valor a Contribuir *</Label>
-            <Input
-              type="number"
-              step="0.01"
-              value={valor}
-              onChange={(e) => setValor(e.target.value)}
-              placeholder="0,00"
-              required
-              className="bg-zinc-900/50 border-zinc-800 text-white text-lg font-semibold"
-            />
+            <Input type="number" step="0.01" value={valor} onChange={(e) => setValor(e.target.value)} placeholder="0,00" required className="bg-zinc-900/50 border-zinc-800 text-white text-lg font-semibold" />
             {valorNumerico > 0 && (
               <div className="mt-2 p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
                 <div className="flex items-center gap-2 text-sm mb-2">
@@ -195,43 +117,22 @@ export default function ContribuirObjetivoModal({
                 </div>
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-zinc-400 text-sm">Novo total:</span>
-                  <span className="font-semibold text-white">
-                    {formatarMoeda(novoTotal)}
-                  </span>
+                  <span className="font-semibold text-white">{formatarMoeda(novoTotal)}</span>
                 </div>
                 <div className="w-full bg-zinc-800 rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full transition-all"
-                    style={{
-                      width: `${Math.min(novaPorcentagem, 100)}%`,
-                      backgroundColor: objetivo.cor
-                    }}
-                  />
+                  <div className="h-2 rounded-full transition-all" style={{ width: `${Math.min(novaPorcentagem, 100)}%`, backgroundColor: objetivo.cor }} />
                 </div>
-                <div className="text-xs text-zinc-500 mt-1">
-                  {Math.round(novaPorcentagem)}% da meta
-                </div>
-                {novoTotal >= objetivo.valorMeta && (
-                  <div className="mt-2 text-sm text-green-400 font-semibold">
-                    🎉 Objetivo será concluído!
-                  </div>
-                )}
+                <div className="text-xs text-zinc-500 mt-1">{Math.round(novaPorcentagem)}% da meta</div>
+                {novoTotal >= objetivo.valorMeta && <div className="mt-2 text-sm text-green-400 font-semibold">🎉 Objetivo será concluído!</div>}
               </div>
             )}
           </div>
 
-          {/* Descrição */}
           <div>
             <Label className="text-zinc-300">Descrição</Label>
-            <Input
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              placeholder="Ex: Contribuição mensal"
-              className="bg-zinc-900/50 border-zinc-800 text-white"
-            />
+            <Input value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Ex: Contribuição mensal" className="bg-zinc-900/50 border-zinc-800 text-white" />
           </div>
 
-          {/* Conta */}
           <div>
             <Label className="text-zinc-300">Conta para Débito</Label>
             <Select value={contaBancariaId} onValueChange={setContaBancariaId}>
@@ -239,46 +140,18 @@ export default function ContribuirObjetivoModal({
                 <SelectValue placeholder="Selecionar conta (opcional)" />
               </SelectTrigger>
               <SelectContent className="bg-zinc-900 border-zinc-800">
-                <SelectItem value="caixa-geral" className="text-white hover:bg-zinc-800">
-                  🏦 Caixa Geral
-                </SelectItem>
+                <SelectItem value="caixa-geral" className="text-white hover:bg-zinc-800">🏦 Caixa Geral</SelectItem>
                 {contas.map((conta) => (
-                  <SelectItem key={conta.id} value={conta.id} className="text-white hover:bg-zinc-800">
-                    {conta.nome}
-                  </SelectItem>
+                  <SelectItem key={conta.id} value={conta.id} className="text-white hover:bg-zinc-800">{conta.nome}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {/* Botões */}
           <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="default"
-              onClick={onFechar}
-              className="flex-1 border-zinc-800 hover:bg-zinc-800"
-              disabled={carregando}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={carregando || !valor || parseFloat(valor) <= 0}
-              className="flex-1"
-              style={{
-                backgroundColor: objetivo.cor,
-                opacity: (!valor || parseFloat(valor) <= 0) ? 0.5 : 1
-              }}
-            >
-              {carregando ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Salvando...
-                </>
-              ) : (
-                'Contribuir'
-              )}
+            <Button type="button" variant="default" onClick={onFechar} className="flex-1 border-zinc-800 hover:bg-zinc-800" disabled={carregando}>Cancelar</Button>
+            <Button type="submit" disabled={carregando || !valor || parseFloat(valor) <= 0} className="flex-1" style={{ backgroundColor: objetivo.cor, opacity: (!valor || parseFloat(valor) <= 0) ? 0.5 : 1 }}>
+              {carregando ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Salvando...</> : 'Contribuir'}
             </Button>
           </div>
         </form>

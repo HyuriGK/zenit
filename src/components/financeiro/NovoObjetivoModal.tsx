@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { Loader2, Target, Shield } from 'lucide-react';
-import { db } from '@/lib/dexie';
+import { toast } from 'sonner';
 
 interface NovoObjetivoModalProps {
   aberto: boolean;
@@ -57,14 +57,19 @@ export default function NovoObjetivoModal({ aberto, onFechar, onSucesso }: NovoO
         updatedAt: new Date(),
       };
 
-      await db.objetivosFinanceiros.add(novoObjetivo);
-
+      const res = await fetch('/api/financeiro/objetivos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(novoObjetivo),
+      });
+      if (!res.ok) throw new Error('Falha ao criar objetivo');
+      toast.success('Objetivo criado com sucesso!');
       limparFormulario();
       onSucesso();
       onFechar();
     } catch (error) {
       console.error('Erro:', error);
-      alert('Erro ao criar objetivo');
+      toast.error('Erro ao criar objetivo.');
     } finally {
       setCarregando(false);
     }
