@@ -17,6 +17,28 @@ import {
 import { TrendingUp, TrendingDown, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
+// Formata uma data como YYYY-MM-DD usando o fuso LOCAL (toISOString() desloca o dia entre fusos)
+function formatLocalDate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+// Data padrão do formulário: dia de hoje quando o mês visualizado é o mês atual,
+// caso contrário o 1º dia do mês selecionado (para registrar em qualquer mês).
+function computeDefaultDateStr(dataReferencia?: Date): string {
+  const today = new Date();
+  if (
+    dataReferencia &&
+    (dataReferencia.getMonth() !== today.getMonth() ||
+      dataReferencia.getFullYear() !== today.getFullYear())
+  ) {
+    return formatLocalDate(dataReferencia);
+  }
+  return formatLocalDate(today);
+}
+
 interface NovaTransacaoModalProps {
   aberto: boolean;
   onFechar: () => void;
@@ -30,14 +52,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
   const [tipo, setTipo] = useState<'RECEITA' | 'DESPESA'>('DESPESA');
   const [descricao, setDescricao] = useState('');
   const [valor, setValor] = useState('');
-  const [data, setData] = useState(() => {
-    const today = new Date();
-    const defaultDate = dataReferencia ? new Date(dataReferencia) : today;
-    if (dataReferencia && dataReferencia.getMonth() === today.getMonth() && dataReferencia.getFullYear() === today.getFullYear()) {
-      return today.toISOString().split('T')[0];
-    }
-    return defaultDate.toISOString().split('T')[0];
-  });
+  const [data, setData] = useState(() => computeDefaultDateStr(dataReferencia));
   const [observacoes, setObservacoes] = useState('');
   const [categoriaId, setCategoriaId] = useState('');
   const [contaBancariaId, setContaBancariaId] = useState('');
@@ -64,7 +79,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
       setTipo(transacaoParaEditar.tipo);
       setDescricao(transacaoParaEditar.descricao);
       setValor(String(transacaoParaEditar.valor));
-      setData(new Date(transacaoParaEditar.data).toISOString().split('T')[0]);
+      setData(formatLocalDate(new Date(transacaoParaEditar.data)));
       setObservacoes(transacaoParaEditar.observacoes || '');
       setCategoriaId(transacaoParaEditar.categoriaId || '');
       setContaBancariaId(transacaoParaEditar.contaBancariaId || 'caixa-geral');
@@ -77,6 +92,15 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
       limparFormulario();
     }
   }, [aberto, transacaoParaEditar]);
+
+  // Garante que, ao abrir um NOVO registro, a data acompanhe o mês que está sendo
+  // visualizado (dataReferencia). Sem dataReferencia nas dependências, o campo podia
+  // ficar preso no mês atual, fazendo a transação cair sempre no mês vigente.
+  useEffect(() => {
+    if (aberto && !transacaoParaEditar) {
+      setData(computeDefaultDateStr(dataReferencia));
+    }
+  }, [aberto, dataReferencia, transacaoParaEditar]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -214,13 +238,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
   const limparFormulario = () => {
     setDescricao('');
     setValor('');
-    const today = new Date();
-    const defaultDate = dataReferencia ? new Date(dataReferencia) : today;
-    let dateStr = defaultDate.toISOString().split('T')[0];
-    if (dataReferencia && dataReferencia.getMonth() === today.getMonth() && dataReferencia.getFullYear() === today.getFullYear()) {
-      dateStr = today.toISOString().split('T')[0];
-    }
-    setData(dateStr);
+    setData(computeDefaultDateStr(dataReferencia));
     setObservacoes('');
     setCategoriaId('');
     setContaBancariaId('');
@@ -231,6 +249,13 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
   };
 
   const categoriasDoTipo = categorias.filter(c => c.tipo === tipo);
+
+  // Mês em que a transação será registrada (a partir da data escolhida)
+  const mesRegistroLabel = (() => {
+    const [y, m] = data.split('-').map(Number);
+    if (!y || !m) return '';
+    return new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+  })();
 
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
@@ -278,6 +303,11 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   <div>
                     <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Data da Operação</Label>
                     <Input type="date" value={data} onChange={(e) => setData(e.target.value)} required className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl focus-visible:ring-0 transition-all" />
+                    {mesRegistroLabel && (
+                      <p className="text-[10px] font-bold text-zinc-500 mt-1.5">
+                        Registrando em <span className="text-emerald-400 capitalize">{mesRegistroLabel}</span>
+                      </p>
+                    )}
                   </div>
                 </div>
 
