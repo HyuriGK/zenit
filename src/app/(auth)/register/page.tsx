@@ -73,7 +73,7 @@ export default function RegisterPage() {
                         </div>
                         <div className="p-6 bg-zinc-900/40 rounded-3xl border border-zinc-800/50 backdrop-blur-sm group hover:border-blue-500/30 transition-all">
                             <Clock className="w-10 h-10 text-blue-400 mb-4 group-hover:scale-110 transition-transform" />
-                            <h3 className="font-bold text-lg mb-1">Hábito de Vencer</h3>
+                            <h3 className="font-bold text-lg mb-1">Foco para Vencer</h3>
                             <p className="text-zinc-500 text-sm leading-relaxed">Construa rotinas sólidas que te levam ao sucesso diariamente.</p>
                         </div>
                     </div>

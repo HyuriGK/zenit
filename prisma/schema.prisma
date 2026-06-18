@@ -32,8 +32,6 @@ model User {
   transacoes           Transacao[]
   objetivosFinanceiros ObjetivoFinanceiro[]
   viagens              Viagem[]
-  habitos              Habito[]
-  categoriasHabito     CategoriaHabito[]
   cursos               Curso[]
   ativosInvestimento   AtivoInvestimento[]
   veiculos             Veiculo[]
@@ -386,58 +384,6 @@ model TransporteViagem {
   viagem   Viagem @relation(fields: [viagemId], references: [id], onDelete: Cascade)
 }
 
-model Habito {
-  id              String   @id @default(uuid())
-  nome            String
-  descricao       String?
-  icone           String
-  cor             String
-  frequencia      String   // DIARIA, SEMANAL, MENSAL
-  diasSemana      Int[]    @default([])
-  metaVezes       Int?
-  periodoDia      String?  // MANHA, TARDE, NOITE, QUALQUER
-  status          String   // ATIVO, PAUSADO, CONCLUIDO, ABANDONADO
-  dataInicio      DateTime @db.Date
-  sequenciaAtual  Int      @default(0)
-  melhorSequencia Int      @default(0)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  userId          String
-  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  categoriaId     String?
-  categoria       CategoriaHabito? @relation(fields: [categoriaId], references: [id])
-  registros       RegistroHabito[]
-}
-
-model CategoriaHabito {
-  id        String   @id @default(uuid())
-  nome      String
-  cor       String
-  icone     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  habitos   Habito[]
-}
-
-model RegistroHabito {
-  id         String   @id @default(uuid())
-  data       DateTime @db.Date
-  concluido  Boolean  @default(false)
-  notas      String?
-  quantidade Int?
-  humor      Int?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  habitoId   String
-  habito     Habito   @relation(fields: [habitoId], references: [id], onDelete: Cascade)
-}
-
 model Curso {
   id        String   @id @default(uuid())
   nome      String
@@ -544,7 +490,7 @@ model TransacaoVeiculo {
 
 model Notificacao {
   id        String   @id @default(uuid())
-  tipo      String   // LEMRETE_HABITO, RESUMO_DIARIO, SEQUENCIA_RISCO, CONQUISTA, SISTEMA
+  tipo      String   // CONQUISTA, SISTEMA
   titulo    String
   mensagem  String
   dados     Json?

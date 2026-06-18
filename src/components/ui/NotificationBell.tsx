@@ -7,9 +7,6 @@ import { useNotifications } from '@/contexts/NotificationContext';
 import {
   Bell,
   CheckCheck,
-  Flame,
-  Calendar,
-  AlertTriangle,
   Award,
   Info,
   Loader2,
@@ -19,21 +16,6 @@ import { ptBR } from 'date-fns/locale';
 
 // Mapeamento de ícones por tipo de notificação
 const TIPO_CONFIG = {
-  LEMBRETE_HABITO: {
-    icon: Bell,
-    bgColor: 'bg-blue-500/20',
-    iconColor: 'text-blue-400',
-  },
-  RESUMO_DIARIO: {
-    icon: Calendar,
-    bgColor: 'bg-green-500/20',
-    iconColor: 'text-green-400',
-  },
-  SEQUENCIA_RISCO: {
-    icon: AlertTriangle,
-    bgColor: 'bg-orange-500/20',
-    iconColor: 'text-orange-400',
-  },
   CONQUISTA: {
     icon: Award,
     bgColor: 'bg-green-500/20',

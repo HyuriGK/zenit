@@ -122,8 +122,8 @@ export default function LandingPage() {
     },
     {
       icon: Target,
-      title: "Metas e Hábitos",
-      description: "Defina objetivos SMART e construa hábitos duradouros.",
+      title: "Metas Pessoais",
+      description: "Defina objetivos SMART e acompanhe sua evolução.",
       gradient: "from-rose-500 to-teal-400",
       bgGradient: "from-rose-500/10 to-teal-400/10",
       comingSoon: true,
@@ -152,7 +152,7 @@ export default function LandingPage() {
     {
       icon: Brain,
       title: "Insights Inteligentes",
-      description: "Análises personalizadas baseadas nos seus hábitos e padrões.",
+      description: "Análises personalizadas baseadas nos seus dados e padrões.",
     },
     {
       icon: Layers,

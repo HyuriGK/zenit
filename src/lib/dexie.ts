@@ -252,46 +252,6 @@ export interface TransporteViagem {
     updatedAt: Date;
 }
 
-export interface Habito {
-    id: string;
-    nome: string;
-    descricao?: string;
-    icone: string;
-    cor: string;
-    frequencia: 'DIARIA' | 'SEMANAL' | 'MENSAL';
-    diasSemana?: number[];
-    metaVezes?: number;
-    periodoDia?: 'MANHA' | 'TARDE' | 'NOITE' | 'QUALQUER';
-    status: 'ATIVO' | 'PAUSADO' | 'CONCLUIDO' | 'ABANDONADO';
-    categoriaId?: string;
-    dataInicio: Date;
-    sequenciaAtual: number;
-    melhorSequencia: number;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface RegistroHabito {
-    id: string;
-    data: Date;
-    concluido: boolean;
-    notas?: string;
-    quantidade?: number;
-    humor?: number;
-    habitoId: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface CategoriaHabito {
-    id: string;
-    nome: string;
-    cor: string;
-    icone: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
 export interface Curso {
     id: string;
     nome: string;
@@ -356,9 +316,6 @@ export class ZenitDB extends Dexie {
     atividadesViagem!: Table<AtividadeViagem, string>;
     hospedagensViagem!: Table<HospedagemViagem, string>;
     transportesViagem!: Table<TransporteViagem, string>;
-    habitos!: Table<Habito, string>;
-    registrosHabitos!: Table<RegistroHabito, string>;
-    categoriasHabito!: Table<CategoriaHabito, string>;
     cursos!: Table<Curso, string>;
     modulos!: Table<Modulo, string>;
     anotacoes!: Table<Anotacao, string>;
@@ -366,7 +323,7 @@ export class ZenitDB extends Dexie {
 
     constructor() {
         super('ZenitDB');
-        this.version(5).stores({
+        this.version(6).stores({
             users: 'id',
             compromissos: 'id, data, recorrenciaGrupoId',
             atividades: 'id, createdAt',
@@ -381,9 +338,9 @@ export class ZenitDB extends Dexie {
             atividadesViagem: 'id, viagemId, data',
             hospedagensViagem: 'id, viagemId, checkIn',
             transportesViagem: 'id, viagemId, dataHora',
-            habitos: 'id, status',
-            registrosHabitos: 'id, habitoId, data',
-            categoriasHabito: 'id',
+            habitos: null,
+            registrosHabitos: null,
+            categoriasHabito: null,
             midias: null,
             citacoes: null,
             cursos: 'id',

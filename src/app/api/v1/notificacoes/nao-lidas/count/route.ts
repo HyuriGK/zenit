@@ -13,7 +13,9 @@ export async function GET() {
 
         const count = await sql`
             SELECT COUNT(*) FROM "Notificacao"
-            WHERE "userId" = ${session.user.id} AND lida = FALSE
+            WHERE "userId" = ${session.user.id}
+              AND lida = FALSE
+              AND tipo IN ('CONQUISTA', 'SISTEMA')
         `;
 
         return NextResponse.json({ count: parseInt(count[0].count) });

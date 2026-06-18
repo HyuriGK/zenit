@@ -18,6 +18,7 @@ export async function GET(request: Request) {
             SELECT id, tipo, titulo, mensagem, dados, lida, "lidaEm", "createdAt"
             FROM "Notificacao"
             WHERE "userId" = ${session.user.id}
+              AND tipo IN ('CONQUISTA', 'SISTEMA')
             ORDER BY "createdAt" DESC
             LIMIT ${limit}
         `;

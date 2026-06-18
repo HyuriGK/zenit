@@ -14,7 +14,9 @@ export async function PUT() {
         await sql`
             UPDATE "Notificacao"
             SET lida = TRUE, "lidaEm" = NOW()
-            WHERE "userId" = ${session.user.id} AND lida = FALSE
+            WHERE "userId" = ${session.user.id}
+              AND lida = FALSE
+              AND tipo IN ('CONQUISTA', 'SISTEMA')
         `;
 
         return NextResponse.json({ success: true });

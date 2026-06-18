@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 
 interface Notificacao {
   id: string;
-  tipo: 'LEMBRETE_HABITO' | 'RESUMO_DIARIO' | 'SEQUENCIA_RISCO' | 'CONQUISTA' | 'SISTEMA';
+  tipo: 'CONQUISTA' | 'SISTEMA';
   titulo: string;
   mensagem: string;
   dados?: Record<string, unknown>;
@@ -69,15 +69,6 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
             };
 
             switch (notif.tipo) {
-              case 'LEMBRETE_HABITO':
-                toast.info(notif.titulo, toastOptions);
-                break;
-              case 'RESUMO_DIARIO':
-                toast.info(notif.titulo, toastOptions);
-                break;
-              case 'SEQUENCIA_RISCO':
-                toast.warning(notif.titulo, toastOptions);
-                break;
               case 'CONQUISTA':
                 toast.success(notif.titulo, toastOptions);
                 break;

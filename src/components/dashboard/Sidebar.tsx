@@ -13,7 +13,6 @@ import {
   Crown,
   ChevronLeft,
   ChevronRight,
-  Heart,
   TrendingUp,
   Car,
   KeyRound
@@ -35,7 +34,6 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
 
   const menuItems = [
     { icon: LayoutDashboard, label: t('dashboard'), href: '/dashboard' },
-    { icon: Heart, label: t('habits'), href: '/dashboard/habitos' },
     { icon: Calendar, label: t('agenda'), href: '/dashboard/agenda' },
     { icon: Wallet, label: t('financial'), href: '/dashboard/financeiro' },
     { icon: Car, label: t('vehicles'), href: '/dashboard/veiculos' },
