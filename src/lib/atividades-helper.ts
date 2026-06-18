@@ -9,10 +9,7 @@ interface RegistrarAtividadeParams {
   'financeiro_conta_criada' | 'financeiro_conta_editada' | 'financeiro_conta_excluida' |
   'financeiro_cartao_criado' | 'financeiro_cartao_editado' | 'financeiro_cartao_excluido' |
   'financeiro_transacao_criada' | 'financeiro_transacao_editada' | 'financeiro_transacao_excluida' |
-  'financeiro_objetivo_criado' | 'financeiro_objetivo_concluido' |
-  'leitura_livro_criado' | 'leitura_livro_editado' | 'leitura_livro_excluido' |
-  'leitura_filme_criado' | 'leitura_filme_editado' | 'leitura_filme_excluido' |
-  'leitura_citacao_criada';
+  'financeiro_objetivo_criado' | 'financeiro_objetivo_concluido';
   titulo: string;
   descricao?: string;
   metadata?: Record<string, any>;
@@ -83,34 +80,6 @@ export async function registrarAtividade({
       financeiro_objetivo_concluido: {
         icone: 'check-circle',
         cor: '#10B981', // verde
-      },
-      leitura_livro_criado: {
-        icone: 'book-open',
-        cor: '#10B981', // roxo
-      },
-      leitura_livro_editado: {
-        icone: 'edit',
-        cor: '#3B82F6', // azul
-      },
-      leitura_livro_excluido: {
-        icone: 'book-x',
-        cor: '#EF4444', // vermelho
-      },
-      leitura_filme_criado: {
-        icone: 'film',
-        cor: '#EC4899', // rosa
-      },
-      leitura_filme_editado: {
-        icone: 'edit',
-        cor: '#3B82F6', // azul
-      },
-      leitura_filme_excluido: {
-        icone: 'film',
-        cor: '#EF4444', // vermelho
-      },
-      leitura_citacao_criada: {
-        icone: 'quote',
-        cor: '#F59E0B', // laranja
       },
     };
 

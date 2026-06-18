@@ -292,46 +292,6 @@ export interface CategoriaHabito {
     updatedAt: Date;
 }
 
-export interface Midia {
-    id: string;
-    tipo: 'LIVRO' | 'FILME';
-    titulo: string;
-    capa?: string;
-    cor: string;
-    autor?: string;
-    editora?: string;
-    genero?: string;
-    fonte?: 'EMPRESTADO' | 'FISICO' | 'KINDLE' | 'DIGITAL';
-    diretor?: string;
-    duracao?: number;
-    anoLancamento?: number;
-    idioma?: string;
-    status: 'PROXIMO' | 'EM_ANDAMENTO' | 'PAUSADO' | 'CONCLUIDO';
-    nota?: number;
-    dataInicio?: Date;
-    dataConclusao?: Date;
-    resenhaGeradaIA?: string;
-    impressoesIniciais?: string;
-    principaisAprendizados?: string;
-    trechosMemoraveis?: string;
-    reflexao?: string;
-    aprendizadosPraticos?: string;
-    consideracoesFinais?: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
-export interface Citacao {
-    id: string;
-    texto: string;
-    autor?: string;
-    pagina?: string;
-    destaque: boolean;
-    midiaId?: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
 export interface Curso {
     id: string;
     nome: string;
@@ -399,8 +359,6 @@ export class ZenitDB extends Dexie {
     habitos!: Table<Habito, string>;
     registrosHabitos!: Table<RegistroHabito, string>;
     categoriasHabito!: Table<CategoriaHabito, string>;
-    midias!: Table<Midia, string>;
-    citacoes!: Table<Citacao, string>;
     cursos!: Table<Curso, string>;
     modulos!: Table<Modulo, string>;
     anotacoes!: Table<Anotacao, string>;
@@ -408,7 +366,7 @@ export class ZenitDB extends Dexie {
 
     constructor() {
         super('ZenitDB');
-        this.version(4).stores({
+        this.version(5).stores({
             users: 'id',
             compromissos: 'id, data, recorrenciaGrupoId',
             atividades: 'id, createdAt',
@@ -426,8 +384,8 @@ export class ZenitDB extends Dexie {
             habitos: 'id, status',
             registrosHabitos: 'id, habitoId, data',
             categoriasHabito: 'id',
-            midias: 'id, tipo, status',
-            citacoes: 'id, midiaId, destaque',
+            midias: null,
+            citacoes: null,
             cursos: 'id',
             modulos: 'id, cursoId, ordem',
             anotacoes: 'id, moduloId, cursoId, dataCriacao',

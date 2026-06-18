@@ -176,10 +176,6 @@ export function DeleteAccountModal({ isOpen, onClose }: DeleteAccountModalProps)
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                  Suas leituras, citações e resenhas
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
                   Todo o seu progresso de hábitos
                 </li>
                 <li className="flex items-center gap-2">

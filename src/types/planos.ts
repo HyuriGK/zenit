@@ -11,8 +11,8 @@ export enum PlanoUsuario {
  * Recursos disponíveis na plataforma
  */
 export enum RecursoPremium {
-  // Biblioteca - IA
-  GERAR_RESENHA_IA = 'GERAR_RESENHA_IA',
+  // Planner - IA
+  GERAR_ANOTACAO_IA = 'GERAR_ANOTACAO_IA',
 
   // Agenda - Google Calendar
   SINCRONIZAR_GOOGLE_CALENDAR = 'SINCRONIZAR_GOOGLE_CALENDAR',
@@ -27,7 +27,7 @@ export const RECURSOS_POR_PLANO: Record<PlanoUsuario, RecursoPremium[]> = {
   ],
   [PlanoUsuario.PREMIUM]: [
     // Plano PREMIUM tem acesso a todos os recursos
-    RecursoPremium.GERAR_RESENHA_IA,
+    RecursoPremium.GERAR_ANOTACAO_IA,
     RecursoPremium.SINCRONIZAR_GOOGLE_CALENDAR,
   ],
 };
@@ -51,9 +51,8 @@ export const PLANOS_INFO: Record<PlanoUsuario, PlanoInfo> = {
     recursos: [
       'Gerenciamento de agenda',
       'Módulo financeiro completo',
-      'Biblioteca de livros e filmes',
       'Módulo de estudos',
-      'Anotações e citações',
+      'Anotações organizadas',
     ],
   },
   [PlanoUsuario.PREMIUM]: {
@@ -62,7 +61,7 @@ export const PLANOS_INFO: Record<PlanoUsuario, PlanoInfo> = {
     preco: 'R$ 29,90',
     recursos: [
       'Todos os recursos do plano Free',
-      'Geração de resenhas com IA',
+      'Geração de anotações com IA',
       'Sincronização com Google Calendar',
       'Suporte prioritário',
       'Novos recursos em primeira mão',
@@ -75,9 +74,9 @@ export const PLANOS_INFO: Record<PlanoUsuario, PlanoInfo> = {
  * Mensagens de erro para recursos premium
  */
 export const MENSAGENS_PLANO = {
-  [RecursoPremium.GERAR_RESENHA_IA]: {
+  [RecursoPremium.GERAR_ANOTACAO_IA]: {
     titulo: 'Recurso Premium',
-    descricao: 'A geração de resenhas com IA está disponível apenas para usuários Premium.',
+    descricao: 'A geração de anotações com IA está disponível apenas para usuários Premium.',
     cta: 'Faça upgrade para Premium',
   },
   [RecursoPremium.SINCRONIZAR_GOOGLE_CALENDAR]: {

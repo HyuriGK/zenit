@@ -34,7 +34,6 @@ model User {
   viagens              Viagem[]
   habitos              Habito[]
   categoriasHabito     CategoriaHabito[]
-  midias               Midia[]
   cursos               Curso[]
   ativosInvestimento   AtivoInvestimento[]
   veiculos             Veiculo[]
@@ -437,52 +436,6 @@ model RegistroHabito {
 
   habitoId   String
   habito     Habito   @relation(fields: [habitoId], references: [id], onDelete: Cascade)
-}
-
-model Midia {
-  id                     String   @id @default(uuid())
-  tipo                   String   // LIVRO, FILME
-  titulo                 String
-  capa                   String?
-  cor                    String
-  autor                  String?
-  editora                String?
-  genero                 String?
-  fonte                  String?  // EMPRESTADO, FISICO, KINDLE, DIGITAL
-  diretor                String?
-  duracao                Int?
-  anoLancamento          Int?
-  idioma                 String?
-  status                 String   // PROXIMO, EM_ANDAMENTO, PAUSADO, CONCLUIDO
-  nota                   Float?
-  dataInicio             DateTime? @db.Date
-  dataConclusao          DateTime? @db.Date
-  resenhaGeradaIA        String?
-  impressoesIniciais     String?
-  principaisAprendizados String?
-  trechosMemoraveis      String?
-  reflexao               String?
-  aprendizadosPraticos   String?
-  consideracoesFinais    String?
-  createdAt              DateTime @default(now())
-  updatedAt              DateTime @updatedAt
-
-  userId   String
-  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  citacoes Citacao[]
-}
-
-model Citacao {
-  id        String   @id @default(uuid())
-  texto     String
-  autor     String?
-  pagina    String?
-  destaque  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  midiaId   String?
-  midia     Midia?   @relation(fields: [midiaId], references: [id], onDelete: Cascade)
 }
 
 model Curso {

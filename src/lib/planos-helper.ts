@@ -108,7 +108,7 @@ export function getRecursosPremium(): RecursoPremium[] {
  */
 export function getDescricaoRecurso(recurso: RecursoPremium): string {
   const descricoes: Record<RecursoPremium, string> = {
-    [RecursoPremium.GERAR_RESENHA_IA]: 'Geração de resenhas com IA',
+    [RecursoPremium.GERAR_ANOTACAO_IA]: 'Geração de anotações com IA',
     [RecursoPremium.SINCRONIZAR_GOOGLE_CALENDAR]: 'Sincronização com Google Calendar',
   };
 

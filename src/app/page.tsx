@@ -8,7 +8,6 @@ import {
   Calendar,
   Wallet,
   BookOpen,
-  Library,
   Target,
   Dumbbell,
   TrendingUp,
@@ -120,13 +119,6 @@ export default function LandingPage() {
       description: "Acompanhe cursos, anotações e progresso com técnicas de aprendizado.",
       gradient: "from-emerald-500 to-green-400",
       bgGradient: "from-emerald-500/10 to-green-400/10",
-    },
-    {
-      icon: Library,
-      title: "Biblioteca Pessoal",
-      description: "Organize livros, artigos e conteúdos com citações e notas.",
-      gradient: "from-orange-500 to-amber-400",
-      bgGradient: "from-orange-500/10 to-amber-400/10",
     },
     {
       icon: Target,
@@ -695,7 +687,6 @@ export default function LandingPage() {
                   "Agenda básica (10 compromissos/mês)",
                   "Financeiro básico (20 transações/mês)",
                   "1 curso ativo",
-                  "Biblioteca limitada",
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm text-gray-300">
                     <Check className="w-5 h-5 text-gray-500 flex-shrink-0 mt-0.5" />

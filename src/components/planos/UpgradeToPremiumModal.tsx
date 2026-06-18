@@ -55,7 +55,7 @@ export function UpgradeToPremiumModal({
                 <Check className="w-4 h-4 text-green-400 mt-0.5 shrink-0" />
                 <span className="text-zinc-300">
                   <Sparkles className="w-4 h-4 inline mr-1 text-green-400" />
-                  {t('aiReviews')}
+                  {t('aiNotes')}
                 </span>
               </div>
               <div className="flex items-start gap-2 text-sm">

@@ -111,7 +111,7 @@ export default function EstudosPage() {
   const plano = (session?.user?.plano as PlanoUsuario) || PlanoUsuario.FREE;
   const rawExpires = (session?.user as any)?.planoExpiraEm;
   const planoExpiraEm = rawExpires ? new Date(rawExpires) : undefined;
-  const acessoRecurso = verificarAcessoRecurso(plano, planoExpiraEm, RecursoPremium.GERAR_RESENHA_IA);
+  const acessoRecurso = verificarAcessoRecurso(plano, planoExpiraEm, RecursoPremium.GERAR_ANOTACAO_IA);
   const isPremium = acessoRecurso.temAcesso;
 
   const [novoCurso, setNovoCurso] = useState({

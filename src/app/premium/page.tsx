@@ -78,7 +78,6 @@ export default function PremiumPage() {
     { feature: "Compromissos na Agenda", free: "10/mês", premium: "Ilimitado" },
     { feature: "Transações Financeiras", free: "20/mês", premium: "Ilimitado" },
     { feature: "Cursos Ativos", free: "1", premium: "Ilimitado" },
-    { feature: "Itens na Biblioteca", free: "10", premium: "Ilimitado" },
     { feature: "Backup de Dados", free: "—", premium: "Diário" },
     { feature: "Relatórios", free: "Básico", premium: "Avançado" },
     { feature: "Exportação", free: "—", premium: "PDF/Excel" },

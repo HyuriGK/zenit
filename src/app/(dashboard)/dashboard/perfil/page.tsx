@@ -17,11 +17,9 @@ import {
   Calendar,
   Activity,
   TrendingUp,
-  Book,
   Target,
   Flame,
   Zap,
-  Star,
   Trophy,
   Sparkles,
   BookOpen,
@@ -55,7 +53,6 @@ interface Stats {
   metasAlcancadas: number;
   diasConsecutivos: number;
   transacoesTotal: number;
-  midiasLidas: number;
 }
 
 interface Achievement {
@@ -102,7 +99,6 @@ export default function PerfilPage() {
     metasAlcancadas: 0,
     diasConsecutivos: 0,
     transacoesTotal: 0,
-    midiasLidas: 0,
   });
 
   const [achievements, setAchievements] = useState<Achievement[]>([
@@ -147,15 +143,6 @@ export default function PerfilPage() {
       progress: 0,
       total: 5,
     },
-    {
-      id: 'reading-enthusiast',
-      title: 'Leitor Ávido',
-      description: 'Concluiu 10 leituras',
-      icon: Book,
-      unlocked: false,
-      progress: 0,
-      total: 10,
-    },
   ]);
 
   const updateAchievements = useCallback((currentStats: Stats) => {
@@ -188,13 +175,6 @@ export default function PerfilPage() {
               unlocked: currentStats.transacoesTotal >= 50,
               unlockedAt: currentStats.transacoesTotal >= 50 ? new Date() : undefined,
             };
-          case 'reading-enthusiast':
-            return {
-              ...achievement,
-              progress: currentStats.midiasLidas,
-              unlocked: currentStats.midiasLidas >= 10,
-              unlockedAt: currentStats.midiasLidas >= 10 ? new Date() : undefined,
-            };
           default:
             return achievement;
         }
@@ -213,16 +193,12 @@ export default function PerfilPage() {
       const transacoesDb = await db.transacoes.toArray();
       const totalTransacoes = transacoesDb.length;
 
-      const midiasDb = await db.midias.toArray();
-      const midiasLidas = midiasDb.filter((m: any) => m.status === 'CONCLUIDO').length;
-
       const newStats = {
         compromissosTotal: totalCompromissos,
         cursosAtivos: cursosAtivos,
         metasAlcancadas: 0,
         diasConsecutivos: 7,
         transacoesTotal: totalTransacoes,
-        midiasLidas: midiasLidas,
       };
 
       setStats(newStats);
@@ -493,20 +469,6 @@ export default function PerfilPage() {
                   </div>
                 </div>
 
-                <div className="bg-zinc-900/40 border border-zinc-800/50 hover:border-teal-500/30 rounded-2xl p-6 transition-all group">
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between">
-                      <div className="p-2 bg-teal-500/10 rounded-xl group-hover:bg-teal-500/20 transition-colors">
-                        <Book className="w-5 h-5 text-teal-400" />
-                      </div>
-                      <Star className="w-4 h-4 text-teal-400/50" />
-                    </div>
-                    <div>
-                      <p className="text-3xl font-bold text-white leading-none">{stats.midiasLidas}</p>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 mt-2">Leituras</p>
-                    </div>
-                  </div>
-                </div>
               </div>
 
               {/* Resumo de Conquistas */}

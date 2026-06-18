@@ -88,7 +88,7 @@ export function usePlano() {
     refreshSessao,
     isUpdating,
     // Verificações específicas de recursos
-    podeGerarResenhaIA: temAcessoARecurso(RecursoPremium.GERAR_RESENHA_IA),
+    podeGerarAnotacaoIA: temAcessoARecurso(RecursoPremium.GERAR_ANOTACAO_IA),
     podeSincronizarGoogleCalendar: temAcessoARecurso(RecursoPremium.SINCRONIZAR_GOOGLE_CALENDAR),
   };
 }

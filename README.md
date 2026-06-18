@@ -25,7 +25,6 @@
 - 💰 **Gestão Financeira Completa** - Controle total sobre suas finanças pessoais
 - 📅 **Agenda Inteligente** - Organize compromissos com sincronização Google Calendar
 - 📚 **Estudos Organizados** - Cursos, módulos e anotações em um sistema completo
-- 📖 **Biblioteca Digital** - Livros e filmes com IA para resenhas e compartilhamento
 - ✅ **Produtividade** - Acompanhe atividades e metas diárias
 
 Desenvolvida com as tecnologias mais modernas do mercado, Zenit oferece uma experiência fluida, rápida e intuitiva, colocando você no controle total da sua vida.
@@ -96,16 +95,6 @@ Desenvolvida com as tecnologias mais modernas do mercado, Zenit oferece uma expe
 - ✅ **CRUD Completo**: Criar, visualizar, editar e excluir
 - ✅ **Busca Integrada**: Busque em cursos, módulos e anotações
 - ✅ **Organização Visual**: Cores personalizadas e ícones
-
-### 📖 Módulo de Biblioteca
-
-- ✅ **Catálogo de Mídias**: Livros e filmes em um só lugar
-- ✅ **Sistema de Avaliação**: Estrelas e comentários detalhados
-- ✅ **Citações**: Salve trechos favoritos de livros
-- ✅ **Geração de Resenhas com IA**: Crie resenhas automáticas usando Gemini
-- ✅ **Compartilhamento Social**: Gere cards visuais para redes sociais
-- ✅ **Busca de Capas**: Integração com APIs de busca de imagens
-- ✅ **Progresso de Leitura**: Acompanhe páginas lidas
 
 ### ✅ Módulo de Produtividade
 
@@ -383,18 +372,6 @@ model Compromisso {
 - `DELETE /api/v1/estudos/anotacoes/:id` - Excluir anotação
 - `GET /api/v1/estudos/buscar` - Busca global
 
-### Biblioteca
-- `GET /api/v1/leituras/midias` - Listar mídias
-- `POST /api/v1/leituras/midias` - Criar mídia
-- `GET /api/v1/leituras/midias/:id` - Detalhes da mídia
-- `PUT /api/v1/leituras/midias/:id` - Atualizar mídia
-- `DELETE /api/v1/leituras/midias/:id` - Excluir mídia
-- `GET /api/v1/leituras/citacoes` - Listar citações
-- `POST /api/v1/leituras/citacoes` - Criar citação
-- `DELETE /api/v1/leituras/citacoes/:id` - Excluir citação
-- `GET /api/v1/leituras/buscar-capas` - Buscar capas
-- `POST /api/generate-review` - Gerar resenha com IA
-
 ### Atividades
 - `GET /api/v1/atividades` - Histórico de atividades
 
@@ -487,9 +464,7 @@ docker run -p 3000:3000 zenit
 
 ### 🚧 Versão 1.1 (Em Desenvolvimento)
 - [x] Módulo de Estudos completo
-- [x] Módulo de Biblioteca com IA
 - [x] Sincronização com Google Calendar
-- [x] Sistema de compartilhamento social
 - [ ] Notificações push em tempo real
 - [ ] Exportação de relatórios (PDF/Excel)
 - [ ] Gráficos avançados com Chart.js

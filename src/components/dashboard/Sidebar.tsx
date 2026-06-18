@@ -9,7 +9,6 @@ import {
   Calendar,
   Wallet,
   BookOpen,
-  Library,
   Settings as IconSettings,
   Crown,
   ChevronLeft,
@@ -43,7 +42,6 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
     { icon: TrendingUp, label: t('investments'), href: '/dashboard/investimentos' },
     { icon: KeyRound, label: t('passwords'), href: '/dashboard/senhas' },
     { icon: BookOpen, label: t('studies'), href: '/dashboard/estudos' },
-    { icon: Library, label: t('library'), href: '/dashboard/biblioteca' },
   ];
 
   useEffect(() => {
