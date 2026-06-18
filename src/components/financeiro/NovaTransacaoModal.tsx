@@ -259,24 +259,25 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
 
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
-      <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1200px] w-[95vw] max-h-[90vh] overflow-visible p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 sm:rounded-[32px] border-zinc-800/30">
-        <div className="flex flex-col h-full overflow-visible">
-          <div className="bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-900/50 p-6 border-b border-zinc-800/50">
+      <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1200px] w-[calc(100vw-1rem)] sm:w-[95vw] max-h-[calc(100dvh-1rem)] sm:max-h-[90dvh] overflow-hidden p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 rounded-2xl sm:rounded-[32px] border-zinc-800/30">
+        <div className="flex min-h-0 max-h-[calc(100dvh-1rem)] sm:max-h-[90dvh] flex-col overflow-hidden">
+          <div className="shrink-0 bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-900/50 p-4 sm:p-6 border-b border-zinc-800/50">
             <DialogHeader className="gap-1">
-              <DialogTitle className="text-3xl font-black text-white tracking-tight flex items-center gap-3">
+              <DialogTitle className="text-xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3 pr-8">
                 <div className={`p-2 rounded-xl transition-colors duration-500 ${tipo === 'RECEITA' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
                   {tipo === 'RECEITA' ? <TrendingUp className="w-6 h-6" /> : <TrendingDown className="w-6 h-6" />}
                 </div>
                 {transacaoParaEditar ? 'Editar Registro' : 'Novo Registro Financeiro'}
               </DialogTitle>
-              <DialogDescription className="text-zinc-500 font-medium text-base ml-12">
+              <DialogDescription className="text-zinc-500 font-medium text-sm sm:text-base ml-0 sm:ml-12">
                 {transacaoParaEditar ? 'Ajuste os detalhes da sua movimentação.' : 'Registre suas entradas e saídas com precisão.'}
               </DialogDescription>
             </DialogHeader>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-6 space-y-6 overflow-visible">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
               <div className="space-y-6">
                 <div className="flex gap-4 p-1.5 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
                   <button type="button" onClick={() => setTipo('RECEITA')} className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 ${tipo === 'RECEITA' ? 'bg-green-600 text-white shadow-lg shadow-green-600/20 ring-1 ring-green-500/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}>
@@ -292,7 +293,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   <Input value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Ex: Assinatura Netflix, Freelance Design..." required className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl placeholder:text-zinc-600 focus:border-zinc-700 focus-visible:ring-0 transition-all text-base" />
                 </div>
 
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Valor (R$)</Label>
                     <div className="relative">
@@ -397,13 +398,14 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   <Textarea value={observacoes} onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setObservacoes(e.target.value)} placeholder="Notas, detalhes da compra..." rows={2} className="bg-zinc-900/50 border-zinc-800 text-white resize-none rounded-xl p-4 placeholder:text-zinc-600 focus-visible:ring-0 transition-all min-h-[80px]" />
                 </div>
               </div>
+              </div>
             </div>
 
-            <div className="flex gap-4 pt-10 border-t border-zinc-800/50">
-              <Button type="button" variant="outline" onClick={onFechar} className="flex-1 border-zinc-800 hover:bg-zinc-900 text-zinc-400 hover:text-white h-14 rounded-2xl font-black text-sm uppercase tracking-widest transition-all" disabled={carregando}>
+            <div className="shrink-0 flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 border-t border-zinc-800/50 bg-zinc-950/95 p-4 sm:p-6 shadow-[0_-16px_40px_rgba(0,0,0,0.35)]">
+              <Button type="button" variant="outline" onClick={onFechar} className="sm:flex-1 border-zinc-800 hover:bg-zinc-900 text-zinc-400 hover:text-white h-12 sm:h-14 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-widest transition-all" disabled={carregando}>
                 Descartar
               </Button>
-              <Button type="submit" disabled={carregando || !contaBancariaId} className={`flex-[2] h-14 rounded-2xl font-black text-sm uppercase tracking-[0.15em] shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] focus-visible:ring-0 ${tipo === 'RECEITA' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} disabled:opacity-50 text-white`}>
+              <Button type="submit" disabled={carregando || !contaBancariaId} className={`sm:flex-[2] h-12 sm:h-14 rounded-2xl font-black text-xs sm:text-sm uppercase tracking-[0.15em] shadow-xl transition-all hover:scale-[1.01] active:scale-[0.99] focus-visible:ring-0 ${tipo === 'RECEITA' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'} disabled:opacity-50 text-white`}>
                 {carregando ? <><Loader2 className="w-5 h-5 mr-3 animate-spin" />Sincronizando...</> : (transacaoParaEditar ? 'Confirmar Alterações' : 'Finalizar Registro')}
               </Button>
             </div>
