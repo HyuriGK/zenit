@@ -69,12 +69,32 @@ export function getDiaSemanaNoTimezone(timezone: string): number {
 }
 
 /**
+ * Extrai uma data civil no formato YYYY-MM-DD sem aplicar conversão de fuso.
+ * Campos @db.Date representam um dia do calendário, não um instante no tempo.
+ */
+export function extrairDataString(data: string | Date): string {
+  if (data instanceof Date) {
+    const ano = data.getUTCFullYear();
+    const mes = String(data.getUTCMonth() + 1).padStart(2, '0');
+    const dia = String(data.getUTCDate()).padStart(2, '0');
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  const match = String(data).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) {
+    throw new Error('Data inválida. Use o formato YYYY-MM-DD.');
+  }
+
+  return `${match[1]}-${match[2]}-${match[3]}`;
+}
+
+/**
  * Converte uma string de data (YYYY-MM-DD) para Date no início do dia
  * @param dataStr - String no formato YYYY-MM-DD
  * @returns Date object
  */
 export function parseDataString(dataStr: string): Date {
-  const [ano, mes, dia] = dataStr.split('-').map(Number);
+  const [ano, mes, dia] = extrairDataString(dataStr).split('-').map(Number);
   return new Date(ano, mes - 1, dia, 0, 0, 0, 0);
 }
 

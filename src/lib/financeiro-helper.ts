@@ -3,6 +3,7 @@
 
 import { format, addMonths } from 'date-fns';
 import type { Transacao, ResumoMensal, GastosPorCategoria } from '@/types/financeiro';
+import { extrairDataString } from '@/lib/timezone';
 
 /**
  * Formata valor monetário para exibição
@@ -193,7 +194,7 @@ export function identificarDuplicadas(transacoes: Transacao[]): string[] {
   const seen = new Map<string, Transacao>();
 
   transacoes.forEach((t) => {
-    const key = `${t.descricao.toLowerCase()}_${t.valor}_${format(new Date(t.data), 'yyyy-MM-dd')}`;
+    const key = `${t.descricao.toLowerCase()}_${t.valor}_${extrairDataString(t.data)}`;
     
     if (seen.has(key)) {
       duplicadas.push(t.id);

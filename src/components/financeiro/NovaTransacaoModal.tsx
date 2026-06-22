@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/select';
 import { TrendingUp, TrendingDown, Loader2, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { extrairDataString, parseDataString } from '@/lib/timezone';
 
 // Formata uma data como YYYY-MM-DD usando o fuso LOCAL (toISOString() desloca o dia entre fusos)
 function formatLocalDate(d: Date): string {
@@ -79,7 +80,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
       setTipo(transacaoParaEditar.tipo);
       setDescricao(transacaoParaEditar.descricao);
       setValor(String(transacaoParaEditar.valor));
-      setData(formatLocalDate(new Date(transacaoParaEditar.data)));
+      setData(extrairDataString(transacaoParaEditar.data));
       setObservacoes(transacaoParaEditar.observacoes || '');
       setCategoriaId(transacaoParaEditar.categoriaId || '');
       setContaBancariaId(transacaoParaEditar.contaBancariaId || 'caixa-geral');
@@ -138,7 +139,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
             futuras.push({
               descricao,
               valor: valorNumerico,
-              data: new Date(year, month - 1 + i, day).toISOString(),
+              data: formatLocalDate(new Date(year, month - 1 + i, day)),
               tipo,
               isFixa: true,
               isParcela: false,
@@ -163,7 +164,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             descricao, valor: valorNumerico,
-            data: new Date(year, month - 1, day).toISOString(),
+            data,
             tipo, observacoes: observacoes || null,
             categoriaId: categoriaId || null,
             contaBancariaId, isFixa, paga,
@@ -176,15 +177,15 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
         if (transacaoParaEditar.grupoParcelaId && aplicarProximas) {
           const serieRes = await fetch('/api/financeiro/transacoes');
           const serieJson = await serieRes.json();
-          const tData = new Date(transacaoParaEditar.data).getTime();
+          const tData = parseDataString(transacaoParaEditar.data).getTime();
           const proximas = (serieJson.data || []).filter((t: any) =>
             t.grupoParcelaId === transacaoParaEditar.grupoParcelaId &&
-            new Date(t.data).getTime() > tData
+            parseDataString(t.data).getTime() > tData
           );
           for (const t of proximas) {
             const updates: any = { categoriaId: categoriaId || null, valor: valorNumerico, descricao, observacoes: observacoes || null, contaBancariaId };
-            const dtT = new Date(t.data);
-            updates.data = new Date(dtT.getFullYear(), dtT.getMonth(), day).toISOString();
+            const dtT = parseDataString(t.data);
+            updates.data = formatLocalDate(new Date(dtT.getFullYear(), dtT.getMonth(), day));
             await fetch(`/api/financeiro/transacoes/${t.id}`, {
               method: 'PUT',
               headers: { 'Content-Type': 'application/json' },
@@ -202,7 +203,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
           transacoes.push({
             descricao: isParcelado ? `${descricao} (${i + 1}/${numTotal})` : descricao,
             valor: valorNumerico,
-            data: new Date(year, month - 1 + i, day).toISOString(),
+            data: formatLocalDate(new Date(year, month - 1 + i, day)),
             tipo,
             observacoes: observacoes || null,
             categoriaId: categoriaId || null,

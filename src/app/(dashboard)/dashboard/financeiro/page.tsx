@@ -11,6 +11,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { parseDataString } from '@/lib/timezone';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -140,14 +141,14 @@ export default function FinanceiroDashboardPage() {
     const fimMes = endOfMonth(hoje);
 
     const transacoesMes = transacoesData.filter(t => {
-      const d = new Date(t.data);
+      const d = parseDataString(t.data);
       return d >= inicioMes && d <= fimMes;
     });
 
     const inicioMesAnterior = startOfMonth(subMonths(hoje, 1));
     const fimMesAnterior = endOfMonth(subMonths(hoje, 1));
     const transacoesMesAnterior = transacoesData.filter(t => {
-      const d = new Date(t.data);
+      const d = parseDataString(t.data);
       return d >= inicioMesAnterior && d <= fimMesAnterior;
     });
 
@@ -188,16 +189,16 @@ export default function FinanceiroDashboardPage() {
 
     const em7Dias = new Date(hoje.getTime() + 7 * 24 * 60 * 60 * 1000);
     const proximas = transacoesData.filter(t => {
-      const d = new Date(t.data);
+      const d = parseDataString(t.data);
       return d > hoje && d <= em7Dias && t.tipo === 'DESPESA' && !t.paga;
-    }).sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime());
+    }).sort((a, b) => parseDataString(a.data).getTime() - parseDataString(b.data).getTime());
 
     const diasMes = fimMes.getDate();
     const fluxoCaixa = Array.from({ length: diasMes }, (_, i) => {
       const dia = i + 1;
       let rDia = 0, dDia = 0;
       transacoesMes.forEach(t => {
-        if (new Date(t.data).getDate() === dia) {
+        if (parseDataString(t.data).getDate() === dia) {
           if (t.tipo === 'RECEITA') rDia += Number(t.valor);
           else dDia += Number(t.valor);
         }

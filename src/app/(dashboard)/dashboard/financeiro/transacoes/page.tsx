@@ -26,6 +26,7 @@ import { toast } from 'sonner';
 import NovaTransacaoModal from '@/components/financeiro/NovaTransacaoModal';
 import { DeleteGroupModal } from '@/components/financeiro/DeleteGroupModal';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { extrairDataString, parseDataString } from '@/lib/timezone';
 
 interface Transacao {
   id: string;
@@ -80,7 +81,7 @@ export default function TransacoesPage() {
   useEffect(() => { recarregarDados(); }, [recarregarDados]);
 
   const transacoes: Transacao[] = transacoesRaw.filter(t => {
-    const dataTransacao = new Date(t.data);
+    const dataTransacao = parseDataString(t.data);
     return isSameMonth(dataTransacao, dataReferencia);
   }).map(t => {
     const categoria = categoriasRaw.find(c => c.id === t.categoriaId);
@@ -89,7 +90,7 @@ export default function TransacoesPage() {
     return {
       ...t,
       valor: Number(t.valor),
-      data: new Date(t.data).toISOString(),
+      data: extrairDataString(t.data),
       categoria: categoria ? { nome: categoria.nome, cor: categoria.cor, icone: categoria.icone } : undefined,
       contaBancaria: t.contaBancariaId === 'caixa-geral' ? { nome: 'Caixa Geral' } : (contaBancaria ? { nome: contaBancaria.nome } : undefined),
       cartao: cartao ? { nome: cartao.nome } : undefined,
@@ -107,7 +108,7 @@ export default function TransacoesPage() {
     const matchesBusca = t.descricao.toLowerCase().includes(busca.toLowerCase());
     if (filtroAtrasado) {
       const hoje = startOfDay(new Date());
-      const dataT = startOfDay(new Date(t.data));
+      const dataT = startOfDay(parseDataString(t.data));
       const atrasada = !t.paga && dataT.getTime() < hoje.getTime();
       return matchesBusca && atrasada;
     }
@@ -338,7 +339,7 @@ export default function TransacoesPage() {
                   <div className="flex items-center gap-3 text-[12px] text-zinc-500">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
-                      {format(new Date(transacao.data), "dd 'de' MMM", { locale: ptBR })}
+                      {format(parseDataString(transacao.data), "dd 'de' MMM", { locale: ptBR })}
                     </div>
                     {transacao.categoria && (
                       <div className="flex items-center gap-1">
@@ -360,8 +361,8 @@ export default function TransacoesPage() {
                     {transacao.tipo === 'RECEITA' ? '+' : '-'} {formatarMoeda(transacao.valor)}
                   </div>
                   {!transacao.paga && (
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] border font-bold uppercase tracking-wider ${getDiasStatus(new Date(transacao.data)).className}`}>
-                      {getDiasStatus(new Date(transacao.data)).label}
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] border font-bold uppercase tracking-wider ${getDiasStatus(parseDataString(transacao.data)).className}`}>
+                      {getDiasStatus(parseDataString(transacao.data)).label}
                     </span>
                   )}
                   {transacao.paga && (

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sql } from '@/lib/neon';
 import { auth } from '@/auth';
+import { extrairDataString } from '@/lib/timezone';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,11 +28,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         }
 
         const valor = d.valor != null ? parseFloat(d.valor) : null;
+        const dataVal = d.data ? extrairDataString(d.data) : null;
         const rows = await sql`
             UPDATE "Transacao" SET
                 "descricao"     = COALESCE(${d.descricao}, "descricao"),
                 "valor"         = COALESCE(${valor}, "valor"),
-                "data"          = COALESCE(${d.data ? new Date(d.data) : null}, "data"),
+                "data"          = COALESCE(${dataVal}::date, "data"),
                 "tipo"          = COALESCE(${d.tipo}, "tipo"),
                 "observacoes"   = COALESCE(${d.observacoes ?? null}, "observacoes"),
                 "isFixa"        = COALESCE(${d.isFixa ?? null}, "isFixa"),
@@ -44,7 +46,12 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
             WHERE "id" = ${id} AND "userId" = ${userId}
             RETURNING *`;
         if (!rows.length) return NextResponse.json({ error: 'Não encontrado' }, { status: 404 });
-        return NextResponse.json({ data: rows[0] });
+        return NextResponse.json({
+            data: {
+                ...rows[0],
+                data: extrairDataString((rows[0] as Record<string, unknown>).data as string | Date),
+            },
+        });
     } catch (e) {
         return NextResponse.json({ error: (e as Error).message }, { status: 500 });
     }
