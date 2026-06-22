@@ -37,6 +37,16 @@ import {
     CheckCircle2,
     AlertCircle,
     ExternalLink,
+    Layers3,
+    Briefcase,
+    WalletCards,
+    GraduationCap,
+    House,
+    Clapperboard,
+    ShoppingBag,
+    Landmark,
+    Folder,
+    ChevronRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -53,15 +63,16 @@ interface Senha {
     updatedAt: string;
 }
 
-const CATEGORIAS = [
-    { valor: 'email', label: 'E-mail', emoji: '📧' },
-    { valor: 'redes_sociais', label: 'Redes Sociais', emoji: '📱' },
-    { valor: 'banco', label: 'Banco / Financeiro', emoji: '🏦' },
-    { valor: 'trabalho', label: 'Trabalho', emoji: '💼' },
-    { valor: 'streaming', label: 'Streaming', emoji: '🎬' },
-    { valor: 'compras', label: 'Compras', emoji: '🛒' },
-    { valor: 'governo', label: 'Governo', emoji: '🏛️' },
-    { valor: 'outros', label: 'Outros', emoji: '🔑' },
+const GRUPOS = [
+    { valor: 'pessoal', label: 'Pessoal', descricao: 'E-mails e redes', cor: '#8b5cf6', icon: User },
+    { valor: 'trabalho', label: 'Trabalho', descricao: 'Empresa e projetos', cor: '#3b82f6', icon: Briefcase },
+    { valor: 'financeiro', label: 'Financeiro', descricao: 'Bancos e cartões', cor: '#10b981', icon: WalletCards },
+    { valor: 'estudos', label: 'Estudos', descricao: 'Cursos e plataformas', cor: '#f59e0b', icon: GraduationCap },
+    { valor: 'casa', label: 'Casa', descricao: 'Serviços e contas', cor: '#06b6d4', icon: House },
+    { valor: 'lazer', label: 'Lazer', descricao: 'Streaming e jogos', cor: '#ec4899', icon: Clapperboard },
+    { valor: 'compras', label: 'Compras', descricao: 'Lojas e entregas', cor: '#f97316', icon: ShoppingBag },
+    { valor: 'governo', label: 'Governo', descricao: 'Portais e documentos', cor: '#64748b', icon: Landmark },
+    { valor: 'outros', label: 'Outros', descricao: 'Demais acessos', cor: '#a1a1aa', icon: Folder },
 ];
 
 const CORES = [
@@ -69,9 +80,15 @@ const CORES = [
     '#f59e0b', '#ef4444', '#06b6d4', '#84cc16',
 ];
 
-function categoriaBadge(cat?: string) {
-    const found = CATEGORIAS.find(c => c.valor === cat);
-    return found ? `${found.emoji} ${found.label}` : null;
+function normalizarGrupo(cat?: string) {
+    if (cat === 'email' || cat === 'redes_sociais') return 'pessoal';
+    if (cat === 'banco') return 'financeiro';
+    if (cat === 'streaming') return 'lazer';
+    return cat || 'outros';
+}
+
+function grupoDaSenha(cat?: string) {
+    return GRUPOS.find(grupo => grupo.valor === normalizarGrupo(cat)) || GRUPOS[GRUPOS.length - 1];
 }
 
 function SenhaCard({
@@ -99,7 +116,7 @@ function SenhaCard({
         toast.success(tipo === 'senha' ? 'Senha copiada!' : 'Usuário copiado!');
     };
 
-    const badge = categoriaBadge(item.categoria);
+    const grupo = grupoDaSenha(item.categoria);
 
     return (
         <div className="group bg-zinc-900/60 border border-zinc-800/60 rounded-2xl p-5 hover:border-zinc-700/80 hover:bg-zinc-900/80 transition-all duration-200">
@@ -196,11 +213,18 @@ function SenhaCard({
                 </div>
             </div>
 
-            {(badge || item.notas) && (
+            {(grupo || item.notas) && (
                 <div className="mt-3 flex items-center gap-2 flex-wrap">
-                    {badge && (
-                        <span className="text-[10px] font-bold text-zinc-500 bg-zinc-800/60 px-2.5 py-1 rounded-full">
-                            {badge}
+                    {grupo && (
+                        <span
+                            className="text-[10px] font-bold px-2.5 py-1 rounded-full border"
+                            style={{
+                                color: grupo.cor,
+                                backgroundColor: `${grupo.cor}12`,
+                                borderColor: `${grupo.cor}30`,
+                            }}
+                        >
+                            {grupo.label}
                         </span>
                     )}
                     {item.notas && (
@@ -220,7 +244,7 @@ const FORM_VAZIO = {
     url: '',
     usuario: '',
     senha: '',
-    categoria: '',
+    categoria: 'pessoal',
     notas: '',
     cor: '#059669',
 };
@@ -264,7 +288,10 @@ export default function GestaoSenhas() {
 
     const abrirNova = () => {
         setSenhaParaEditar(null);
-        setForm(FORM_VAZIO);
+        setForm({
+            ...FORM_VAZIO,
+            categoria: filtroCategoria === '_all' ? 'pessoal' : filtroCategoria,
+        });
         setRevelarFormSenha(false);
         setSheetAberto(true);
     };
@@ -276,7 +303,7 @@ export default function GestaoSenhas() {
             url: s.url || '',
             usuario: s.usuario,
             senha: s.senha,
-            categoria: s.categoria || '',
+            categoria: normalizarGrupo(s.categoria),
             notas: s.notas || '',
             cor: s.cor,
         });
@@ -335,12 +362,96 @@ export default function GestaoSenhas() {
             s.nome.toLowerCase().includes(busca.toLowerCase()) ||
             s.usuario.toLowerCase().includes(busca.toLowerCase()) ||
             (s.url || '').toLowerCase().includes(busca.toLowerCase());
-        const matchCategoria = filtroCategoria === '_all' || s.categoria === filtroCategoria;
+        const matchCategoria = filtroCategoria === '_all' || normalizarGrupo(s.categoria) === filtroCategoria;
         return matchBusca && matchCategoria;
     });
 
+    const quantidadePorGrupo = (grupo: string) =>
+        senhas.filter(s => normalizarGrupo(s.categoria) === grupo).length;
+
     return (
         <div className="space-y-6">
+            {/* Grupos */}
+            {!carregando && (
+                <section className="space-y-3">
+                    <div className="flex items-center justify-between gap-4">
+                        <div>
+                            <h2 className="text-sm font-black text-white">Seus grupos</h2>
+                            <p className="text-xs text-zinc-600 mt-0.5">Escolha uma área para ver as senhas salvas.</p>
+                        </div>
+                        {filtroCategoria !== '_all' && (
+                            <button
+                                type="button"
+                                onClick={() => setFiltroCategoria('_all')}
+                                className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors"
+                            >
+                                Ver todos
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3">
+                        <button
+                            type="button"
+                            onClick={() => setFiltroCategoria('_all')}
+                            className={`text-left rounded-2xl border p-4 transition-all group ${
+                                filtroCategoria === '_all'
+                                    ? 'bg-emerald-500/10 border-emerald-500/40'
+                                    : 'bg-zinc-900/50 border-zinc-800/60 hover:bg-zinc-900 hover:border-zinc-700'
+                            }`}
+                        >
+                            <div className="flex items-start justify-between">
+                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
+                                    filtroCategoria === '_all' ? 'bg-emerald-500/15 text-emerald-400' : 'bg-zinc-800 text-zinc-500'
+                                }`}>
+                                    <Layers3 className="w-4 h-4" />
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-zinc-700 group-hover:text-zinc-500 transition-colors" />
+                            </div>
+                            <p className="text-sm font-bold text-white mt-4">Todas</p>
+                            <p className="text-[11px] text-zinc-600 mt-0.5">
+                                {senhas.length} {senhas.length === 1 ? 'senha' : 'senhas'}
+                            </p>
+                        </button>
+
+                        {GRUPOS.map(grupo => {
+                            const Icone = grupo.icon;
+                            const quantidade = quantidadePorGrupo(grupo.valor);
+                            const ativo = filtroCategoria === grupo.valor;
+
+                            return (
+                                <button
+                                    key={grupo.valor}
+                                    type="button"
+                                    onClick={() => setFiltroCategoria(grupo.valor)}
+                                    className="text-left rounded-2xl border p-4 transition-all group"
+                                    style={{
+                                        backgroundColor: ativo ? `${grupo.cor}12` : 'rgba(24, 24, 27, 0.5)',
+                                        borderColor: ativo ? `${grupo.cor}66` : 'rgba(63, 63, 70, 0.6)',
+                                    }}
+                                >
+                                    <div className="flex items-start justify-between">
+                                        <div
+                                            className="w-9 h-9 rounded-xl flex items-center justify-center"
+                                            style={{ color: grupo.cor, backgroundColor: `${grupo.cor}16` }}
+                                        >
+                                            <Icone className="w-4 h-4" />
+                                        </div>
+                                        <ChevronRight className="w-4 h-4 text-zinc-700 group-hover:text-zinc-500 transition-colors" />
+                                    </div>
+                                    <p className="text-sm font-bold text-white mt-4">{grupo.label}</p>
+                                    <p className="text-[11px] text-zinc-600 mt-0.5">
+                                        {quantidade > 0
+                                            ? `${quantidade} ${quantidade === 1 ? 'senha' : 'senhas'}`
+                                            : grupo.descricao}
+                                    </p>
+                                </button>
+                            );
+                        })}
+                    </div>
+                </section>
+            )}
+
             {/* Header de ações */}
             <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
@@ -352,19 +463,6 @@ export default function GestaoSenhas() {
                         className="pl-10 bg-zinc-900/50 border-zinc-800 text-white h-11 rounded-xl focus:border-emerald-500/50 placeholder:text-zinc-600"
                     />
                 </div>
-                <Select value={filtroCategoria} onValueChange={setFiltroCategoria}>
-                    <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white h-11 rounded-xl w-full sm:w-48">
-                        <SelectValue placeholder="Todas categorias" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-zinc-900 border-zinc-800 rounded-xl">
-                        <SelectItem value="_all" className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">Todas</SelectItem>
-                        {CATEGORIAS.map(c => (
-                            <SelectItem key={c.valor} value={c.valor} className="text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">
-                                {c.emoji} {c.label}
-                            </SelectItem>
-                        ))}
-                    </SelectContent>
-                </Select>
                 <Button
                     onClick={abrirNova}
                     className="bg-emerald-600 hover:bg-emerald-500 text-white h-11 rounded-xl px-5 font-bold gap-2 flex-shrink-0"
@@ -507,19 +605,19 @@ export default function GestaoSenhas() {
                                 </div>
                             </div>
 
-                            {/* Categoria */}
+                            {/* Grupo */}
                             <div className="space-y-2">
                                 <Label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 ml-1 flex items-center gap-1.5">
-                                    <Tag className="w-3 h-3" /> Categoria
+                                    <Tag className="w-3 h-3" /> Grupo
                                 </Label>
                                 <Select value={form.categoria} onValueChange={v => setForm(f => ({ ...f, categoria: v }))}>
                                     <SelectTrigger className="bg-zinc-900/50 border-zinc-800 text-white font-bold h-14 rounded-2xl focus:ring-emerald-500/20">
-                                        <SelectValue placeholder="Selecione uma categoria" />
+                                        <SelectValue placeholder="Selecione um grupo" />
                                     </SelectTrigger>
                                     <SelectContent className="bg-zinc-900 border-zinc-800 rounded-2xl">
-                                        {CATEGORIAS.map(c => (
-                                            <SelectItem key={c.valor} value={c.valor} className="text-sm font-bold text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">
-                                                {c.emoji} {c.label}
+                                        {GRUPOS.map(grupo => (
+                                            <SelectItem key={grupo.valor} value={grupo.valor} className="text-sm font-bold text-zinc-300 focus:bg-zinc-800 focus:text-white rounded-lg">
+                                                {grupo.label}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
