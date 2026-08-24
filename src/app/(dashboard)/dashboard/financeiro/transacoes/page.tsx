@@ -57,6 +57,7 @@ export default function TransacoesPage() {
   const [visualizacao, setVisualizacao] = useState<'cartoes' | 'planilha' | 'planilha-selecao'>('cartoes');
   const [linhasSelecionadas, setLinhasSelecionadas] = useState<string[]>([]);
   const [somaSelecionada, setSomaSelecionada] = useState(0);
+  const [celulasSelecionadas, setCelulasSelecionadas] = useState<{ chave: string; valor: number }[]>([]);
   const [modalAberto, setModalAberto] = useState(false);
   const [transacaoParaEditar, setTransacaoParaEditar] = useState<any>(null);
   const [dataReferencia, setDataReferencia] = useState(() => startOfMonth(new Date()));
@@ -91,18 +92,30 @@ export default function TransacoesPage() {
     if (visualizacao !== 'planilha-selecao') return;
     const tabela = document.querySelector('.overflow-x-auto table');
     if (!tabela) return;
+    tabela.querySelectorAll('tbody td').forEach((celula) => celula.classList.add('cursor-cell', 'transition-colors', 'hover:bg-zinc-800/70'));
     const aoClicar = (evento: Event) => {
       const mouse = evento as MouseEvent;
-      const linha = (mouse.target as HTMLElement).closest('tbody tr');
-      if (!linha || (mouse.target as HTMLElement).closest('button')) return;
+      const celula = (mouse.target as HTMLElement).closest('tbody td');
+      const linha = celula?.closest('tr');
+      if (!linha || !celula || (mouse.target as HTMLElement).closest('button')) return;
       const indice = Array.from(linha.parentElement?.children || []).indexOf(linha);
       const transacao = transacoesFiltradas[indice];
       if (!transacao) return;
-      setLinhasSelecionadas((atual) => mouse.ctrlKey ? (atual.includes(transacao.id) ? atual.filter((id) => id !== transacao.id) : [...atual, transacao.id]) : [transacao.id]);
+      const coluna = Array.from(linha.children).indexOf(celula);
+      const restantes = transacao.isParcela && transacao.parcelaTotais && transacao.parcelaNumero ? transacao.parcelaTotais - transacao.parcelaNumero + 1 : 0;
+      const valor = coluna === 3 ? transacao.valor : coluna === 7 ? transacao.valor * restantes : 0;
+      if (!valor) return;
+      const chave = `${transacao.id}-${coluna}`;
+      setCelulasSelecionadas((atual) => mouse.ctrlKey ? (atual.some((item) => item.chave === chave) ? atual.filter((item) => item.chave !== chave) : [...atual, { chave, valor }]) : [{ chave, valor }]);
+      tabela.querySelectorAll('tbody td').forEach((item) => item.classList.remove('bg-cyan-400/15', 'ring-1', 'ring-inset', 'ring-cyan-300'));
+      const chavesAtuais = mouse.ctrlKey ? [...celulasSelecionadas.map((item) => item.chave), chave] : [chave];
+      chavesAtuais.forEach((itemChave) => { const [id, colunaSelecionada] = itemChave.split('-'); const posicao = transacoesFiltradas.findIndex((t) => t.id === id); const linhaSelecionada = tabela.querySelectorAll('tbody tr')[posicao]; linhaSelecionada?.children[Number(colunaSelecionada)]?.classList.add('bg-cyan-400/15', 'ring-1', 'ring-inset', 'ring-cyan-300'); });
     };
     tabela.addEventListener('click', aoClicar);
     return () => tabela.removeEventListener('click', aoClicar);
   }, [visualizacao, transacoesRaw, categoriasRaw, contasRaw, cartoesRaw, filtroTipo, busca, dataReferencia]);
+
+  useEffect(() => setSomaSelecionada(celulasSelecionadas.reduce((total, celula) => total + celula.valor, 0)), [celulasSelecionadas]);
 
   useEffect(() => {
     setSomaSelecionada(transacoesFiltradas.filter((t) => linhasSelecionadas.includes(t.id)).reduce((total, t) => total + t.valor, 0));
@@ -440,7 +453,7 @@ export default function TransacoesPage() {
         </>
       )}
 
-      {visualizacao === 'planilha-selecao' && linhasSelecionadas.length > 0 && <div className="fixed bottom-4 left-4 right-4 z-40 mx-auto flex max-w-xl items-center justify-between rounded-xl border border-cyan-400/25 bg-zinc-900/95 px-5 py-3 shadow-2xl backdrop-blur-xl sm:left-auto"><span className="text-sm text-zinc-400">{linhasSelecionadas.length} célula(s) selecionada(s)</span><strong className="text-lg text-cyan-300">Soma: {formatarMoeda(somaSelecionada)}</strong></div>}
+      {visualizacao === 'planilha-selecao' && celulasSelecionadas.length > 0 && <div className="fixed bottom-5 left-4 right-4 z-40 mx-auto flex max-w-md items-center justify-between rounded-2xl border border-cyan-400/25 bg-zinc-900/95 p-4 shadow-2xl shadow-cyan-950/30 backdrop-blur-xl sm:left-auto"><div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Seleção de células</p><p className="mt-1 text-sm text-zinc-300">{celulasSelecionadas.length} valor(es) selecionado(s)</p></div><div className="border-l border-zinc-700 pl-4 text-right"><p className="text-[10px] font-bold uppercase tracking-widest text-cyan-300">Soma</p><strong className="text-xl font-black text-white">{formatarMoeda(somaSelecionada)}</strong></div></div>}
 
       <NovaTransacaoModal
         aberto={modalAberto}
