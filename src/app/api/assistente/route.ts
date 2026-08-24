@@ -31,8 +31,8 @@ export async function POST(request: Request) {
       sql`SELECT "descricao", "valor", "data", "tipo", "isFixa", "isParcela" FROM "Transacao" WHERE "userId" = ${userId} AND "data" >= CURRENT_DATE - INTERVAL '60 days' AND "data" < CURRENT_DATE + INTERVAL '180 days' ORDER BY "data" DESC LIMIT 60`,
       sql`SELECT "nome", "tipo", "saldoAtual", "ativa" FROM "ContaBancaria" WHERE "userId" = ${userId} AND "ativa" = true ORDER BY "nome" ASC LIMIT 12`,
       sql`SELECT "nome", "valorMeta", "valorAtual", "dataMeta", "status" FROM "ObjetivoFinanceiro" WHERE "userId" = ${userId} ORDER BY "status" ASC, "dataMeta" ASC NULLS LAST LIMIT 12`,
-      admin ? sql`SELECT u."name" AS "usuario", u."email" AS "email", c."titulo", c."data", c."horaInicio", c."horaFim", c."categoria", c."concluido" FROM "Compromisso" c INNER JOIN "User" u ON u."id" = c."userId" WHERE c."data" >= CURRENT_DATE - INTERVAL '14 days' AND c."data" < CURRENT_DATE + INTERVAL '45 days' ORDER BY c."data" ASC, c."horaInicio" ASC LIMIT 120` : Promise.resolve([]),
-      admin ? sql`SELECT u."name" AS "usuario", u."email" AS "email", cb."nome", cb."tipo", cb."saldoAtual", cb."ativa" FROM "ContaBancaria" cb INNER JOIN "User" u ON u."id" = cb."userId" WHERE cb."ativa" = true ORDER BY u."name" ASC, cb."nome" ASC LIMIT 120` : Promise.resolve([]),
+      admin ? sql`SELECT u."name" AS "usuario", c."titulo", c."data", c."horaInicio", c."concluido" FROM "Compromisso" c INNER JOIN "User" u ON u."id" = c."userId" WHERE c."data" >= CURRENT_DATE - INTERVAL '14 days' AND c."data" < CURRENT_DATE + INTERVAL '45 days' ORDER BY c."data" ASC, c."horaInicio" ASC LIMIT 35` : Promise.resolve([]),
+      admin ? sql`SELECT u."name" AS "usuario", cb."nome", cb."tipo", cb."saldoAtual" FROM "ContaBancaria" cb INNER JOIN "User" u ON u."id" = cb."userId" WHERE cb."ativa" = true ORDER BY u."name" ASC, cb."nome" ASC LIMIT 35` : Promise.resolve([]),
     ]);
 
     const contextoPessoal = JSON.stringify({
