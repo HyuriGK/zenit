@@ -372,11 +372,11 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                         <SelectValue placeholder="Selecionar conta" />
                       </SelectTrigger>
                       <SelectContent className="bg-zinc-950 border-zinc-800/80 rounded-xl">
-                        <SelectItem value="caixa-geral" className="text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg p-2 font-black text-xs uppercase tracking-widest cursor-pointer">
+                        <SelectItem value="caixa-geral" className="text-white [&_*]:text-white hover:bg-zinc-900 focus:bg-zinc-900 focus:text-white data-[highlighted]:bg-zinc-900 data-[highlighted]:text-white rounded-lg p-2 font-black text-xs uppercase tracking-widest cursor-pointer">
                           🏦 Caixa Geral
                         </SelectItem>
                         {contas.map((conta) => (
-                          <SelectItem key={conta.id} value={conta.id} className="text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg p-2 cursor-pointer">
+                          <SelectItem key={conta.id} value={conta.id} className="text-white [&_*]:text-white hover:bg-zinc-900 focus:bg-zinc-900 focus:text-white data-[highlighted]:bg-zinc-900 data-[highlighted]:text-white rounded-lg p-2 cursor-pointer">
                             {conta.nome}
                           </SelectItem>
                         ))}
