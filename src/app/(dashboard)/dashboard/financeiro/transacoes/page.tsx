@@ -131,7 +131,7 @@ export default function TransacoesPage() {
       celula?.classList.add('bg-cyan-400/15', 'ring-1', 'ring-inset', 'ring-cyan-300');
       if (celula) { celula.style.backgroundColor = 'rgba(6, 182, 212, 0.32)'; celula.style.boxShadow = 'inset 0 0 0 1px rgba(103, 232, 249, 0.95)'; }
     });
-  }, [celulasSelecionadas, transacoesFiltradas, visualizacao]);
+  }, [celulasSelecionadas, visualizacao, transacoesRaw, categoriasRaw, contasRaw, cartoesRaw, filtroTipo, busca, dataReferencia]);
 
   useEffect(() => {
     setSomaSelecionada(transacoesFiltradas.filter((t) => linhasSelecionadas.includes(t.id)).reduce((total, t) => total + t.valor, 0));
