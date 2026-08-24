@@ -252,7 +252,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-zinc-950 px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
+    <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-zinc-950 px-4 py-4 sm:px-6 lg:px-10 lg:py-6">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.13),transparent_64%)]" />
       <div className="relative mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col">
         {mensagens.length === 0 ? (

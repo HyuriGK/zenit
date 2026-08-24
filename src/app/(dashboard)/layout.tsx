@@ -22,8 +22,8 @@ export default function DashboardLayout({
           <HeaderWrapper />
 
           {/* Page Content - Performance Optimized Scroll */}
-          <main className="flex-1 overflow-auto scroll-container flex flex-col">
-            <div className="flex-1">
+          <main className="flex-1 min-h-0 overflow-auto scroll-container flex flex-col">
+            <div className="flex-1 min-h-0">
               {children}
             </div>
             
