@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { useSession } from '@/lib/auth-mock';
 import { useTranslations } from 'next-intl';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
-import { ArrowUp, Bot, CalendarDays, ChartNoAxesCombined, ListTodo, Mic, Paperclip, Pause, PhoneOff, Play, Sparkles } from 'lucide-react';
+import { ArrowUp, Bot, CalendarDays, ChartNoAxesCombined, ListTodo, Mic, MicOff, Paperclip, Pause, PhoneOff, Play, Sparkles } from 'lucide-react';
 
 type Mensagem = { id: number; papel: 'assistente' | 'usuario'; texto: string };
 
@@ -34,11 +34,14 @@ export default function DashboardPage() {
   const [enviando, setEnviando] = useState(false);
   const [chamadaAtiva, setChamadaAtiva] = useState(false);
   const [falaPausada, setFalaPausada] = useState(false);
+  const [microfoneMutado, setMicrofoneMutado] = useState(false);
   const [estadoChamada, setEstadoChamada] = useState<'ouvindo' | 'pensando' | 'falando'>('ouvindo');
   const reconhecimentoRef = useRef<any>(null);
   const interrupcaoRef = useRef<any>(null);
   const chamadaAtivaRef = useRef(false);
   const aguardandoRespostaRef = useRef(false);
+  const microfoneMutadoRef = useRef(false);
+  const requisicaoRef = useRef<AbortController | null>(null);
 
   if (status === 'loading') return <LoadingScreen message={tCommon('loading')} />;
   if (!session) return null;
@@ -52,7 +55,7 @@ export default function DashboardPage() {
     fala.rate = 1;
     if (retomarChamada) {
       setEstadoChamada('falando');
-      fala.onstart = () => iniciarEscutaParaInterromper();
+      fala.onstart = () => { if (!microfoneMutadoRef.current) iniciarEscutaParaInterromper(); };
       fala.onend = () => {
         interrupcaoRef.current?.stop();
         interrupcaoRef.current = null;
@@ -73,23 +76,33 @@ export default function DashboardPage() {
     const proximoHistorico = [...mensagens, novaMensagem];
     setMensagens(proximoHistorico);
     setTexto('');
+    requisicaoRef.current?.abort();
+    const requisicao = new AbortController();
+    requisicaoRef.current = requisicao;
     setEnviando(true);
     try {
       const response = await fetch('/api/assistente', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: requisicao.signal,
         body: JSON.stringify({ mensagens: proximoHistorico.map(({ papel, texto }) => ({ papel, texto })) }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Não foi possível responder agora.');
+      if (requisicao.signal.aborted) return;
       setMensagens((atual) => [...atual, { id: Date.now() + 1, papel: 'assistente', texto: data.resposta }]);
       if (responderEmVoz) falarResposta(data.resposta, chamadaAtivaRef.current);
     } catch (error) {
+      if (requisicao.signal.aborted || (error instanceof DOMException && error.name === 'AbortError')) return;
       setMensagens((atual) => [...atual, { id: Date.now() + 1, papel: 'assistente', texto: error instanceof Error ? error.message : 'Não foi possível responder agora.' }]);
-    } finally { setEnviando(false); }
+    } finally {
+      if (requisicaoRef.current === requisicao) {
+        requisicaoRef.current = null;
+        setEnviando(false);
+      }
+    }
   };
 
   const iniciarEscuta = () => {
-    if (!chamadaAtivaRef.current || enviando || reconhecimentoRef.current) return;
+    if (!chamadaAtivaRef.current || microfoneMutadoRef.current || enviando || reconhecimentoRef.current) return;
     const navegadorComVoz = window as Window & { SpeechRecognition?: any; webkitSpeechRecognition?: any };
     const Reconhecimento = navegadorComVoz.SpeechRecognition || navegadorComVoz.webkitSpeechRecognition;
     if (!Reconhecimento) return;
@@ -118,7 +131,7 @@ export default function DashboardPage() {
   };
 
   const iniciarEscutaParaInterromper = () => {
-    if (!chamadaAtivaRef.current || interrupcaoRef.current) return;
+    if (!chamadaAtivaRef.current || microfoneMutadoRef.current || interrupcaoRef.current) return;
     const navegadorComVoz = window as Window & { SpeechRecognition?: any; webkitSpeechRecognition?: any };
     const Reconhecimento = navegadorComVoz.SpeechRecognition || navegadorComVoz.webkitSpeechRecognition;
     if (!Reconhecimento) return;
@@ -150,6 +163,8 @@ export default function DashboardPage() {
     chamadaAtivaRef.current = true;
     setChamadaAtiva(true);
     setFalaPausada(false);
+    setMicrofoneMutado(false);
+    microfoneMutadoRef.current = false;
     iniciarEscuta();
   };
 
@@ -160,10 +175,31 @@ export default function DashboardPage() {
     reconhecimentoRef.current = null;
     interrupcaoRef.current?.stop();
     interrupcaoRef.current = null;
+    requisicaoRef.current?.abort();
+    requisicaoRef.current = null;
     window.speechSynthesis?.cancel();
     setGravando(false);
+    setEnviando(false);
     setChamadaAtiva(false);
     setFalaPausada(false);
+    setMicrofoneMutado(false);
+    microfoneMutadoRef.current = false;
+  };
+
+  const alternarMicrofone = () => {
+    const novoEstado = !microfoneMutadoRef.current;
+    microfoneMutadoRef.current = novoEstado;
+    setMicrofoneMutado(novoEstado);
+    if (novoEstado) {
+      reconhecimentoRef.current?.stop();
+      reconhecimentoRef.current = null;
+      interrupcaoRef.current?.stop();
+      interrupcaoRef.current = null;
+      setGravando(false);
+      return;
+    }
+    if (estadoChamada === 'falando' && !falaPausada) iniciarEscutaParaInterromper();
+    else iniciarEscuta();
   };
 
   const alternarPausaFala = () => {
@@ -216,9 +252,9 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="relative flex min-h-full flex-1 flex-col overflow-hidden bg-zinc-950 px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
+    <div className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden bg-zinc-950 px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_at_top,rgba(6,182,212,0.13),transparent_64%)]" />
-      <div className="relative mx-auto flex w-full max-w-5xl flex-1 flex-col">
+      <div className="relative mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col">
         {mensagens.length === 0 ? (
           <div className="flex flex-1 items-center justify-center py-8 sm:py-12">
             <section className="w-full overflow-hidden rounded-[28px] border border-zinc-800 bg-zinc-900/35 shadow-2xl shadow-black/20 backdrop-blur-sm">
@@ -249,7 +285,7 @@ export default function DashboardPage() {
             </section>
           </div>
         ) : (
-          <div className="flex-1 space-y-6 overflow-y-auto pb-8 pt-2">
+          <div className="min-h-0 flex-1 space-y-6 overflow-y-auto pb-8 pt-2">
             <div className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200"><Bot className="h-5 w-5" /></div><div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-zinc-800 bg-zinc-900/70 px-4 py-3 text-sm leading-relaxed text-zinc-300">Estou pronto para ajudar com sua rotina, metas e registros.</div></div>
             {mensagens.map((mensagem) => mensagem.papel === 'usuario' ? <div key={mensagem.id} className="flex justify-end"><div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-cyan-500 to-blue-600 px-4 py-3 text-sm leading-relaxed text-white shadow-lg shadow-cyan-950/30">{mensagem.texto}</div></div> : <div key={mensagem.id} className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200"><Bot className="h-5 w-5" /></div><div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-zinc-800 bg-zinc-900/70 px-4 py-3 text-sm leading-relaxed text-zinc-300"><RespostaFormatada texto={mensagem.texto} /></div></div>)}
             {enviando && <div className="flex items-center gap-3 text-sm text-zinc-500"><Bot className="h-5 w-5 animate-pulse text-cyan-300" />Azimov está pensando...</div>}
@@ -260,10 +296,11 @@ export default function DashboardPage() {
 
       {chamadaAtiva && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/90 px-4 backdrop-blur-xl">
-          <div className="relative flex w-full max-w-md flex-col items-center overflow-hidden rounded-[36px] border border-zinc-800 bg-zinc-900/80 px-6 py-10 text-center shadow-2xl shadow-cyan-950/40 sm:px-10">
-            <div className="pointer-events-none absolute -top-24 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
+          <div className="relative flex w-full max-w-lg flex-col items-center overflow-hidden rounded-[40px] border border-cyan-300/15 bg-[linear-gradient(145deg,rgba(24,24,27,0.98),rgba(9,9,11,0.96))] px-6 py-8 text-center shadow-2xl shadow-cyan-950/50 sm:px-12 sm:py-11">
+            <div className="pointer-events-none absolute -top-24 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
+            <div className="pointer-events-none absolute inset-x-12 bottom-0 h-px bg-gradient-to-r from-transparent via-cyan-300/35 to-transparent" />
             <span className="relative text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-200">Chamada com Azimov</span>
-            <div className="relative my-10 flex h-52 w-52 items-center justify-center">
+            <div className="relative my-8 flex h-56 w-56 items-center justify-center">
               <div className={`absolute inset-0 rounded-full bg-cyan-400/10 blur-xl transition-all duration-500 ${estadoChamada === 'falando' ? 'scale-125 animate-pulse' : estadoChamada === 'ouvindo' ? 'scale-110 animate-pulse' : 'scale-95'}`} />
               <div className={`absolute inset-5 rounded-full border border-cyan-300/20 transition-all duration-500 ${estadoChamada === 'falando' ? 'scale-110' : ''}`} />
               <div className={`absolute inset-10 rounded-full bg-gradient-to-br from-cyan-300 via-sky-500 to-blue-700 shadow-[0_0_60px_rgba(34,211,238,0.45)] transition-all duration-500 ${estadoChamada === 'pensando' ? 'animate-pulse' : ''}`} />
@@ -271,7 +308,12 @@ export default function DashboardPage() {
             </div>
             <h2 className="relative text-2xl font-black text-white">{estadoChamada === 'ouvindo' ? 'Estou ouvindo' : estadoChamada === 'pensando' ? 'Pensando na resposta' : falaPausada ? 'Fala pausada' : 'Azimov está falando'}</h2>
             <p className="relative mt-3 max-w-xs text-sm leading-6 text-zinc-400">{estadoChamada === 'ouvindo' ? 'Fale naturalmente. O Azimov pausa para escutar você.' : estadoChamada === 'pensando' ? 'Organizando uma resposta com seus dados.' : 'Você pode pausar a resposta ou falar para interromper.'}</p>
-            <div className="relative mt-9 flex items-center gap-3">
+            <div className="relative mt-4 flex items-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-950/55 px-3 py-2 text-xs text-zinc-400">
+              {microfoneMutado ? <MicOff className="h-4 w-4 text-amber-300" /> : <Mic className="h-4 w-4 text-cyan-300" />}
+              {microfoneMutado ? 'Microfone mutado: sua fala não interrompe o Azimov.' : 'Microfone ativo: fale para interromper e responder.'}
+            </div>
+            <div className="relative mt-7 flex items-center gap-3">
+              <button type="button" onClick={alternarMicrofone} aria-label={microfoneMutado ? 'Ativar microfone' : 'Mutar microfone'} className={`flex h-12 w-12 items-center justify-center rounded-2xl border transition-colors ${microfoneMutado ? 'border-amber-300/30 bg-amber-400/10 text-amber-200' : 'border-zinc-700 bg-zinc-800 text-zinc-200 hover:bg-zinc-700'}`}>{microfoneMutado ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}</button>
               <button type="button" onClick={alternarPausaFala} aria-label={falaPausada ? 'Continuar fala' : 'Pausar fala'} className="flex h-12 w-12 items-center justify-center rounded-2xl border border-zinc-700 bg-zinc-800 text-zinc-200 transition-colors hover:bg-zinc-700">{falaPausada ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}</button>
               <button type="button" onClick={encerrarChamada} className="flex h-12 items-center gap-2 rounded-2xl bg-red-500 px-5 text-sm font-bold text-white transition-colors hover:bg-red-400"><PhoneOff className="h-5 w-5" /> Encerrar</button>
             </div>
