@@ -86,6 +86,14 @@ export default function TransacoesPage() {
         linha.appendChild(celula);
       });
     }
+    tabela?.querySelectorAll('tbody tr').forEach((linha, indice) => {
+      const transacao = transacoesFiltradas[indice];
+      if (!transacao || transacao.isParcela) return;
+      if (linha.children[4]) linha.children[4].textContent = '1';
+      if (linha.children[5]) linha.children[5].textContent = '1';
+      if (linha.children[6]) linha.children[6].textContent = '1';
+      if (linha.children[7]) linha.children[7].textContent = formatarMoeda(transacao.valor);
+    });
   }, [visualizacao, transacoesRaw, categoriasRaw, contasRaw, cartoesRaw, filtroTipo, busca, dataReferencia]);
 
   useEffect(() => {
