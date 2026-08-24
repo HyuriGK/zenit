@@ -5,7 +5,7 @@ import { useSession, signOut } from '@/lib/auth-mock';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useTranslations } from 'next-intl';
-import { Menu, Bell, Crown, User, Settings, LogOut, Sparkles } from 'lucide-react';
+import { Menu, Bell, Crown, User, Settings, LogOut, Sparkles, ShieldCheck } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,6 +26,7 @@ import { Sidebar } from './Sidebar';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { LanguageSwitcher } from '@/components/ui/LanguageSwitcher';
 import { NotificationBell } from '@/components/ui/NotificationBell';
+import { isAdminEmail } from '@/lib/admin';
 
 export function Header() {
   const { data: session } = useSession();
@@ -142,6 +143,14 @@ export function Header() {
                     <p className="text-[11px] font-medium text-zinc-500 mt-0.5">{t('viewAndEdit')}</p>
                   </div>
                 </DropdownMenuItem>
+
+                {isAdminEmail(session?.user?.email) && <DropdownMenuItem
+                  className="cursor-pointer hover:bg-zinc-900 focus:bg-zinc-900 rounded-xl px-4 py-3 flex items-center gap-4 transition-all"
+                  onClick={() => router.push('/dashboard/admin')}
+                >
+                  <div className="w-10 h-10 bg-violet-500/10 border border-violet-500/20 flex items-center justify-center rounded-xl"><ShieldCheck className="w-5 h-5 text-violet-300" /></div>
+                  <div className="flex-1"><p className="text-sm font-semibold text-zinc-100">Painel administrativo</p><p className="text-[11px] font-medium text-zinc-500 mt-0.5">Acessos e logs do sistema</p></div>
+                </DropdownMenuItem>}
 
                 <DropdownMenuItem
                   className="cursor-pointer hover:bg-zinc-900 focus:bg-zinc-900 rounded-xl px-4 py-3 flex items-center gap-4 transition-all"

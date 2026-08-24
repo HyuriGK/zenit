@@ -10,6 +10,7 @@ declare module 'next-auth' {
     image?: string | null;
     emailVerified?: Date | null;
     plano?: string;
+    role?: string;
     planoExpiraEm?: Date | null;
     createdAt?: Date;
     updatedAt?: Date;
@@ -25,6 +26,7 @@ declare module 'next-auth' {
       image?: string | null;
       emailVerified?: Date | null;
       plano?: string;
+      role?: string;
       planoExpiraEm?: Date | null;
       createdAt?: Date;
       updatedAt?: Date;
@@ -42,6 +44,7 @@ declare module 'next-auth/jwt' {
     image?: string | null;
     emailVerified?: Date | null;
     plano?: string;
+    role?: string;
     planoExpiraEm?: Date | null;
     createdAt?: Date;
     updatedAt?: Date;

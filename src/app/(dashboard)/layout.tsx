@@ -4,6 +4,7 @@ import { Footer } from '@/components/dashboard/Footer';
 import { InstallPWA } from '@/components/pwa/InstallPWA';
 import { Toaster } from 'sonner';
 import { NotificationProvider } from '@/contexts/NotificationContext';
+import { AccessLogger } from '@/components/admin/AccessLogger';
 
 export default function DashboardLayout({
   children,
@@ -13,6 +14,7 @@ export default function DashboardLayout({
   return (
     <NotificationProvider>
       <div className="h-screen text-white flex overflow-hidden relative bg-[#09090b]">
+        <AccessLogger />
         {/* Sidebar - Desktop */}
         <Sidebar />
 

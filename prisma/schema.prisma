@@ -19,6 +19,7 @@ model User {
   usernameChangedAt DateTime?
   plano         String    @default("FREE") // FREE ou PREMIUM
   planoExpiraEm DateTime?
+  role          String    @default("OPERADOR") // ADMIN ou OPERADOR
   
   accounts      Account[]
   sessions      Session[]
@@ -37,6 +38,7 @@ model User {
   veiculos             Veiculo[]
   notificacoes         Notificacao[]
   senhasArmazenadas    SenhaArmazenada[]
+  logsAcesso           LogAcesso[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -48,6 +50,21 @@ model User {
   googleCalendarChannelId       String?
   googleCalendarResourceId      String?
   googleCalendarWatchExpiration DateTime?
+}
+
+model LogAcesso {
+  id        String   @id @default(uuid())
+  rota      String
+  acao      String   @default("ACESSOU_TELA")
+  dispositivo String?
+  detalhes  String?
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([createdAt])
+  @@index([userId, createdAt])
 }
 
 model Account {

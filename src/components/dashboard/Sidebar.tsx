@@ -15,10 +15,13 @@ import {
   ChevronRight,
   TrendingUp,
   Car,
-  KeyRound
+  KeyRound,
+  ShieldCheck
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { usePlano } from '@/hooks/usePlano';
+import { useSession } from '@/lib/auth-mock';
+import { isAdminEmail } from '@/lib/admin';
 
 interface SidebarProps {
   isMobile?: boolean;
@@ -31,6 +34,7 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const t = useTranslations('sidebar');
   const { ehFree } = usePlano();
+  const { data: session } = useSession();
 
   const menuItems = [
     { icon: LayoutDashboard, label: t('dashboard'), href: '/dashboard' },
@@ -40,6 +44,7 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
     { icon: TrendingUp, label: t('investments'), href: '/dashboard/investimentos' },
     { icon: KeyRound, label: t('passwords'), href: '/dashboard/senhas' },
     { icon: BookOpen, label: t('studies'), href: '/dashboard/estudos' },
+    ...(isAdminEmail(session?.user?.email) ? [{ icon: ShieldCheck, label: 'Administração', href: '/dashboard/admin' }] : []),
   ];
 
   useEffect(() => {

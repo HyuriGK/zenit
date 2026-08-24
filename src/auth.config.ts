@@ -23,12 +23,16 @@ export const authConfig = {
             if (token?.plano && session.user) {
                 (session.user as any).plano = token.plano
             }
+            if (token?.role && session.user) {
+                session.user.role = token.role as string
+            }
             return session
         },
         async jwt({ token, user }) {
             if (user) {
                 token.sub = user.id
                 token.plano = (user as any).plano
+                token.role = (user as any).role
             }
             return token
         },
