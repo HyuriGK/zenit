@@ -294,7 +294,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   <Input value={descricao} onChange={(e) => setDescricao(e.target.value)} placeholder="Ex: Assinatura Netflix, Freelance Design..." required className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl placeholder:text-zinc-600 focus:border-zinc-700 focus-visible:ring-0 transition-all text-base" />
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid min-w-0 grid-cols-1 sm:grid-cols-2 gap-6">
                   <div>
                     <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Valor (R$)</Label>
                     <div className="relative">
@@ -304,7 +304,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   </div>
                   <div>
                     <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Data da Operação</Label>
-                    <Input type="date" value={data} onChange={(e) => setData(e.target.value)} required className="bg-zinc-900/50 border-zinc-800 text-white h-12 px-4 rounded-xl focus-visible:ring-0 transition-all" />
+                    <Input type="date" value={data} onChange={(e) => setData(e.target.value)} required className="w-full min-w-0 max-w-full bg-zinc-900/50 border-zinc-800 text-white h-12 px-3 sm:px-4 text-sm rounded-xl focus-visible:ring-0 transition-all" />
                     {mesRegistroLabel && (
                       <p className="text-[10px] font-bold text-zinc-500 mt-1.5">
                         Registrando em <span className="text-emerald-400 capitalize">{mesRegistroLabel}</span>

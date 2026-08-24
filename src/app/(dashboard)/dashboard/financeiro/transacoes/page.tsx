@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -57,6 +57,7 @@ export default function TransacoesPage() {
   const [dataReferencia, setDataReferencia] = useState(() => startOfMonth(new Date()));
   const [deleteGroupModalOpen, setDeleteGroupModalOpen] = useState(false);
   const [selectedForDelete, setSelectedForDelete] = useState<any>(null);
+  const mesesRef = useRef<HTMLDivElement>(null);
 
   const recarregarDados = useCallback(async () => {
     setCarregando(true);
@@ -101,6 +102,11 @@ export default function TransacoesPage() {
     const fim = addMonths(dataReferencia, 6);
     return eachMonthOfInterval({ start: inicio, end: fim });
   }, [dataReferencia]);
+
+  useEffect(() => {
+    const mesAtivo = mesesRef.current?.querySelector<HTMLElement>('[data-month-active="true"]');
+    mesAtivo?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, [dataReferencia, meses]);
 
   const transacoesFiltradas = transacoes.filter((t) =>
     t.descricao.toLowerCase().includes(busca.toLowerCase())
@@ -245,11 +251,11 @@ export default function TransacoesPage() {
         <Button variant="ghost" size="icon" onClick={() => setDataReferencia(prev => subMonths(prev, 1))} className="text-zinc-400 hover:text-white">
           <ChevronLeft className="w-5 h-5" />
         </Button>
-        <div className="flex min-w-0 flex-1 items-center justify-between overflow-x-auto scrollbar-none gap-2 px-1 sm:px-2">
+        <div ref={mesesRef} className="flex min-w-0 flex-1 items-center justify-between overflow-x-auto scrollbar-none gap-2 px-1 sm:px-2">
           {meses.map((mes) => {
             const selecionado = isSameMonth(mes, dataReferencia);
             return (
-              <button key={mes.toISOString()} onClick={() => setDataReferencia(mes)}
+              <button key={mes.toISOString()} data-month-active={selecionado} onClick={() => setDataReferencia(mes)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${selecionado ? 'bg-green-600 text-white shadow-lg shadow-green-500/20' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800'}`}>
                 <span className="capitalize">{format(mes, 'MMM', { locale: ptBR }).replace('.', '')}</span>
                 <span className="ml-1 text-[10px] opacity-50">{format(mes, 'yyyy')}</span>
@@ -296,7 +302,7 @@ export default function TransacoesPage() {
       ) : (
         <div className="space-y-2">
           {transacoesFiltradas.map((transacao) => (
-            <Card key={transacao.id} className={`bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 transition-all group hover:shadow-lg ${transacao.paga ? 'opacity-60 grayscale-[0.5]' : ''}`}>
+            <Card key={transacao.id} className={`overflow-hidden bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 transition-all group hover:shadow-lg ${transacao.paga ? 'opacity-60 grayscale-[0.5]' : ''}`}>
               <div className="p-4 flex flex-wrap items-center gap-3 sm:flex-nowrap sm:gap-4">
                 <div className="flex items-center justify-center p-1">
                   <Checkbox
@@ -343,9 +349,12 @@ export default function TransacoesPage() {
                   </div>
                 </div>
 
-                <div className="basis-full pl-10 text-left flex flex-col items-start gap-1.5 sm:basis-auto sm:pl-0 sm:text-right sm:items-end sm:min-w-[120px]">
-                  <div className={`text-lg font-black tracking-tight ${transacao.tipo === 'RECEITA' ? 'text-green-400' : 'text-red-400'} ${transacao.paga ? 'opacity-40' : ''}`}>
-                    {transacao.tipo === 'RECEITA' ? '+' : '-'} {formatarMoeda(transacao.valor)}
+                <div className="basis-full ml-10 flex items-center justify-between gap-3 border-t border-zinc-800/70 pt-3 sm:ml-0 sm:basis-auto sm:border-0 sm:pt-0 sm:flex-col sm:items-end sm:gap-1.5 sm:min-w-[120px]">
+                  <div className="min-w-0">
+                    <span className="block text-[10px] font-bold uppercase tracking-wider text-zinc-600 sm:hidden">Valor</span>
+                    <div className={`text-lg font-black tracking-tight ${transacao.tipo === 'RECEITA' ? 'text-green-400' : 'text-red-400'} ${transacao.paga ? 'opacity-40' : ''}`}>
+                      {transacao.tipo === 'RECEITA' ? '+' : '-'} {formatarMoeda(transacao.valor)}
+                    </div>
                   </div>
                   {!transacao.paga && (
                     <span className={`px-2 py-0.5 rounded-full text-[10px] border font-bold uppercase tracking-wider ${getDiasStatus(parseDataString(transacao.data)).className}`}>
