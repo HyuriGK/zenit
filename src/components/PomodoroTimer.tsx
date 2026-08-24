@@ -84,12 +84,12 @@ export function PomodoroTimer() {
       const seconds = timeLeft % 60
       document.title = `${minutes}:${seconds.toString().padStart(2, '0')} - ${getModeLabel(mode)}`
     } else {
-      document.title = 'Zenit - Estudos'
+      document.title = 'Azimov - Estudos'
     }
 
     return () => {
       if (!isRunning) {
-        document.title = 'Zenit - Estudos'
+        document.title = 'Azimov - Estudos'
       }
     }
   }, [timeLeft, isRunning, mode])

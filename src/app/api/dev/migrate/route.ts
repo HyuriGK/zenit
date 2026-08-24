@@ -14,7 +14,7 @@ export async function GET() {
         return NextResponse.json({ 
             success: true, 
             message: "Coluna 'valorFipe' adicionada com sucesso ao banco de dados!",
-            instruction: "Agora você pode fechar esta aba e tentar salvar o veículo novamente no Zenit."
+            instruction: "Agora você pode fechar esta aba e tentar salvar o veículo novamente no Azimov."
         });
     } catch (error) {
         console.error("Erro na migração manual:", error);

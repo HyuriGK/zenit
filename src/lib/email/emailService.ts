@@ -19,7 +19,7 @@ export async function sendVerificationEmail(
     await resend.emails.send({
       from: process.env.EMAIL_FROM!,
       to: email,
-      subject: 'Verifique seu email - Zenit',
+      subject: 'Verifique seu email - Azimov',
       html: `
         <!DOCTYPE html>
         <html>
@@ -28,14 +28,14 @@ export async function sendVerificationEmail(
           </head>
           <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; text-align: center;">
-              <h1 style="color: white; margin: 0;">Bem-vindo ao Zenit!</h1>
+              <h1 style="color: white; margin: 0;">Bem-vindo ao Azimov!</h1>
             </div>
             <div style="padding: 40px; background: #f9fafb;">
               <p style="font-size: 16px; color: #374151;">
                 Olá ${name || 'usuário'},
               </p>
               <p style="font-size: 16px; color: #374151;">
-                Obrigado por se registrar no Zenit! Para começar a usar todos os recursos,
+                Obrigado por se registrar no Azimov! Para começar a usar todos os recursos,
                 precisamos verificar seu endereço de email.
               </p>
               <div style="text-align: center; margin: 30px 0;">
@@ -65,7 +65,7 @@ export async function sendVerificationEmail(
             </div>
             <div style="background: #374151; padding: 20px; text-align: center;">
               <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-                © 2025 Zenit. Todos os direitos reservados.
+                © 2025 Azimov. Todos os direitos reservados.
               </p>
             </div>
           </body>
@@ -92,7 +92,7 @@ export async function sendPasswordResetEmail(
     await resend.emails.send({
       from: process.env.EMAIL_FROM!,
       to: email,
-      subject: 'Redefinição de Senha - Zenit',
+      subject: 'Redefinição de Senha - Azimov',
       html: `
         <!DOCTYPE html>
         <html>
@@ -108,7 +108,7 @@ export async function sendPasswordResetEmail(
                 Olá ${name || 'usuário'},
               </p>
               <p style="font-size: 16px; color: #374151;">
-                Recebemos uma solicitação para redefinir a senha da sua conta no Zenit.
+                Recebemos uma solicitação para redefinir a senha da sua conta no Azimov.
               </p>
               <div style="text-align: center; margin: 30px 0;">
                 <a href="${resetUrl}"
@@ -137,7 +137,7 @@ export async function sendPasswordResetEmail(
             </div>
             <div style="background: #374151; padding: 20px; text-align: center;">
               <p style="color: #9ca3af; font-size: 12px; margin: 0;">
-                © 2025 Zenit. Todos os direitos reservados.
+                © 2025 Azimov. Todos os direitos reservados.
               </p>
             </div>
           </body>

@@ -140,9 +140,9 @@ export default function PremiumPage() {
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3">
-              <img src="/images/logo.png" alt="Logo Zenit" className="h-10 w-10 rounded-xl object-cover" />
+              <img src="/images/logo-sem-fundo.png" alt="Logo Azimov" className="h-10 w-10 rounded-xl object-contain" />
               <span className="text-3xl font-bold bg-gradient-to-r from-green-400 via-teal-400 to-blue-400 bg-clip-text text-transparent animate-gradient">
-                Zenit
+                Azimov
               </span>
             </Link>
 
@@ -179,12 +179,12 @@ export default function PremiumPage() {
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 mb-8 animate-fade-in">
               <Crown className="w-4 h-4 text-amber-400" />
-              <span className="text-sm text-amber-300">Desbloqueie todo o potencial do Zenit</span>
+              <span className="text-sm text-amber-300">Desbloqueie todo o potencial do Azimov</span>
             </div>
 
             {/* Main Headline */}
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fade-in-delay-1">
-              <span className="text-white">Zenit</span>
+              <span className="text-white">Azimov</span>
               <br />
               <span className="bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400 bg-clip-text text-transparent">
                 Premium
@@ -422,7 +422,7 @@ export default function PremiumPage() {
                 Pronto para o próximo nível?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Desbloqueie todo o potencial do Zenit e transforme sua produtividade hoje.
+                Desbloqueie todo o potencial do Azimov e transforme sua produtividade hoje.
               </p>
 
               {isPremium ? (
@@ -452,10 +452,10 @@ export default function PremiumPage() {
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <span className="text-2xl font-bold bg-gradient-to-r from-green-400 via-teal-400 to-blue-400 bg-clip-text text-transparent animate-gradient">
-              Zenit
+              Azimov
             </span>
             <p className="text-sm text-gray-500">
-              © 2026 Zenit. Todos os direitos reservados.
+              © 2026 Azimov. Todos os direitos reservados.
             </p>
           </div>
         </div>

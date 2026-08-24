@@ -31,7 +31,7 @@ export default function LoginPage() {
             if (result?.error) {
                 toast.error('Credenciais inválidas. Verifique seu email e senha.');
             } else {
-                toast.success('Bem-vindo ao Zênit!');
+                toast.success('Bem-vindo ao Azimov!');
                 router.push('/dashboard');
                 router.refresh();
             }
@@ -56,8 +56,8 @@ export default function LoginPage() {
 
                 {/* Logo Section */}
                 <div className="relative z-10 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
-                    <img src="/images/logo.png" alt="Logo Zenit" className="w-12 h-12 rounded-xl object-cover shadow-[0_0_30px_rgba(52,211,153,0.3)]" />
-                    <span className="text-2xl font-black tracking-tighter bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">ZÊNIT</span>
+                    <img src="/images/logo-sem-fundo.png" alt="Logo Azimov" className="w-12 h-12 rounded-xl object-contain shadow-[0_0_30px_rgba(52,211,153,0.3)]" />
+                    <span className="text-2xl font-black tracking-tighter bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">AZIMOV</span>
                 </div>
 
                 {/* Main Content Area */}
@@ -90,7 +90,7 @@ export default function LoginPage() {
                         ))}
                     </div>
                     <p className="text-zinc-500 text-xs font-medium max-w-xs">
-                        Junte-se a centenas de usuários que transformaram suas vidas com o Zênit.
+                        Junte-se a centenas de usuários que transformaram suas vidas com o Azimov.
                     </p>
                 </div>
 
@@ -109,8 +109,8 @@ export default function LoginPage() {
                 <div className="w-full max-w-[420px] relative z-10 animate-in fade-in zoom-in-95 duration-500">
                     {/* Header Mobile Only */}
                     <div className="lg:hidden mb-8 text-center">
-                        <img src="/images/logo.png" alt="Logo Zenit" className="mx-auto w-14 h-14 rounded-2xl object-cover shadow-lg mb-4" />
-                        <h1 className="text-3xl font-black tracking-tight">ZÊNIT</h1>
+                        <img src="/images/logo-sem-fundo.png" alt="Logo Azimov" className="mx-auto w-14 h-14 rounded-2xl object-contain shadow-lg mb-4" />
+                        <h1 className="text-3xl font-black tracking-tight">AZIMOV</h1>
                     </div>
 
                     <div className="mb-10 text-left lg:block hidden">
@@ -201,7 +201,7 @@ export default function LoginPage() {
 
                 {/* Desktop Version Text */}
                 <div className="absolute bottom-8 text-zinc-600 text-[10px] font-black tracking-[0.2em] uppercase lg:block hidden">
-                    Zênit Platform &copy; 2025 // Professional Performance System
+                    Azimov Platform &copy; 2025 // Professional Performance System
                 </div>
             </div>
         </div>

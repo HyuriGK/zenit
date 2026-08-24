@@ -119,7 +119,7 @@ export function InstallPWA() {
             </div>
           </div>
           <DialogTitle className="text-center text-xl">
-            Adicionar Zenit na Tela Inicial
+            Adicionar Azimov na Tela Inicial
           </DialogTitle>
           <DialogDescription className="text-center text-zinc-400">
             Instale o app na sua tela inicial para acesso rápido e uma experiência sem barra de navegação.

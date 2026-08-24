@@ -179,19 +179,19 @@ export default function LandingPage() {
       name: "Carlos Santos",
       role: "Estudante de Medicina",
       image: null,
-      text: "Organizei todo o meu planner no Zênit. A produtividade aumentou muito e consigo acompanhar meu progresso de forma visual.",
+      text: "Organizei todo o meu planner no Azimov. A produtividade aumentou muito e consigo acompanhar meu progresso de forma visual.",
     },
     {
       name: "Mariana Costa",
       role: "Designer",
       image: null,
-      text: "Simplesmente incrível. Cancelei 5 assinaturas de apps diferentes e agora uso só o Zênit. Vale cada centavo!",
+      text: "Simplesmente incrível. Cancelei 5 assinaturas de apps diferentes e agora uso só o Azimov. Vale cada centavo!",
     },
   ];
 
   const faqs = [
     {
-      question: "Quando o Zênit estará disponível?",
+      question: "Quando o Azimov estará disponível?",
       answer: "Estamos finalizando os testes beta e planejamos o lançamento oficial para fevereiro de 2026. Quem estiver na lista de espera terá acesso prioritário!",
     },
     {
@@ -200,7 +200,7 @@ export default function LandingPage() {
     },
     {
       question: "Posso usar no celular?",
-      answer: "Sim! O Zênit é totalmente responsivo e funciona perfeitamente em qualquer dispositivo. Apps nativos para iOS e Android estão previstos para o segundo semestre de 2026.",
+      answer: "Sim! O Azimov é totalmente responsivo e funciona perfeitamente em qualquer dispositivo. Apps nativos para iOS e Android estão previstos para o segundo semestre de 2026.",
     },
     {
       question: "Posso cancelar a qualquer momento?",
@@ -229,9 +229,9 @@ export default function LandingPage() {
           <div className="flex justify-between items-center h-20">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3">
-              <img src="/images/logo.png" alt="Logo Zenit" className="h-10 w-10 rounded-xl object-cover" />
+              <img src="/images/logo-sem-fundo.png" alt="Logo Azimov" className="h-10 w-10 rounded-xl object-contain" />
               <span className="text-3xl font-bold bg-gradient-to-r from-green-400 via-teal-400 to-blue-400 bg-clip-text text-transparent animate-gradient">
-                Zênit
+                Azimov
               </span>
             </Link>
 
@@ -332,7 +332,7 @@ export default function LandingPage() {
 
             {/* Subheadline */}
             <p className="text-lg md:text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed animate-fade-in-delay-2">
-              Zênit é a plataforma completa de produtividade pessoal que integra
+              Azimov é a plataforma completa de produtividade pessoal que integra
               <span className="text-white font-medium"> agenda</span>,
               <span className="text-white font-medium"> finanças</span>,
               <span className="text-white font-medium"> planner</span> e muito mais.
@@ -379,7 +379,7 @@ export default function LandingPage() {
                   </div>
                   <h3 className="text-lg font-semibold text-emerald-300 mb-2">Você está na lista!</h3>
                   <p className="text-sm text-gray-400">
-                    Avisaremos assim que o Zênit estiver disponível. Fique de olho no seu e-mail!
+                    Avisaremos assim que o Azimov estiver disponível. Fique de olho no seu e-mail!
                   </p>
                 </div>
               )}
@@ -508,7 +508,7 @@ export default function LandingPage() {
               </span>
             </h2>
             <p className="text-lg text-gray-400 max-w-2xl mx-auto">
-              Pare de usar dezenas de aplicativos. Com o Zênit, você centraliza toda sua vida em uma plataforma inteligente.
+              Pare de usar dezenas de aplicativos. Com o Azimov, você centraliza toda sua vida em uma plataforma inteligente.
             </p>
           </div>
 
@@ -600,7 +600,7 @@ export default function LandingPage() {
             {/* Left Content */}
             <div>
               <Badge className="mb-4 bg-emerald-500/10 text-emerald-300 border-emerald-500/20 hover:bg-emerald-500/20">
-                Por que Zênit?
+                Por que Azimov?
               </Badge>
               <h2 className="text-3xl md:text-4xl font-bold mb-6">
                 Uma plataforma pensada para quem quer{" "}
@@ -609,7 +609,7 @@ export default function LandingPage() {
                 </span>
               </h2>
               <p className="text-gray-400 mb-8 leading-relaxed">
-                Desenvolvemos o Zênit para pessoas que levam a sério sua produtividade e organização pessoal.
+                Desenvolvemos o Azimov para pessoas que levam a sério sua produtividade e organização pessoal.
                 Cada detalhe foi pensado para simplificar sua rotina e potencializar seus resultados.
               </p>
 
@@ -845,7 +845,7 @@ export default function LandingPage() {
                 Pronto para transformar sua produtividade?
               </h2>
               <p className="text-lg text-white/80 mb-8 max-w-xl mx-auto">
-                Junte-se a centenas de pessoas que já estão na lista de espera do Zenit.
+                Junte-se a centenas de pessoas que já estão na lista de espera do Azimov.
               </p>
 
               {!submitted ? (
@@ -888,7 +888,7 @@ export default function LandingPage() {
             <div className="md:col-span-2">
               <Link href="/" className="inline-block mb-4">
                 <span className="text-2xl font-bold bg-gradient-to-r from-green-400 via-teal-400 to-blue-400 bg-clip-text text-transparent animate-gradient">
-                  Zenit
+                  Azimov
                 </span>
               </Link>
               <p className="text-sm text-gray-500 max-w-xs">
@@ -928,7 +928,7 @@ export default function LandingPage() {
           {/* Bottom */}
           <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-gray-500">
-              © 2026 Zenit. Todos os direitos reservados.
+              © 2026 Azimov. Todos os direitos reservados.
             </p>
             <div className="flex items-center gap-4">
               <a href="#" className="text-gray-500 hover:text-white transition-colors">

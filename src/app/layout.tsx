@@ -24,19 +24,19 @@ const vt323 = VT323({
 });
 
 export const metadata: Metadata = {
-  title: "Zênit - Gerenciamento Pessoal",
+  title: "Azimov - Gerenciamento Pessoal",
   description: "Sistema completo de gerenciamento pessoal",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "Zênit",
+    title: "Azimov",
   },
   icons: {
     icon: [
-      { url: '/images/logo.png', type: 'image/png' },
+      { url: '/images/logo-com-fundo.png', type: 'image/png' },
     ],
-    shortcut: '/images/logo.png',
+    shortcut: '/images/logo-com-fundo.png',
     apple: [
       { url: '/images/logo-com-fundo.png', sizes: '180x180' },
     ],

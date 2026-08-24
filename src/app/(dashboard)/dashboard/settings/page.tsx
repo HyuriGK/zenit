@@ -509,7 +509,7 @@ export default function SettingsPage() {
                           <AtSign className="w-5 h-5" />
                           Username
                         </h3>
-                        <p className="text-sm text-zinc-400 mt-1">Seu identificador único no Zenit</p>
+                        <p className="text-sm text-zinc-400 mt-1">Seu identificador único no Azimov</p>
                       </div>
                       {session?.user?.username && (
                         <Badge variant="outline" className="border-zinc-700 text-zinc-300 gap-1 px-3">

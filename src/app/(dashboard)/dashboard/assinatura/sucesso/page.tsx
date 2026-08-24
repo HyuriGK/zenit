@@ -75,7 +75,7 @@ export default function SuccessPage() {
               Sua assinatura premium foi ativada com sucesso!
             </p>
             <p className="text-sm text-gray-400">
-              Agora você tem acesso a todos os recursos premium do Zenit.
+              Agora você tem acesso a todos os recursos premium do Azimov.
             </p>
           </div>
 

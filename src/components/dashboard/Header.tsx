@@ -70,12 +70,12 @@ export function Header() {
           <h1 className="text-xl font-bold text-white lg:hidden flex items-center gap-2">
             <Image
               src="/images/logo-sem-fundo.png"
-              alt="Zênit Logo"
+              alt="Logo Azimov"
               width={20}
               height={20}
               className="w-5 h-5 object-contain"
             />
-            Zênit
+            Azimov
           </h1>
         </div>
 

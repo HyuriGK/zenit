@@ -57,12 +57,12 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
             <h1 className="text-xl font-bold tracking-tight text-white flex items-center gap-2">
               <Image
                 src="/images/logo-sem-fundo.png"
-                alt="Zênit Logo"
+                alt="Logo Azimov"
                 width={24}
                 height={24}
                 className="w-6 h-6 object-contain"
               />
-              Zênit
+              Azimov
             </h1>
             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-0.5">{t('personalManagement')}</p>
           </Link>
@@ -71,7 +71,7 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
           <Link href="/dashboard" className="hover:opacity-80 transition-opacity">
             <Image
               src="/images/logo-sem-fundo.png"
-              alt="Zênit Logo"
+              alt="Logo Azimov"
               width={32}
               height={32}
               className="w-8 h-8 flex-shrink-0 object-contain"

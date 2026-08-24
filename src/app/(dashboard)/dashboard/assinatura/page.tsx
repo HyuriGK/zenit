@@ -1,7 +1,7 @@
 import { SubscriptionManager } from '@/components/subscriptions/SubscriptionManager';
 
 export const metadata = {
-  title: 'Minha Assinatura | Zenit',
+  title: 'Minha Assinatura | Azimov',
   description: 'Gerencie sua assinatura premium',
 };
 

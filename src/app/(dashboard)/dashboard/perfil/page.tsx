@@ -69,7 +69,7 @@ interface Achievement {
 // --- Constants ---
 const NAV_ITEMS: NavItem[] = [
   { id: 'overview', label: 'Visão Geral', icon: User, description: 'Informações do perfil' },
-  { id: 'stats', label: 'Estatísticas', icon: ChartBar, description: 'Seu progresso no Zenit' },
+  { id: 'stats', label: 'Estatísticas', icon: ChartBar, description: 'Seu progresso no Azimov' },
   { id: 'achievements', label: 'Conquistas', icon: Medal, description: 'Suas conquistas desbloqueadas' },
 ];
 
@@ -364,14 +364,14 @@ export default function PerfilPage() {
                 </>
               ) : (
                 <>
-                  <SectionHeader title="Upgrade" description="Aproveite todos os recursos do Zenit." />
+                  <SectionHeader title="Upgrade" description="Aproveite todos os recursos do Azimov." />
                   <SettingsCard className="bg-gradient-to-br from-zenit-500/5 to-green-500/5 border-zenit-500/20">
                     <div className="flex flex-col sm:flex-row items-center gap-6">
                       <div className="p-4 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-2xl">
                         <Sparkles className="w-10 h-10 text-yellow-400" />
                       </div>
                       <div className="flex-1 text-center sm:text-left">
-                        <h3 className="text-lg font-semibold text-white mb-1">Desbloqueie o Zenit Premium</h3>
+                        <h3 className="text-lg font-semibold text-white mb-1">Desbloqueie o Azimov Premium</h3>
                         <p className="text-sm text-zinc-400 mb-4">Acesse recursos exclusivos, conquistas especiais e muito mais.</p>
                         <Button
                           onClick={() => router.push('/premium')}
@@ -391,7 +391,7 @@ export default function PerfilPage() {
           {/* --- STATS TAB --- */}
           {activeTab === 'stats' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <SectionHeader title="Suas Estatísticas" description="Acompanhe seu progresso no Zenit." />
+              <SectionHeader title="Suas Estatísticas" description="Acompanhe seu progresso no Azimov." />
 
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="bg-zinc-900/40 border border-zinc-800/50 hover:border-blue-500/30 rounded-2xl p-6 transition-all group">
@@ -495,7 +495,7 @@ export default function PerfilPage() {
           {/* --- ACHIEVEMENTS TAB --- */}
           {activeTab === 'achievements' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <SectionHeader title="Conquistas" description="Suas medalhas e realizações no Zenit." />
+              <SectionHeader title="Conquistas" description="Suas medalhas e realizações no Azimov." />
 
               {/* Progress Overview */}
               <SettingsCard>

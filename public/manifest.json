@@ -1,6 +1,6 @@
 {
-  "name": "Zenit - Gerenciamento Pessoal",
-  "short_name": "Zenit",
+  "name": "Azimov - Gerenciamento Pessoal",
+  "short_name": "Azimov",
   "description": "Sistema completo de gerenciamento pessoal",
   "start_url": "/dashboard",
   "display": "standalone",

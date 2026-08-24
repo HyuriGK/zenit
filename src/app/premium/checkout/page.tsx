@@ -91,9 +91,9 @@ export default function CheckoutPage() {
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <Link href="/premium" className="flex items-center space-x-2">
-                <img src="/images/logo.png" alt="Logo Zenit" className="w-8 h-8 rounded-lg object-cover" />
+                <img src="/images/logo-sem-fundo.png" alt="Logo Azimov" className="w-8 h-8 rounded-lg object-contain" />
                 <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
-                  Zenit
+                  Azimov
                 </span>
               </Link>
             </div>

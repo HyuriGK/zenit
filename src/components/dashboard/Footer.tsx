@@ -9,7 +9,7 @@ export function Footer() {
   return (
     <footer className="shrink-0 border-t border-zinc-800 bg-zinc-950 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div className="flex items-center gap-2 text-[11px] font-medium text-zinc-500 uppercase tracking-wider">
-        <span>© {new Date().getFullYear()} Zênit</span>
+        <span>© {new Date().getFullYear()} Azimov</span>
         <span className="text-zinc-800">•</span>
         <span>{t('footerTagline') || 'Gestão Pessoal Inteligente'}</span>
       </div>
