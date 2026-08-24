@@ -63,6 +63,13 @@ export default function TransacoesPage() {
   const [selectedForDelete, setSelectedForDelete] = useState<any>(null);
   const mesesRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (visualizacao !== 'planilha-selecao') return;
+    document.querySelectorAll('th').forEach((cabecalho) => {
+      if (cabecalho.textContent === 'Restante provisionado') cabecalho.textContent = 'Restante (R$)';
+    });
+  }, [visualizacao]);
+
   const recarregarDados = useCallback(async () => {
     setCarregando(true);
     try {
@@ -312,7 +319,6 @@ export default function TransacoesPage() {
       ) : (
         <>
         {visualizacao === 'planilha-selecao' && <div className="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-950"><table className="min-w-[1080px] w-full text-sm"><thead className="bg-zinc-900 text-[10px] uppercase tracking-wider text-zinc-400"><tr><th className="border-b border-r border-zinc-800 px-4 py-3"><Checkbox checked={linhasSelecionadas.length === transacoesFiltradas.length && transacoesFiltradas.length > 0} onCheckedChange={(marcar) => setLinhasSelecionadas(marcar ? transacoesFiltradas.map((t) => t.id) : [])} /></th><th className="border-b border-r border-zinc-800 px-4 py-3 text-left">Vencimento</th><th className="border-b border-r border-zinc-800 px-4 py-3 text-left">Descrição</th><th className="border-b border-r border-zinc-800 px-4 py-3 text-right">Valor mensal</th><th className="border-b border-r border-zinc-800 px-4 py-3 text-center">Parcela atual</th><th className="border-b border-r border-zinc-800 px-4 py-3 text-center">Quant. parcelas</th><th className="border-b border-r border-zinc-800 px-4 py-3 text-center">Restantes</th><th className="border-b border-zinc-800 px-4 py-3 text-right">Restante provisionado</th></tr></thead><tbody>{transacoesFiltradas.map((t) => { const restante = t.isParcela && t.parcelaTotais && t.parcelaNumero ? t.parcelaTotais - t.parcelaNumero + 1 : 0; const marcado = linhasSelecionadas.includes(t.id); return <tr key={t.id} className={marcado ? 'bg-cyan-500/5' : 'hover:bg-zinc-900/70'}><td className="border-b border-r border-zinc-800 px-4 py-3 text-center"><Checkbox checked={marcado} onCheckedChange={() => setLinhasSelecionadas((atual) => marcado ? atual.filter((id) => id !== t.id) : [...atual, t.id])} /></td><td className="border-b border-r border-zinc-800 px-4 py-3 text-zinc-400">{format(parseDataString(t.data), 'dd/MM/yyyy')}</td><td className="border-b border-r border-zinc-800 px-4 py-3 font-medium text-zinc-100">{t.descricao}</td><td className="border-b border-r border-zinc-800 px-4 py-3 text-right font-bold text-zinc-100">{formatarMoeda(t.valor)}</td><td className="border-b border-r border-zinc-800 px-4 py-3 text-center">{t.isParcela ? t.parcelaNumero : '—'}</td><td className="border-b border-r border-zinc-800 px-4 py-3 text-center">{t.isParcela ? t.parcelaTotais : '—'}</td><td className="border-b border-r border-zinc-800 px-4 py-3 text-center text-cyan-300">{t.isParcela ? restante : '—'}</td><td className="border-b border-zinc-800 px-4 py-3 text-right text-amber-300">{t.isParcela ? formatarMoeda(t.valor * restante) : '—'}</td></tr>})}</tbody></table></div>}
-        {visualizacao === 'planilha-selecao' && <div className="rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-100">Soma automática: <strong>{formatarMoeda(transacoesFiltradas.filter((t) => linhasSelecionadas.includes(t.id)).reduce((total, t) => total + t.valor, 0))}</strong> · {linhasSelecionadas.length} registro(s) selecionado(s)</div>}
         <div className={visualizacao === 'cartoes' ? 'space-y-2' : 'hidden'}>
           {transacoesFiltradas.map((transacao) => (
             <Card key={transacao.id} className={`overflow-hidden bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 transition-all group hover:shadow-lg ${transacao.paga ? 'opacity-60 grayscale-[0.5]' : ''}`}>
