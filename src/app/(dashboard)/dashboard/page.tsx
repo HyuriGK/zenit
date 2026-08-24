@@ -88,6 +88,7 @@ export default function DashboardPage() {
     const requisicao = new AbortController();
     requisicaoRef.current = requisicao;
     setEnviando(true);
+    const limiteResposta = window.setTimeout(() => requisicao.abort(), 30_000);
     try {
       const response = await fetch('/api/assistente', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: requisicao.signal,
@@ -95,13 +96,17 @@ export default function DashboardPage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Não foi possível responder agora.');
+      if (typeof data.resposta !== 'string' || !data.resposta.trim()) throw new Error('O assistente não retornou uma resposta válida. Tente novamente.');
       if (requisicao.signal.aborted) return;
       setMensagens((atual) => [...atual, { id: Date.now() + 1, papel: 'assistente', texto: data.resposta }]);
       if (responderEmVoz) falarResposta(data.resposta, chamadaAtivaRef.current);
     } catch (error) {
-      if (requisicao.signal.aborted || (error instanceof DOMException && error.name === 'AbortError')) return;
-      setMensagens((atual) => [...atual, { id: Date.now() + 1, papel: 'assistente', texto: error instanceof Error ? error.message : 'Não foi possível responder agora.' }]);
+      const mensagemErro = requisicao.signal.aborted || (error instanceof DOMException && error.name === 'AbortError')
+        ? 'A resposta demorou mais que o esperado. Tente enviar novamente.'
+        : error instanceof Error ? error.message : 'Não foi possível responder agora.';
+      setMensagens((atual) => [...atual, { id: Date.now() + 1, papel: 'assistente', texto: mensagemErro }]);
     } finally {
+      window.clearTimeout(limiteResposta);
       if (requisicaoRef.current === requisicao) {
         requisicaoRef.current = null;
         setEnviando(false);

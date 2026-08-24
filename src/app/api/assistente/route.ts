@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 
     const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
     const resposta = await groq.chat.completions.create({
-      model: 'openai/gpt-oss-20b', temperature: 0.35, max_completion_tokens: 850, user: userId,
+      model: 'openai/gpt-oss-20b', temperature: 0.25, max_completion_tokens: 450, user: userId,
       messages: [{
         role: 'system',
         content: `Você é o assistente pessoal do Azimov. Responda em português do Brasil, com tom direto, útil e acolhedor. Para registrar uma despesa ou receita, primeiro pergunte todos os dados faltantes: data de vencimento, conta ou cartão e, se parcelado, número de parcelas. Nunca salve nem sugira confirmação se faltar qualquer um deles. Quando todos existirem, acrescente no fim <lancamento>{"descricao":"...","valor":0,"tipo":"DESPESA","data":"AAAA-MM-DD","vencimento":"AAAA-MM-DD","parcelas":1}</lancamento>. Nunca mencione senhas. ${admin ? 'Este usuário é administrador e pode consultar os dados presentes no contexto de todos os usuários.' : 'Nunca mencione dados de outros usuários.'} Formate em Markdown simples.\n\nCONTEXTO AUTORIZADO:\n${contextoPessoal}`,
