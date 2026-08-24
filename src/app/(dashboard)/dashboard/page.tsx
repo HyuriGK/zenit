@@ -24,17 +24,36 @@ export default function DashboardPage() {
   const [mensagens, setMensagens] = useState<Mensagem[]>([]);
   const [texto, setTexto] = useState('');
   const [gravando, setGravando] = useState(false);
+  const [enviando, setEnviando] = useState(false);
 
   if (status === 'loading') return <LoadingScreen message={tCommon('loading')} />;
   if (!session) return null;
 
   const firstName = session.user.name?.split(' ')[0] || 'Usuário';
-  const enviarMensagem = (conteudo = texto) => {
+  const enviarMensagem = async (conteudo = texto) => {
     const mensagem = conteudo.trim();
-    if (!mensagem) return;
+    if (!mensagem || enviando) return;
 
-    setMensagens((atual) => [...atual, { id: Date.now(), papel: 'usuario', texto: mensagem }]);
+    const novaMensagem = { id: Date.now(), papel: 'usuario' as const, texto: mensagem };
+    const proximoHistorico = [...mensagens, novaMensagem];
+    setMensagens(proximoHistorico);
     setTexto('');
+    setEnviando(true);
+
+    try {
+      const response = await fetch('/api/assistente', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mensagens: proximoHistorico.map(({ papel, texto }) => ({ papel, texto })) }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Não foi possível responder agora.');
+      setMensagens((atual) => [...atual, { id: Date.now() + 1, papel: 'assistente', texto: data.resposta }]);
+    } catch (error) {
+      setMensagens((atual) => [...atual, { id: Date.now() + 1, papel: 'assistente', texto: error instanceof Error ? error.message : 'Não foi possível responder agora.' }]);
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
@@ -78,13 +97,17 @@ export default function DashboardPage() {
                 Estou pronto para analisar seus registros assim que o assistente estiver conectado.
               </div>
             </div>
-            {mensagens.map((mensagem) => (
+            {mensagens.map((mensagem) => mensagem.papel === 'usuario' ? (
               <div key={mensagem.id} className="flex justify-end">
-                <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-cyan-500 to-blue-600 px-4 py-3 text-sm leading-relaxed text-white shadow-lg shadow-cyan-950/30">
-                  {mensagem.texto}
-                </div>
+                <div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-cyan-500 to-blue-600 px-4 py-3 text-sm leading-relaxed text-white shadow-lg shadow-cyan-950/30">{mensagem.texto}</div>
+              </div>
+            ) : (
+              <div key={mensagem.id} className="flex items-start gap-3">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200"><Bot className="h-5 w-5" /></div>
+                <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-zinc-800 bg-zinc-900/70 px-4 py-3 text-sm leading-relaxed text-zinc-300">{mensagem.texto}</div>
               </div>
             ))}
+            {enviando && <div className="flex items-center gap-3 text-sm text-zinc-500"><Bot className="h-5 w-5 animate-pulse text-cyan-300" />Azimov está pensando...</div>}
           </div>
         )}
 
@@ -111,7 +134,7 @@ export default function DashboardPage() {
                   <span className="hidden sm:inline">{gravando ? 'Ouvindo...' : 'Voz'}</span>
                 </button>
               </div>
-              <button type="button" aria-label="Enviar mensagem" onClick={() => enviarMensagem()} disabled={!texto.trim()} className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400 text-zinc-950 transition-all hover:bg-cyan-300 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600">
+              <button type="button" aria-label="Enviar mensagem" onClick={() => enviarMensagem()} disabled={!texto.trim() || enviando} className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400 text-zinc-950 transition-all hover:bg-cyan-300 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600">
                 <ArrowUp className="h-5 w-5" />
               </button>
             </div>
