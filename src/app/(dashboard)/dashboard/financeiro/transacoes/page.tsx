@@ -121,13 +121,15 @@ export default function TransacoesPage() {
     if (visualizacao !== 'planilha-selecao') return;
     const tabela = document.querySelector('.overflow-x-auto table');
     if (!tabela) return;
-    tabela.querySelectorAll('tbody td').forEach((celula) => celula.classList.remove('bg-cyan-400/15', 'ring-1', 'ring-inset', 'ring-cyan-300'));
+    tabela.querySelectorAll('tbody td').forEach((celula) => { celula.classList.remove('bg-cyan-400/15', 'ring-1', 'ring-inset', 'ring-cyan-300'); (celula as HTMLElement).style.backgroundColor = ''; (celula as HTMLElement).style.boxShadow = ''; });
     celulasSelecionadas.forEach(({ chave }) => {
       const ultimoSeparador = chave.lastIndexOf('-');
       const id = chave.slice(0, ultimoSeparador);
       const coluna = Number(chave.slice(ultimoSeparador + 1));
       const indice = transacoesFiltradas.findIndex((transacao) => transacao.id === id);
-      tabela.querySelectorAll('tbody tr')[indice]?.children[coluna]?.classList.add('bg-cyan-400/15', 'ring-1', 'ring-inset', 'ring-cyan-300');
+      const celula = tabela.querySelectorAll('tbody tr')[indice]?.children[coluna] as HTMLElement | undefined;
+      celula?.classList.add('bg-cyan-400/15', 'ring-1', 'ring-inset', 'ring-cyan-300');
+      if (celula) { celula.style.backgroundColor = 'rgba(6, 182, 212, 0.32)'; celula.style.boxShadow = 'inset 0 0 0 1px rgba(103, 232, 249, 0.95)'; }
     });
   }, [celulasSelecionadas, transacoesFiltradas, visualizacao]);
 
