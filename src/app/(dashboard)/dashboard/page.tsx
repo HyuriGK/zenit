@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { useSession } from '@/lib/auth-mock';
 import { useTranslations } from 'next-intl';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
-import { ArrowUp, Bot, CalendarDays, ChartNoAxesCombined, ListTodo, Mic, Paperclip, Sparkles } from 'lucide-react';
+import { ArrowUp, Bot, CalendarDays, ChartNoAxesCombined, ListTodo, Mic, Paperclip, Pause, PhoneOff, Play, Sparkles } from 'lucide-react';
 
 type Mensagem = { id: number; papel: 'assistente' | 'usuario'; texto: string };
 
@@ -32,18 +32,36 @@ export default function DashboardPage() {
   const [texto, setTexto] = useState('');
   const [gravando, setGravando] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  const [chamadaAtiva, setChamadaAtiva] = useState(false);
+  const [falaPausada, setFalaPausada] = useState(false);
+  const [estadoChamada, setEstadoChamada] = useState<'ouvindo' | 'pensando' | 'falando'>('ouvindo');
   const reconhecimentoRef = useRef<any>(null);
+  const interrupcaoRef = useRef<any>(null);
+  const chamadaAtivaRef = useRef(false);
+  const aguardandoRespostaRef = useRef(false);
 
   if (status === 'loading') return <LoadingScreen message={tCommon('loading')} />;
   if (!session) return null;
 
   const firstName = session.user.name?.split(' ')[0] || 'Usuário';
-  const falarResposta = (resposta: string) => {
+  const falarResposta = (resposta: string, retomarChamada = false) => {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const fala = new SpeechSynthesisUtterance(resposta.replace(/\*\*/g, ''));
     fala.lang = 'pt-BR';
     fala.rate = 1;
+    if (retomarChamada) {
+      setEstadoChamada('falando');
+      fala.onstart = () => iniciarEscutaParaInterromper();
+      fala.onend = () => {
+        interrupcaoRef.current?.stop();
+        interrupcaoRef.current = null;
+        if (chamadaAtivaRef.current) {
+          if (!aguardandoRespostaRef.current) iniciarEscuta();
+          aguardandoRespostaRef.current = false;
+        }
+      };
+    }
     window.speechSynthesis.speak(fala);
   };
 
@@ -64,13 +82,106 @@ export default function DashboardPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Não foi possível responder agora.');
       setMensagens((atual) => [...atual, { id: Date.now() + 1, papel: 'assistente', texto: data.resposta }]);
-      if (responderEmVoz) falarResposta(data.resposta);
+      if (responderEmVoz) falarResposta(data.resposta, chamadaAtivaRef.current);
     } catch (error) {
       setMensagens((atual) => [...atual, { id: Date.now() + 1, papel: 'assistente', texto: error instanceof Error ? error.message : 'Não foi possível responder agora.' }]);
     } finally { setEnviando(false); }
   };
 
+  const iniciarEscuta = () => {
+    if (!chamadaAtivaRef.current || enviando || reconhecimentoRef.current) return;
+    const navegadorComVoz = window as Window & { SpeechRecognition?: any; webkitSpeechRecognition?: any };
+    const Reconhecimento = navegadorComVoz.SpeechRecognition || navegadorComVoz.webkitSpeechRecognition;
+    if (!Reconhecimento) return;
+    const reconhecimento = new Reconhecimento();
+    reconhecimento.lang = 'pt-BR';
+    reconhecimento.continuous = false;
+    reconhecimento.interimResults = false;
+    reconhecimento.onresult = (event: any) => {
+      const transcricao = event.results[0]?.[0]?.transcript?.trim();
+      if (transcricao) {
+        aguardandoRespostaRef.current = true;
+        setEstadoChamada('pensando');
+        enviarMensagem(transcricao, true);
+      }
+    };
+    reconhecimento.onerror = () => { reconhecimentoRef.current = null; setGravando(false); };
+    reconhecimento.onend = () => {
+      reconhecimentoRef.current = null;
+      setGravando(false);
+      if (chamadaAtivaRef.current && !aguardandoRespostaRef.current) setTimeout(iniciarEscuta, 250);
+    };
+    reconhecimentoRef.current = reconhecimento;
+    setGravando(true);
+    setEstadoChamada('ouvindo');
+    reconhecimento.start();
+  };
+
+  const iniciarEscutaParaInterromper = () => {
+    if (!chamadaAtivaRef.current || interrupcaoRef.current) return;
+    const navegadorComVoz = window as Window & { SpeechRecognition?: any; webkitSpeechRecognition?: any };
+    const Reconhecimento = navegadorComVoz.SpeechRecognition || navegadorComVoz.webkitSpeechRecognition;
+    if (!Reconhecimento) return;
+    const interrupcao = new Reconhecimento();
+    interrupcao.lang = 'pt-BR';
+    interrupcao.continuous = false;
+    interrupcao.interimResults = false;
+    interrupcao.onresult = (event: any) => {
+      const transcricao = event.results[0]?.[0]?.transcript?.trim();
+      if (!transcricao || !chamadaAtivaRef.current) return;
+      aguardandoRespostaRef.current = true;
+      window.speechSynthesis.cancel();
+      interrupcaoRef.current = null;
+      setEstadoChamada('pensando');
+      enviarMensagem(transcricao, true);
+    };
+    interrupcao.onerror = () => { interrupcaoRef.current = null; };
+    interrupcao.onend = () => { interrupcaoRef.current = null; };
+    interrupcaoRef.current = interrupcao;
+    interrupcao.start();
+  };
+
+  const iniciarChamada = () => {
+    const navegadorComVoz = window as Window & { SpeechRecognition?: any; webkitSpeechRecognition?: any };
+    if (!(navegadorComVoz.SpeechRecognition || navegadorComVoz.webkitSpeechRecognition)) {
+      setMensagens((atual) => [...atual, { id: Date.now(), papel: 'assistente', texto: 'A chamada por voz requer Chrome ou Edge com acesso ao microfone.' }]);
+      return;
+    }
+    chamadaAtivaRef.current = true;
+    setChamadaAtiva(true);
+    setFalaPausada(false);
+    iniciarEscuta();
+  };
+
+  const encerrarChamada = () => {
+    chamadaAtivaRef.current = false;
+    aguardandoRespostaRef.current = false;
+    reconhecimentoRef.current?.stop();
+    reconhecimentoRef.current = null;
+    interrupcaoRef.current?.stop();
+    interrupcaoRef.current = null;
+    window.speechSynthesis?.cancel();
+    setGravando(false);
+    setChamadaAtiva(false);
+    setFalaPausada(false);
+  };
+
+  const alternarPausaFala = () => {
+    if (!window.speechSynthesis) return;
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      setFalaPausada(false);
+    } else {
+      window.speechSynthesis.pause();
+      setFalaPausada(true);
+    }
+  };
+
   const alternarVoz = () => {
+    if (!gravando && !chamadaAtivaRef.current) {
+      iniciarChamada();
+      return;
+    }
     if (gravando) {
       reconhecimentoRef.current?.stop();
       return;
@@ -146,6 +257,27 @@ export default function DashboardPage() {
         )}
         <div className="sticky bottom-0 w-full pt-4"><div className="rounded-[26px] border border-zinc-700/80 bg-zinc-900/95 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl"><textarea value={texto} onChange={(event) => setTexto(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); enviarMensagem(); } }} rows={1} placeholder="Pergunte sobre sua vida, rotina ou finanças..." className="max-h-36 min-h-12 w-full resize-none bg-transparent px-3 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none" /><div className="flex items-center justify-between gap-2 px-1 pb-1"><div className="flex items-center gap-1"><button type="button" aria-label="Anexar contexto" className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-200"><Paperclip className="h-4 w-4" /></button><button type="button" aria-label={gravando ? 'Parar de ouvir' : 'Conversar por voz'} onClick={alternarVoz} className={`flex h-9 items-center gap-2 rounded-xl px-3 text-xs font-bold transition-colors ${gravando ? 'bg-red-500/15 text-red-300' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}><Mic className={`h-4 w-4 ${gravando ? 'animate-pulse' : ''}`} /><span className="hidden sm:inline">{gravando ? 'Ouvindo...' : 'Voz'}</span></button></div><button type="button" aria-label="Enviar mensagem" onClick={() => enviarMensagem()} disabled={!texto.trim() || enviando} className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400 text-zinc-950 transition-all hover:bg-cyan-300 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600"><ArrowUp className="h-5 w-5" /></button></div></div><p className="mt-3 text-center text-[10px] text-zinc-600">O assistente poderá usar seus dados somente quando você autorizar.</p></div>
       </div>
+
+      {chamadaAtiva && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-zinc-950/90 px-4 backdrop-blur-xl">
+          <div className="relative flex w-full max-w-md flex-col items-center overflow-hidden rounded-[36px] border border-zinc-800 bg-zinc-900/80 px-6 py-10 text-center shadow-2xl shadow-cyan-950/40 sm:px-10">
+            <div className="pointer-events-none absolute -top-24 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
+            <span className="relative text-[10px] font-bold uppercase tracking-[0.22em] text-cyan-200">Chamada com Azimov</span>
+            <div className="relative my-10 flex h-52 w-52 items-center justify-center">
+              <div className={`absolute inset-0 rounded-full bg-cyan-400/10 blur-xl transition-all duration-500 ${estadoChamada === 'falando' ? 'scale-125 animate-pulse' : estadoChamada === 'ouvindo' ? 'scale-110 animate-pulse' : 'scale-95'}`} />
+              <div className={`absolute inset-5 rounded-full border border-cyan-300/20 transition-all duration-500 ${estadoChamada === 'falando' ? 'scale-110' : ''}`} />
+              <div className={`absolute inset-10 rounded-full bg-gradient-to-br from-cyan-300 via-sky-500 to-blue-700 shadow-[0_0_60px_rgba(34,211,238,0.45)] transition-all duration-500 ${estadoChamada === 'pensando' ? 'animate-pulse' : ''}`} />
+              <Bot className="relative h-12 w-12 text-white" />
+            </div>
+            <h2 className="relative text-2xl font-black text-white">{estadoChamada === 'ouvindo' ? 'Estou ouvindo' : estadoChamada === 'pensando' ? 'Pensando na resposta' : falaPausada ? 'Fala pausada' : 'Azimov está falando'}</h2>
+            <p className="relative mt-3 max-w-xs text-sm leading-6 text-zinc-400">{estadoChamada === 'ouvindo' ? 'Fale naturalmente. O Azimov pausa para escutar você.' : estadoChamada === 'pensando' ? 'Organizando uma resposta com seus dados.' : 'Você pode pausar a resposta ou falar para interromper.'}</p>
+            <div className="relative mt-9 flex items-center gap-3">
+              <button type="button" onClick={alternarPausaFala} aria-label={falaPausada ? 'Continuar fala' : 'Pausar fala'} className="flex h-12 w-12 items-center justify-center rounded-2xl border border-zinc-700 bg-zinc-800 text-zinc-200 transition-colors hover:bg-zinc-700">{falaPausada ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}</button>
+              <button type="button" onClick={encerrarChamada} className="flex h-12 items-center gap-2 rounded-2xl bg-red-500 px-5 text-sm font-bold text-white transition-colors hover:bg-red-400"><PhoneOff className="h-5 w-5" /> Encerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
