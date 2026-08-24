@@ -34,12 +34,9 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/favicon.ico', sizes: '16x16' },
-      { url: '/favicon.ico', sizes: '32x32' },
-      { url: '/favicon.ico', sizes: '48x48' },
-      { url: '/favicon.ico', sizes: '64x64' },
+      { url: '/images/logo.png', type: 'image/png' },
     ],
-    shortcut: '/favicon.ico',
+    shortcut: '/images/logo.png',
     apple: [
       { url: '/images/logo-com-fundo.png', sizes: '180x180' },
     ],

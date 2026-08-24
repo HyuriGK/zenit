@@ -258,6 +258,22 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
     return new Date(y, m - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
   })();
 
+  const [anoData, mesData, diaData] = data.split('-').map(Number);
+  const anosDisponiveis = Array.from({ length: 11 }, (_, index) => new Date().getFullYear() - 5 + index);
+  const diasNoMes = new Date(anoData, mesData, 0).getDate();
+  const atualizarParteData = (parte: 'ano' | 'mes' | 'dia', valor: string) => {
+    let ano = anoData;
+    let mes = mesData;
+    let dia = diaData;
+
+    if (parte === 'ano') ano = Number(valor);
+    if (parte === 'mes') mes = Number(valor);
+    if (parte === 'dia') dia = Number(valor);
+
+    dia = Math.min(dia, new Date(ano, mes, 0).getDate());
+    setData(`${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`);
+  };
+
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
       <DialogContent className="w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] sm:max-w-[1200px] sm:w-[95vw] max-h-[calc(100dvh-1rem)] sm:max-h-[90dvh] overflow-x-hidden overflow-y-hidden bg-zinc-950 border-zinc-800/50 p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 rounded-2xl sm:rounded-[32px] border-zinc-800/30">
@@ -304,7 +320,17 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   </div>
                   <div>
                     <Label className="text-[11px] font-black uppercase tracking-[0.1em] text-zinc-500 mb-2 block">Data da Operação</Label>
-                    <Input type="date" value={data} onChange={(e) => setData(e.target.value)} required className="w-full min-w-0 max-w-full bg-zinc-900/50 border-zinc-800 text-white h-12 px-3 sm:px-4 text-sm rounded-xl focus-visible:ring-0 transition-all" />
+                    <div className="grid grid-cols-[0.8fr_1fr_1.2fr] gap-2">
+                      <select aria-label="Dia da operação" value={diaData} onChange={(e) => atualizarParteData('dia', e.target.value)} className="min-w-0 h-12 rounded-xl border border-zinc-800 bg-zinc-900/50 px-2 text-center text-sm font-bold text-white outline-none focus:border-emerald-500">
+                        {Array.from({ length: diasNoMes }, (_, index) => index + 1).map((dia) => <option key={dia} value={dia}>{String(dia).padStart(2, '0')}</option>)}
+                      </select>
+                      <select aria-label="Mês da operação" value={mesData} onChange={(e) => atualizarParteData('mes', e.target.value)} className="min-w-0 h-12 rounded-xl border border-zinc-800 bg-zinc-900/50 px-1 text-center text-sm font-bold text-white outline-none focus:border-emerald-500">
+                        {['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'].map((mes, index) => <option key={mes} value={index + 1}>{mes}</option>)}
+                      </select>
+                      <select aria-label="Ano da operação" value={anoData} onChange={(e) => atualizarParteData('ano', e.target.value)} className="min-w-0 h-12 rounded-xl border border-zinc-800 bg-zinc-900/50 px-1 text-center text-sm font-bold text-white outline-none focus:border-emerald-500">
+                        {anosDisponiveis.map((ano) => <option key={ano} value={ano}>{ano}</option>)}
+                      </select>
+                    </div>
                     {mesRegistroLabel && (
                       <p className="text-[10px] font-bold text-zinc-500 mt-1.5">
                         Registrando em <span className="text-emerald-400 capitalize">{mesRegistroLabel}</span>

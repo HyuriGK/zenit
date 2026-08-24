@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles, Loader2, UserPlus, Github, Mail, User, ShieldCheck, Target, Zap, Clock } from 'lucide-react';
+import { Loader2, UserPlus, Github, Mail, User, ShieldCheck, Target, Zap, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
@@ -54,9 +54,7 @@ export default function RegisterPage() {
                      style={{ backgroundImage: 'linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
 
                 <div className="relative z-10 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
-                    <div className="w-12 h-12 bg-gradient-to-br from-emerald-400 to-green-600 rounded-xl flex items-center justify-center shadow-[0_0_30px_rgba(52,211,153,0.3)]">
-                        <Sparkles className="w-6 h-6 text-white" />
-                    </div>
+                    <img src="/images/logo.png" alt="Logo Zenit" className="w-12 h-12 rounded-xl object-cover shadow-[0_0_30px_rgba(52,211,153,0.3)]" />
                     <span className="text-2xl font-black tracking-tighter bg-gradient-to-r from-white to-zinc-500 bg-clip-text text-transparent">ZÊNIT</span>
                 </div>
 
@@ -104,9 +102,7 @@ export default function RegisterPage() {
 
                 <div className="w-full max-w-[420px] relative z-10 animate-in fade-in zoom-in-95 duration-500 my-8">
                     <div className="lg:hidden mb-8 text-center">
-                        <div className="mx-auto w-14 h-14 bg-gradient-to-br from-emerald-400 to-green-600 rounded-2xl flex items-center justify-center shadow-lg mb-4">
-                            <Sparkles className="w-7 h-7 text-white" />
-                        </div>
+                        <img src="/images/logo.png" alt="Logo Zenit" className="mx-auto w-14 h-14 rounded-2xl object-cover shadow-lg mb-4" />
                         <h1 className="text-3xl font-black tracking-tight">ZÊNIT</h1>
                     </div>
 
