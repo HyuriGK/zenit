@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { usePathname } from 'next/navigation';
 
 // Dynamic import para evitar hydration mismatch com Radix UI
 const Header = dynamic(
@@ -9,5 +10,7 @@ const Header = dynamic(
 );
 
 export function HeaderWrapper() {
-  return <Header />;
+  const pathname = usePathname();
+
+  return pathname === '/dashboard' ? <Header /> : null;
 }

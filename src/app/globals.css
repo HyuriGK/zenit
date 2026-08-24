@@ -124,6 +124,13 @@ body {
   color: var(--color-foreground);
 }
 
+/* A interface não utiliza anéis ou contornos visuais ao focar campos e controles. */
+:where(button, input, textarea, select, [role="button"], [role="combobox"], [role="checkbox"], [role="switch"], [role="tab"]):focus,
+:where(button, input, textarea, select, [role="button"], [role="combobox"], [role="checkbox"], [role="switch"], [role="tab"]):focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Estilos para o editor TipTap */
 .ProseMirror {
   outline: none;
