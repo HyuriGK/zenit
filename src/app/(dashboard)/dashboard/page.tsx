@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useSession } from '@/lib/auth-mock';
 import { useTranslations } from 'next-intl';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
@@ -32,12 +32,22 @@ export default function DashboardPage() {
   const [texto, setTexto] = useState('');
   const [gravando, setGravando] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  const reconhecimentoRef = useRef<any>(null);
 
   if (status === 'loading') return <LoadingScreen message={tCommon('loading')} />;
   if (!session) return null;
 
   const firstName = session.user.name?.split(' ')[0] || 'Usuário';
-  const enviarMensagem = async (conteudo = texto) => {
+  const falarResposta = (resposta: string) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const fala = new SpeechSynthesisUtterance(resposta.replace(/\*\*/g, ''));
+    fala.lang = 'pt-BR';
+    fala.rate = 1;
+    window.speechSynthesis.speak(fala);
+  };
+
+  const enviarMensagem = async (conteudo = texto, responderEmVoz = false) => {
     const mensagem = conteudo.trim();
     if (!mensagem || enviando) return;
 
@@ -54,9 +64,44 @@ export default function DashboardPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Não foi possível responder agora.');
       setMensagens((atual) => [...atual, { id: Date.now() + 1, papel: 'assistente', texto: data.resposta }]);
+      if (responderEmVoz) falarResposta(data.resposta);
     } catch (error) {
       setMensagens((atual) => [...atual, { id: Date.now() + 1, papel: 'assistente', texto: error instanceof Error ? error.message : 'Não foi possível responder agora.' }]);
     } finally { setEnviando(false); }
+  };
+
+  const alternarVoz = () => {
+    if (gravando) {
+      reconhecimentoRef.current?.stop();
+      return;
+    }
+
+    const navegadorComVoz = window as Window & { SpeechRecognition?: any; webkitSpeechRecognition?: any };
+    const Reconhecimento = navegadorComVoz.SpeechRecognition || navegadorComVoz.webkitSpeechRecognition;
+    if (!Reconhecimento) {
+      setMensagens((atual) => [...atual, { id: Date.now(), papel: 'assistente', texto: 'A captura de voz não é compatível com este navegador. Use o Chrome ou Edge para falar comigo.' }]);
+      return;
+    }
+
+    const reconhecimento = new Reconhecimento();
+    reconhecimento.lang = 'pt-BR';
+    reconhecimento.continuous = false;
+    reconhecimento.interimResults = false;
+    reconhecimento.onresult = (event: any) => {
+      const transcricao = event.results[0]?.[0]?.transcript?.trim();
+      if (transcricao) enviarMensagem(transcricao, true);
+    };
+    reconhecimento.onerror = () => {
+      setGravando(false);
+      reconhecimentoRef.current = null;
+    };
+    reconhecimento.onend = () => {
+      setGravando(false);
+      reconhecimentoRef.current = null;
+    };
+    reconhecimentoRef.current = reconhecimento;
+    setGravando(true);
+    reconhecimento.start();
   };
 
   return (
@@ -99,7 +144,7 @@ export default function DashboardPage() {
             {enviando && <div className="flex items-center gap-3 text-sm text-zinc-500"><Bot className="h-5 w-5 animate-pulse text-cyan-300" />Azimov está pensando...</div>}
           </div>
         )}
-        <div className="sticky bottom-0 w-full pt-4"><div className="rounded-[26px] border border-zinc-700/80 bg-zinc-900/95 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl"><textarea value={texto} onChange={(event) => setTexto(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); enviarMensagem(); } }} rows={1} placeholder="Pergunte sobre sua vida, rotina ou finanças..." className="max-h-36 min-h-12 w-full resize-none bg-transparent px-3 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none" /><div className="flex items-center justify-between gap-2 px-1 pb-1"><div className="flex items-center gap-1"><button type="button" aria-label="Anexar contexto" className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-200"><Paperclip className="h-4 w-4" /></button><button type="button" aria-label="Conversar por voz" onClick={() => setGravando((atual) => !atual)} className={`flex h-9 items-center gap-2 rounded-xl px-3 text-xs font-bold transition-colors ${gravando ? 'bg-red-500/15 text-red-300' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}><Mic className={`h-4 w-4 ${gravando ? 'animate-pulse' : ''}`} /><span className="hidden sm:inline">{gravando ? 'Ouvindo...' : 'Voz'}</span></button></div><button type="button" aria-label="Enviar mensagem" onClick={() => enviarMensagem()} disabled={!texto.trim() || enviando} className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400 text-zinc-950 transition-all hover:bg-cyan-300 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600"><ArrowUp className="h-5 w-5" /></button></div></div><p className="mt-3 text-center text-[10px] text-zinc-600">O assistente poderá usar seus dados somente quando você autorizar.</p></div>
+        <div className="sticky bottom-0 w-full pt-4"><div className="rounded-[26px] border border-zinc-700/80 bg-zinc-900/95 p-2 shadow-2xl shadow-black/40 backdrop-blur-xl"><textarea value={texto} onChange={(event) => setTexto(event.target.value)} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); enviarMensagem(); } }} rows={1} placeholder="Pergunte sobre sua vida, rotina ou finanças..." className="max-h-36 min-h-12 w-full resize-none bg-transparent px-3 py-3 text-sm text-white placeholder:text-zinc-500 focus:outline-none" /><div className="flex items-center justify-between gap-2 px-1 pb-1"><div className="flex items-center gap-1"><button type="button" aria-label="Anexar contexto" className="flex h-9 w-9 items-center justify-center rounded-xl text-zinc-500 transition-colors hover:bg-zinc-800 hover:text-zinc-200"><Paperclip className="h-4 w-4" /></button><button type="button" aria-label={gravando ? 'Parar de ouvir' : 'Conversar por voz'} onClick={alternarVoz} className={`flex h-9 items-center gap-2 rounded-xl px-3 text-xs font-bold transition-colors ${gravando ? 'bg-red-500/15 text-red-300' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}><Mic className={`h-4 w-4 ${gravando ? 'animate-pulse' : ''}`} /><span className="hidden sm:inline">{gravando ? 'Ouvindo...' : 'Voz'}</span></button></div><button type="button" aria-label="Enviar mensagem" onClick={() => enviarMensagem()} disabled={!texto.trim() || enviando} className="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400 text-zinc-950 transition-all hover:bg-cyan-300 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-600"><ArrowUp className="h-5 w-5" /></button></div></div><p className="mt-3 text-center text-[10px] text-zinc-600">O assistente poderá usar seus dados somente quando você autorizar.</p></div>
       </div>
     </div>
   );
