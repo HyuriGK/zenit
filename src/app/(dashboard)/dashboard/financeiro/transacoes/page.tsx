@@ -17,6 +17,7 @@ import {
   Trash2,
   ArrowUpDown,
   Check,
+  Tags,
 } from 'lucide-react';
 import { formatarMoeda } from '@/lib/financeiro-helper';
 import { format, startOfMonth, eachMonthOfInterval, subMonths, addMonths, isSameMonth, differenceInDays, startOfDay } from 'date-fns';
@@ -201,6 +202,10 @@ export default function TransacoesPage() {
             <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-1 italic">Histórico completo de transações</p>
           </div>
         </div>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+        <Link href="/dashboard/financeiro/categorias" className="flex h-12 items-center justify-center gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 px-4 text-xs font-black uppercase tracking-widest text-zinc-200 transition-colors hover:bg-zinc-800">
+          <Tags className="h-4 w-4 text-emerald-400" /> Categorias
+        </Link>
         <Button
           onClick={() => { setTransacaoParaEditar(null); setModalAberto(true); }}
           className="w-full sm:w-auto shrink-0 bg-zinc-950 border border-zinc-800 hover:bg-zinc-900 text-white px-4 sm:px-6 h-12 rounded-2xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl group"
@@ -210,6 +215,7 @@ export default function TransacoesPage() {
           </div>
           <span className="font-black text-xs uppercase tracking-widest">Nova Transação</span>
         </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
