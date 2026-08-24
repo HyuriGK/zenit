@@ -20,6 +20,7 @@ model User {
   plano         String    @default("FREE") // FREE ou PREMIUM
   planoExpiraEm DateTime?
   role          String    @default("OPERADOR") // ADMIN ou OPERADOR
+  ativo         Boolean   @default(true)
   
   accounts      Account[]
   sessions      Session[]
