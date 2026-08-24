@@ -482,7 +482,7 @@ export default function CursoDetalhePage() {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] lg:h-[calc(100vh-5.5rem)] flex flex-col overflow-hidden bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
+    <div className="h-full min-h-0 flex flex-col overflow-hidden bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
       {/* Header com gradiente */}
       <div className="relative shrink-0 border-b border-zinc-800/50 backdrop-blur-xl bg-zinc-900/80 overflow-x-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-blue-500/5" />
