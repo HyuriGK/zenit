@@ -2,9 +2,10 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useSession } from '@/lib/auth-mock';
 import { isAdminEmail } from '@/lib/admin';
-import { AlertCircle, Laptop, RefreshCw, ShieldCheck, Ticket } from 'lucide-react';
+import { AlertCircle, FileClock, Laptop, RefreshCw, ShieldCheck, Ticket, Users } from 'lucide-react';
 
 type Log = {
   id: string;
@@ -57,8 +58,16 @@ export default function AdminPage() {
         </header>
 
         <section className="pt-6">
+          <div className="mb-7 grid gap-4 md:grid-cols-2">
+            <Link href="/dashboard/admin/usuarios" className="group rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5 transition-colors hover:border-blue-400/35 hover:bg-zinc-900/60">
+              <div className="flex items-center gap-4"><div className="flex h-11 w-11 items-center justify-center rounded-xl border border-blue-400/25 bg-blue-500/10 text-blue-300"><Users className="h-5 w-5" /></div><div><h2 className="font-bold text-white">Usuários</h2><p className="mt-1 text-sm text-zinc-500">Consulte contas, roles e a última atividade.</p></div></div>
+            </Link>
+            <a href="#logs" className="group rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5 transition-colors hover:border-emerald-400/35 hover:bg-zinc-900/60">
+              <div className="flex items-center gap-4"><div className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-500/10 text-emerald-300"><FileClock className="h-5 w-5" /></div><div><h2 className="font-bold text-white">Logs do sistema</h2><p className="mt-1 text-sm text-zinc-500">Audite acessos de todos os usuários.</p></div></div>
+            </a>
+          </div>
           <div className="mb-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-zinc-400"><ShieldCheck className="h-4 w-4 text-amber-400" /> Logs do sistema</div>
+            <div id="logs" className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-zinc-400"><ShieldCheck className="h-4 w-4 text-amber-400" /> Logs do sistema</div>
             <button type="button" onClick={() => void carregarLogs()} className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800"><RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />Atualizar</button>
           </div>
           <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/30">

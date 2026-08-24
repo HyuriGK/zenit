@@ -44,7 +44,6 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
     { icon: TrendingUp, label: t('investments'), href: '/dashboard/investimentos' },
     { icon: KeyRound, label: t('passwords'), href: '/dashboard/senhas' },
     { icon: BookOpen, label: t('studies'), href: '/dashboard/estudos' },
-    ...(isAdminEmail(session?.user?.email) ? [{ icon: ShieldCheck, label: 'Administração', href: '/dashboard/admin' }] : []),
   ];
 
   useEffect(() => {
@@ -167,6 +166,17 @@ export function Sidebar({ isMobile = false, onNavigate }: SidebarProps) {
 
       {/* Settings */}
       <div className={`border-t border-zinc-800 ${isCollapsed ? 'p-2 flex justify-center' : 'px-4 py-2'}`}>
+        {isAdminEmail(session?.user?.email) && (
+          <Link
+            href="/dashboard/admin"
+            onClick={onNavigate}
+            className={`mb-1 flex items-center rounded-xl text-violet-300 hover:bg-violet-500/10 hover:text-violet-200 transition-all ${isCollapsed ? 'justify-center p-2' : 'w-full gap-3 px-3 py-2'}`}
+            title={isCollapsed ? 'Administração' : ''}
+          >
+            <ShieldCheck className="w-5 h-5 shrink-0" />
+            {!isCollapsed && <span className="font-semibold text-sm">Administração</span>}
+          </Link>
+        )}
         <Link
           href="/dashboard/settings"
           onClick={onNavigate}
