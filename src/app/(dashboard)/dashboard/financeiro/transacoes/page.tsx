@@ -56,6 +56,7 @@ export default function TransacoesPage() {
   const [busca, setBusca] = useState('');
   const [visualizacao, setVisualizacao] = useState<'cartoes' | 'planilha' | 'planilha-selecao'>('cartoes');
   const [linhasSelecionadas, setLinhasSelecionadas] = useState<string[]>([]);
+  const [somaSelecionada, setSomaSelecionada] = useState(0);
   const [modalAberto, setModalAberto] = useState(false);
   const [transacaoParaEditar, setTransacaoParaEditar] = useState<any>(null);
   const [dataReferencia, setDataReferencia] = useState(() => startOfMonth(new Date()));
@@ -68,7 +69,44 @@ export default function TransacoesPage() {
     document.querySelectorAll('th').forEach((cabecalho) => {
       if (cabecalho.textContent === 'Restante provisionado') cabecalho.textContent = 'Restante (R$)';
     });
-  }, [visualizacao]);
+    const tabela = document.querySelector('.overflow-x-auto table');
+    const cabecalho = tabela?.querySelector('thead tr');
+    if (cabecalho && cabecalho.children.length === 8) {
+      const titulo = document.createElement('th');
+      titulo.className = 'border-b border-zinc-800 px-4 py-3 text-left';
+      titulo.textContent = 'Categoria';
+      cabecalho.appendChild(titulo);
+      tabela?.querySelectorAll('tbody tr').forEach((linha, indice) => {
+        const celula = document.createElement('td');
+        celula.className = 'border-b border-zinc-800 px-4 py-3 text-zinc-300';
+        celula.textContent = transacoesFiltradas[indice]?.categoria?.nome || 'Sem categoria';
+        linha.children[6]?.classList.remove('text-cyan-300');
+        linha.children[6]?.classList.add('text-zinc-300');
+        linha.appendChild(celula);
+      });
+    }
+  }, [visualizacao, transacoesFiltradas]);
+
+  useEffect(() => {
+    if (visualizacao !== 'planilha-selecao') return;
+    const tabela = document.querySelector('.overflow-x-auto table');
+    if (!tabela) return;
+    const aoClicar = (evento: Event) => {
+      const mouse = evento as MouseEvent;
+      const linha = (mouse.target as HTMLElement).closest('tbody tr');
+      if (!linha || (mouse.target as HTMLElement).closest('button')) return;
+      const indice = Array.from(linha.parentElement?.children || []).indexOf(linha);
+      const transacao = transacoesFiltradas[indice];
+      if (!transacao) return;
+      setLinhasSelecionadas((atual) => mouse.ctrlKey ? (atual.includes(transacao.id) ? atual.filter((id) => id !== transacao.id) : [...atual, transacao.id]) : [transacao.id]);
+    };
+    tabela.addEventListener('click', aoClicar);
+    return () => tabela.removeEventListener('click', aoClicar);
+  }, [visualizacao, transacoesFiltradas]);
+
+  useEffect(() => {
+    setSomaSelecionada(transacoesFiltradas.filter((t) => linhasSelecionadas.includes(t.id)).reduce((total, t) => total + t.valor, 0));
+  }, [linhasSelecionadas, transacoesFiltradas]);
 
   const recarregarDados = useCallback(async () => {
     setCarregando(true);
@@ -401,6 +439,8 @@ export default function TransacoesPage() {
         </div>
         </>
       )}
+
+      {visualizacao === 'planilha-selecao' && linhasSelecionadas.length > 0 && <div className="fixed bottom-4 left-4 right-4 z-40 mx-auto flex max-w-xl items-center justify-between rounded-xl border border-cyan-400/25 bg-zinc-900/95 px-5 py-3 shadow-2xl backdrop-blur-xl sm:left-auto"><span className="text-sm text-zinc-400">{linhasSelecionadas.length} célula(s) selecionada(s)</span><strong className="text-lg text-cyan-300">Soma: {formatarMoeda(somaSelecionada)}</strong></div>}
 
       <NovaTransacaoModal
         aberto={modalAberto}
