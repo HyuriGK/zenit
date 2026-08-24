@@ -347,7 +347,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                     </SelectTrigger>
                     <SelectContent className="bg-zinc-950 border-zinc-800/80 rounded-xl shadow-2xl">
                       {categoriasDoTipo.map((cat) => (
-                        <SelectItem key={cat.id} value={cat.id} className="text-white hover:bg-zinc-900 focus:bg-zinc-900 rounded-lg m-1 py-2 cursor-pointer">
+                        <SelectItem key={cat.id} value={cat.id} className="text-white [&_*]:text-white hover:bg-zinc-900 focus:bg-zinc-900 focus:text-white data-[highlighted]:bg-zinc-900 data-[highlighted]:text-white rounded-lg m-1 py-2 cursor-pointer">
                           <div className="flex items-center gap-3">
                             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: cat.cor }} />
                             <span className="font-medium">{cat.nome}</span>
