@@ -272,12 +272,12 @@ export default function TransacoesPage() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
           <Input placeholder="Buscar transações..." value={busca} onChange={(e) => setBusca(e.target.value)}
-            className="pl-10 bg-zinc-900/50 border-zinc-800 focus:border-green-500 transition-colors" />
+            className="h-10 pl-10 bg-zinc-900/50 border-zinc-800 focus:border-green-500 transition-colors" />
         </div>
         <div className="grid grid-cols-3 gap-2 sm:flex">
-          <Button variant="default" onClick={() => setFiltroTipo('TODOS')} className={`w-full sm:w-auto ${filtroTipo === 'TODOS' ? 'bg-green-600 hover:bg-green-700' : 'border-zinc-800 hover:bg-zinc-800'}`}>Todas</Button>
-          <Button variant="default" onClick={() => setFiltroTipo('RECEITA')} className={`w-full sm:w-auto ${filtroTipo === 'RECEITA' ? 'bg-green-600 hover:bg-green-700' : 'border-zinc-800 hover:bg-zinc-800'}`}>Receitas</Button>
-          <Button variant="default" onClick={() => setFiltroTipo('DESPESA')} className={`w-full sm:w-auto ${filtroTipo === 'DESPESA' ? 'bg-red-600 hover:bg-red-700' : 'border-zinc-800 hover:bg-zinc-800'}`}>Despesas</Button>
+          <Button variant="default" onClick={() => setFiltroTipo('TODOS')} className={`h-10 w-full sm:w-auto ${filtroTipo === 'TODOS' ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-zinc-900 text-zinc-300 border border-zinc-800 hover:bg-zinc-800 hover:text-white'}`}>Todas</Button>
+          <Button variant="default" onClick={() => setFiltroTipo('RECEITA')} className={`h-10 w-full sm:w-auto ${filtroTipo === 'RECEITA' ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-zinc-900 text-zinc-300 border border-zinc-800 hover:bg-zinc-800 hover:text-white'}`}>Receitas</Button>
+          <Button variant="default" onClick={() => setFiltroTipo('DESPESA')} className={`h-10 w-full sm:w-auto ${filtroTipo === 'DESPESA' ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-zinc-900 text-zinc-300 border border-zinc-800 hover:bg-zinc-800 hover:text-white'}`}>Despesas</Button>
         </div>
       </div>
 
