@@ -85,7 +85,7 @@ export default function TransacoesPage() {
         linha.appendChild(celula);
       });
     }
-  }, [visualizacao, transacoesFiltradas]);
+  }, [visualizacao, transacoesRaw, categoriasRaw, contasRaw, cartoesRaw, filtroTipo, busca, dataReferencia]);
 
   useEffect(() => {
     if (visualizacao !== 'planilha-selecao') return;
@@ -102,11 +102,11 @@ export default function TransacoesPage() {
     };
     tabela.addEventListener('click', aoClicar);
     return () => tabela.removeEventListener('click', aoClicar);
-  }, [visualizacao, transacoesFiltradas]);
+  }, [visualizacao, transacoesRaw, categoriasRaw, contasRaw, cartoesRaw, filtroTipo, busca, dataReferencia]);
 
   useEffect(() => {
     setSomaSelecionada(transacoesFiltradas.filter((t) => linhasSelecionadas.includes(t.id)).reduce((total, t) => total + t.valor, 0));
-  }, [linhasSelecionadas, transacoesFiltradas]);
+  }, [linhasSelecionadas, transacoesRaw, categoriasRaw, contasRaw, cartoesRaw, filtroTipo, busca, dataReferencia]);
 
   const recarregarDados = useCallback(async () => {
     setCarregando(true);
