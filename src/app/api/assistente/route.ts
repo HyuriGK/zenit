@@ -7,6 +7,18 @@ import { isAdminEmail } from '@/lib/admin';
 export const dynamic = 'force-dynamic';
 
 type MensagemRecebida = { papel?: unknown; texto?: unknown };
+type LancamentoPendente = { descricao: string; valor: number; tipo: 'RECEITA' | 'DESPESA'; data: string; vencimento: string; parcelas: number };
+
+function extrairLancamento(texto: string): { resposta: string; lancamento?: LancamentoPendente } {
+  const marcador = texto.match(/<lancamento>([\s\S]*?)<\/lancamento>/i);
+  if (!marcador) return { resposta: texto };
+  try {
+    const dado = JSON.parse(marcador[1]) as LancamentoPendente;
+    const valido = dado.descricao && Number.isFinite(Number(dado.valor)) && ['RECEITA', 'DESPESA'].includes(dado.tipo) && /^\d{4}-\d{2}-\d{2}$/.test(dado.data) && /^\d{4}-\d{2}-\d{2}$/.test(dado.vencimento);
+    if (!valido) throw new Error('Dados incompletos');
+    return { resposta: texto.replace(marcador[0], '').trim(), lancamento: { ...dado, valor: Number(dado.valor), parcelas: Math.max(1, Math.min(60, Number(dado.parcelas) || 1)) } };
+  } catch { return { resposta: texto.replace(marcador[0], '').trim() }; }
+}
 
 export async function POST(request: Request) {
   const session = await auth();
@@ -47,10 +59,10 @@ export async function POST(request: Request) {
       model: 'openai/gpt-oss-20b', temperature: 0.35, max_completion_tokens: 850, user: userId,
       messages: [{
         role: 'system',
-        content: `Você é o assistente pessoal do Azimov. Responda em português do Brasil, com tom direto, útil e acolhedor. Use o contexto para analisar agenda/planner, finanças e objetivos, incluindo meses específicos solicitados pelo usuário. Faça cálculos simples quando necessário e destaque datas, valores e próximos passos. Não invente informações nem diga que não tem acesso quando o dado estiver no contexto. Se o período pedido não tiver registros, informe isso claramente. Nunca mencione senhas ou dados fora do contexto. ${admin ? 'Este usuário é administrador: ele pode consultar os dados de agenda e contas financeiras de todos os usuários presentes no contexto. Identifique sempre o usuário ao apresentar dados de terceiros.' : 'Nunca mencione dados de outros usuários.'} Formate a resposta em Markdown simples: títulos curtos com **negrito**, listas com hífen e parágrafos curtos.\n\nCONTEXTO AUTORIZADO:\n${contextoPessoal}`,
+        content: `Você é o assistente pessoal do Azimov. Responda em português do Brasil, com tom direto, útil e acolhedor. Para registrar uma despesa ou receita, primeiro pergunte todos os dados faltantes: data de vencimento, conta ou cartão e, se parcelado, número de parcelas. Nunca salve nem sugira confirmação se faltar qualquer um deles. Quando todos existirem, acrescente no fim <lancamento>{"descricao":"...","valor":0,"tipo":"DESPESA","data":"AAAA-MM-DD","vencimento":"AAAA-MM-DD","parcelas":1}</lancamento>. Nunca mencione senhas. ${admin ? 'Este usuário é administrador e pode consultar os dados presentes no contexto de todos os usuários.' : 'Nunca mencione dados de outros usuários.'} Formate em Markdown simples.\n\nCONTEXTO AUTORIZADO:\n${contextoPessoal}`,
       }, ...historico],
     });
-    return NextResponse.json({ resposta: resposta.choices[0]?.message?.content || 'Não consegui gerar uma resposta agora. Tente novamente.' });
+    return NextResponse.json(extrairLancamento(resposta.choices[0]?.message?.content || 'Não consegui gerar uma resposta agora. Tente novamente.'));
   } catch (error) {
     console.error('Erro no assistente Groq:', error);
     return NextResponse.json({ error: 'Não foi possível responder agora. Tente novamente.' }, { status: 500 });
