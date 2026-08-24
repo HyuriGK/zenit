@@ -260,8 +260,8 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
 
   return (
     <Dialog open={aberto} onOpenChange={onFechar}>
-      <DialogContent className="bg-zinc-950 border-zinc-800/50 sm:max-w-[1200px] w-[calc(100vw-1rem)] sm:w-[95vw] max-h-[calc(100dvh-1rem)] sm:max-h-[90dvh] overflow-hidden p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 rounded-2xl sm:rounded-[32px] border-zinc-800/30">
-        <div className="flex min-h-0 max-h-[calc(100dvh-1rem)] sm:max-h-[90dvh] flex-col overflow-hidden">
+      <DialogContent className="w-[calc(100vw-1rem)] max-w-[calc(100vw-1rem)] sm:max-w-[1200px] sm:w-[95vw] max-h-[calc(100dvh-1rem)] sm:max-h-[90dvh] overflow-x-hidden overflow-y-hidden bg-zinc-950 border-zinc-800/50 p-0 gap-0 shadow-2xl focus:ring-0 focus:outline-none focus-visible:ring-0 rounded-2xl sm:rounded-[32px] border-zinc-800/30">
+        <div className="flex w-full min-h-0 max-h-[calc(100dvh-1rem)] sm:max-h-[90dvh] flex-col overflow-hidden">
           <div className="shrink-0 bg-gradient-to-r from-zinc-900 via-zinc-900 to-zinc-900/50 p-4 sm:p-6 border-b border-zinc-800/50">
             <DialogHeader className="gap-1">
               <DialogTitle className="text-xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3 pr-8">
@@ -278,9 +278,9 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
 
           <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 sm:p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-              <div className="space-y-6">
-                <div className="flex gap-4 p-1.5 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
+              <div className="grid min-w-0 grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              <div className="min-w-0 space-y-6">
+                <div className="flex min-w-0 gap-2 sm:gap-4 p-1.5 bg-zinc-900/80 border border-zinc-800 rounded-2xl">
                   <button type="button" onClick={() => setTipo('RECEITA')} className={`flex-1 flex items-center justify-center gap-3 py-4 rounded-xl font-black text-sm uppercase tracking-wider transition-all duration-300 ${tipo === 'RECEITA' ? 'bg-green-600 text-white shadow-lg shadow-green-600/20 ring-1 ring-green-500/50' : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}>
                     <TrendingUp className="w-5 h-5" /> Receita
                   </button>
@@ -333,7 +333,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                 </div>
               </div>
 
-              <div className="space-y-6">
+              <div className="min-w-0 space-y-6">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-sm text-zinc-400 bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
                     <AlertCircle className="w-4 h-4 text-blue-400 shrink-0" />
@@ -371,7 +371,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
                   </div>
                 )}
 
-                <div className={`grid gap-4 transition-all duration-300 ${isFixa ? 'grid-cols-2' : 'grid-cols-1'}`}>
+                <div className={`grid gap-4 transition-all duration-300 ${isFixa ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
                   <div className="space-y-4 p-4 bg-zinc-900/40 rounded-2xl border border-zinc-800 h-[88px] flex items-center">
                     <div className="flex items-center justify-between w-full">
                       <div>

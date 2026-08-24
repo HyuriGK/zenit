@@ -17,7 +17,6 @@ import {
   Trash2,
   ArrowUpDown,
   Check,
-  AlertCircle,
 } from 'lucide-react';
 import { formatarMoeda } from '@/lib/financeiro-helper';
 import { format, startOfMonth, eachMonthOfInterval, subMonths, addMonths, isSameMonth, differenceInDays, startOfDay } from 'date-fns';
@@ -56,7 +55,6 @@ export default function TransacoesPage() {
   const [modalAberto, setModalAberto] = useState(false);
   const [transacaoParaEditar, setTransacaoParaEditar] = useState<any>(null);
   const [dataReferencia, setDataReferencia] = useState(() => startOfMonth(new Date()));
-  const [filtroAtrasado, setFiltroAtrasado] = useState(false);
   const [deleteGroupModalOpen, setDeleteGroupModalOpen] = useState(false);
   const [selectedForDelete, setSelectedForDelete] = useState<any>(null);
 
@@ -104,16 +102,9 @@ export default function TransacoesPage() {
     return eachMonthOfInterval({ start: inicio, end: fim });
   }, [dataReferencia]);
 
-  const transacoesFiltradas = transacoes.filter((t) => {
-    const matchesBusca = t.descricao.toLowerCase().includes(busca.toLowerCase());
-    if (filtroAtrasado) {
-      const hoje = startOfDay(new Date());
-      const dataT = startOfDay(parseDataString(t.data));
-      const atrasada = !t.paga && dataT.getTime() < hoje.getTime();
-      return matchesBusca && atrasada;
-    }
-    return matchesBusca;
-  });
+  const transacoesFiltradas = transacoes.filter((t) =>
+    t.descricao.toLowerCase().includes(busca.toLowerCase())
+  );
 
   const handleEditar = (transacao: any) => {
     const original = transacoesRaw.find(t => t.id === transacao.id);
@@ -192,9 +183,9 @@ export default function TransacoesPage() {
   };
 
   return (
-    <div className="bg-zinc-950 p-4 lg:p-6 space-y-4 sm:space-y-6">
-      <div className="mb-8 flex items-center justify-between">
-        <div className="flex items-center gap-4">
+    <div className="w-full max-w-full overflow-x-hidden bg-zinc-950 p-4 lg:p-6 space-y-4 sm:space-y-6">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0 flex items-center gap-3 sm:gap-4">
           <Link href="/dashboard/financeiro" className="flex items-center text-zinc-500 hover:text-white transition-colors group">
             <span className="font-black text-xs uppercase tracking-[0.2em] group-hover:translate-x-[-4px] transition-transform">Voltar</span>
           </Link>
@@ -206,7 +197,7 @@ export default function TransacoesPage() {
         </div>
         <Button
           onClick={() => { setTransacaoParaEditar(null); setModalAberto(true); }}
-          className="bg-zinc-950 border border-zinc-800 hover:bg-zinc-900 text-white px-6 h-12 rounded-2xl flex items-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl group"
+          className="w-full sm:w-auto shrink-0 bg-zinc-950 border border-zinc-800 hover:bg-zinc-900 text-white px-4 sm:px-6 h-12 rounded-2xl flex items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-2xl group"
         >
           <div className="bg-green-500/20 p-1.5 rounded-lg group-hover:bg-green-500 transition-colors">
             <Plus className="w-4 h-4 text-green-500 group-hover:text-black" />
@@ -250,11 +241,11 @@ export default function TransacoesPage() {
         </Card>
       </div>
 
-      <div className="mb-6 flex items-center gap-4 bg-zinc-900/50 p-2 rounded-xl border border-zinc-800">
+      <div className="mb-6 flex min-w-0 items-center gap-1 sm:gap-4 bg-zinc-900/50 p-2 rounded-xl border border-zinc-800">
         <Button variant="ghost" size="icon" onClick={() => setDataReferencia(prev => subMonths(prev, 1))} className="text-zinc-400 hover:text-white">
           <ChevronLeft className="w-5 h-5" />
         </Button>
-        <div className="flex-1 flex items-center justify-between overflow-x-auto scrollbar-none gap-2 px-2">
+        <div className="flex min-w-0 flex-1 items-center justify-between overflow-x-auto scrollbar-none gap-2 px-1 sm:px-2">
           {meses.map((mes) => {
             const selecionado = isSameMonth(mes, dataReferencia);
             return (
@@ -277,14 +268,10 @@ export default function TransacoesPage() {
           <Input placeholder="Buscar transações..." value={busca} onChange={(e) => setBusca(e.target.value)}
             className="pl-10 bg-zinc-900/50 border-zinc-800 focus:border-green-500 transition-colors" />
         </div>
-        <div className="flex gap-2">
-          <Button variant="default" onClick={() => setFiltroTipo('TODOS')} className={filtroTipo === 'TODOS' ? 'bg-green-600 hover:bg-green-700' : 'border-zinc-800 hover:bg-zinc-800'}>Todas</Button>
-          <Button variant="default" onClick={() => setFiltroTipo('RECEITA')} className={filtroTipo === 'RECEITA' ? 'bg-green-600 hover:bg-green-700' : 'border-zinc-800 hover:bg-zinc-800'}>Receitas</Button>
-          <Button variant="default" onClick={() => setFiltroTipo('DESPESA')} className={filtroTipo === 'DESPESA' ? 'bg-red-600 hover:bg-red-700' : 'border-zinc-800 hover:bg-zinc-800'}>Despesas</Button>
-          <Button variant="default" onClick={() => { setFiltroAtrasado(!filtroAtrasado); if (!filtroAtrasado) setFiltroTipo('TODOS'); }}
-            className={filtroAtrasado ? 'bg-red-600 hover:bg-red-700 shadow-lg shadow-red-500/20' : 'border-zinc-800 hover:bg-zinc-800 text-zinc-400'}>
-            <AlertCircle className="w-4 h-4 mr-2" />Atrasadas
-          </Button>
+        <div className="grid grid-cols-3 gap-2 sm:flex">
+          <Button variant="default" onClick={() => setFiltroTipo('TODOS')} className={`w-full sm:w-auto ${filtroTipo === 'TODOS' ? 'bg-green-600 hover:bg-green-700' : 'border-zinc-800 hover:bg-zinc-800'}`}>Todas</Button>
+          <Button variant="default" onClick={() => setFiltroTipo('RECEITA')} className={`w-full sm:w-auto ${filtroTipo === 'RECEITA' ? 'bg-green-600 hover:bg-green-700' : 'border-zinc-800 hover:bg-zinc-800'}`}>Receitas</Button>
+          <Button variant="default" onClick={() => setFiltroTipo('DESPESA')} className={`w-full sm:w-auto ${filtroTipo === 'DESPESA' ? 'bg-red-600 hover:bg-red-700' : 'border-zinc-800 hover:bg-zinc-800'}`}>Despesas</Button>
         </div>
       </div>
 
@@ -310,7 +297,7 @@ export default function TransacoesPage() {
         <div className="space-y-2">
           {transacoesFiltradas.map((transacao) => (
             <Card key={transacao.id} className={`bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 transition-all group hover:shadow-lg ${transacao.paga ? 'opacity-60 grayscale-[0.5]' : ''}`}>
-              <div className="p-4 flex items-center gap-4">
+              <div className="p-4 flex flex-wrap items-center gap-3 sm:flex-nowrap sm:gap-4">
                 <div className="flex items-center justify-center p-1">
                   <Checkbox
                     checked={transacao.paga || false}
@@ -328,15 +315,15 @@ export default function TransacoesPage() {
                   )}
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className={`font-bold text-base leading-none ${transacao.paga ? 'text-zinc-400 line-through' : 'text-white'}`}>{transacao.descricao}</h3>
-                    <div className="flex gap-1">
+                <div className="min-w-0 flex-1 basis-[calc(100%-5rem)] sm:basis-auto">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
+                    <h3 className={`min-w-0 break-words font-bold text-base leading-tight ${transacao.paga ? 'text-zinc-400 line-through' : 'text-white'}`}>{transacao.descricao}</h3>
+                    <div className="flex shrink-0 gap-1">
                       {transacao.isFixa && <span className="px-1.5 py-0.5 bg-blue-500/10 text-blue-400 text-[10px] font-bold rounded uppercase">Fixa</span>}
                       {transacao.isParcela && <span className="px-1.5 py-0.5 bg-purple-500/10 text-purple-400 text-[10px] font-bold rounded uppercase">{transacao.parcelaNumero}/{transacao.parcelaTotais}</span>}
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 text-[12px] text-zinc-500">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-zinc-500">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5" />
                       {format(parseDataString(transacao.data), "dd 'de' MMM", { locale: ptBR })}
@@ -356,7 +343,7 @@ export default function TransacoesPage() {
                   </div>
                 </div>
 
-                <div className="text-right flex flex-col items-end gap-1.5 min-w-[120px]">
+                <div className="basis-full pl-10 text-left flex flex-col items-start gap-1.5 sm:basis-auto sm:pl-0 sm:text-right sm:items-end sm:min-w-[120px]">
                   <div className={`text-lg font-black tracking-tight ${transacao.tipo === 'RECEITA' ? 'text-green-400' : 'text-red-400'} ${transacao.paga ? 'opacity-40' : ''}`}>
                     {transacao.tipo === 'RECEITA' ? '+' : '-'} {formatarMoeda(transacao.valor)}
                   </div>
@@ -370,12 +357,14 @@ export default function TransacoesPage() {
                   )}
                 </div>
 
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity ml-2">
-                  <Button variant="ghost" size="icon" onClick={() => handleEditar(transacao)} className="h-8 w-8 text-zinc-500 hover:text-white hover:bg-zinc-800">
+                <div className="order-first flex basis-full items-center justify-end gap-2 border-b border-zinc-800/70 pb-3 sm:order-none sm:basis-auto sm:border-0 sm:pb-0 sm:ml-2">
+                  <Button variant="ghost" size="sm" onClick={() => handleEditar(transacao)} className="h-8 px-2.5 text-zinc-300 hover:text-white hover:bg-zinc-800">
                     <Edit className="w-4 h-4" />
+                    <span className="ml-1.5 text-xs font-bold">Editar</span>
                   </Button>
-                  <Button variant="ghost" size="icon" onClick={() => handleExcluir(transacao.id)} className="h-8 w-8 text-zinc-500 hover:text-red-400 hover:bg-red-500/10">
+                  <Button variant="ghost" size="sm" onClick={() => handleExcluir(transacao.id)} className="h-8 px-2.5 text-red-400 hover:text-red-300 hover:bg-red-500/10">
                     <Trash2 className="w-4 h-4" />
+                    <span className="ml-1.5 text-xs font-bold">Excluir</span>
                   </Button>
                 </div>
               </div>
