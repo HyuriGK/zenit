@@ -18,6 +18,7 @@ import {
   ArrowUpDown,
   Check,
   Tags,
+  TableProperties,
 } from 'lucide-react';
 import { formatarMoeda } from '@/lib/financeiro-helper';
 import { format, startOfMonth, eachMonthOfInterval, subMonths, addMonths, isSameMonth, differenceInDays, startOfDay } from 'date-fns';
@@ -53,6 +54,7 @@ export default function TransacoesPage() {
 
   const [filtroTipo, setFiltroTipo] = useState<string>('TODOS');
   const [busca, setBusca] = useState('');
+  const [visualizacao, setVisualizacao] = useState<'cartoes' | 'planilha'>('cartoes');
   const [modalAberto, setModalAberto] = useState(false);
   const [transacaoParaEditar, setTransacaoParaEditar] = useState<any>(null);
   const [dataReferencia, setDataReferencia] = useState(() => startOfMonth(new Date()));
@@ -284,6 +286,7 @@ export default function TransacoesPage() {
           <Button variant="default" onClick={() => setFiltroTipo('TODOS')} className={`h-10 w-full sm:w-auto ${filtroTipo === 'TODOS' ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-zinc-900 text-zinc-300 border border-zinc-800 hover:bg-zinc-800 hover:text-white'}`}>Todas</Button>
           <Button variant="default" onClick={() => setFiltroTipo('RECEITA')} className={`h-10 w-full sm:w-auto ${filtroTipo === 'RECEITA' ? 'bg-green-600 hover:bg-green-700 text-white' : 'bg-zinc-900 text-zinc-300 border border-zinc-800 hover:bg-zinc-800 hover:text-white'}`}>Receitas</Button>
           <Button variant="default" onClick={() => setFiltroTipo('DESPESA')} className={`h-10 w-full sm:w-auto ${filtroTipo === 'DESPESA' ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-zinc-900 text-zinc-300 border border-zinc-800 hover:bg-zinc-800 hover:text-white'}`}>Despesas</Button>
+          <Button variant="default" onClick={() => setVisualizacao((atual) => atual === 'cartoes' ? 'planilha' : 'cartoes')} className={`h-10 w-full sm:w-auto border ${visualizacao === 'planilha' ? 'bg-cyan-500 text-zinc-950 border-cyan-400 hover:bg-cyan-400' : 'bg-zinc-900 text-zinc-300 border-zinc-800 hover:bg-zinc-800 hover:text-white'}`}><TableProperties className="mr-2 h-4 w-4" />Planilha</Button>
         </div>
       </div>
 
@@ -306,7 +309,9 @@ export default function TransacoesPage() {
           </div>
         </Card>
       ) : (
-        <div className="space-y-2">
+        <>
+        {visualizacao === 'planilha' && <div className="overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-950"><table className="min-w-[1000px] w-full text-sm"><thead className="bg-zinc-900 text-[10px] uppercase tracking-wider text-zinc-400"><tr><th className="border-b border-r border-zinc-800 px-4 py-3 text-left">Vencimento</th><th className="border-b border-r border-zinc-800 px-4 py-3 text-left">Descrição</th><th className="border-b border-r border-zinc-800 px-4 py-3 text-right">Valor mensal</th><th className="border-b border-r border-zinc-800 px-4 py-3 text-center">Parcela atual</th><th className="border-b border-r border-zinc-800 px-4 py-3 text-center">Quant. parcelas</th><th className="border-b border-r border-zinc-800 px-4 py-3 text-center">Restantes</th><th className="border-b border-zinc-800 px-4 py-3 text-left">Categoria</th></tr></thead><tbody>{transacoesFiltradas.map((t) => <tr key={t.id} className="hover:bg-zinc-900/70"><td className="border-b border-r border-zinc-800 px-4 py-3 text-zinc-400">{format(parseDataString(t.data), 'dd/MM/yyyy')}</td><td className="border-b border-r border-zinc-800 px-4 py-3 font-medium text-zinc-100">{t.descricao}</td><td className={`border-b border-r border-zinc-800 px-4 py-3 text-right font-bold ${t.tipo === 'RECEITA' ? 'text-emerald-400' : 'text-red-400'}`}>{formatarMoeda(t.valor)}</td><td className="border-b border-r border-zinc-800 px-4 py-3 text-center text-zinc-300">{t.isParcela ? t.parcelaNumero : '—'}</td><td className="border-b border-r border-zinc-800 px-4 py-3 text-center text-zinc-300">{t.isParcela ? t.parcelaTotais : '—'}</td><td className="border-b border-r border-zinc-800 px-4 py-3 text-center text-zinc-300">{t.isParcela && t.parcelaTotais && t.parcelaNumero ? t.parcelaTotais - t.parcelaNumero : '—'}</td><td className="border-b border-zinc-800 px-4 py-3 text-zinc-400">{t.categoria?.nome || 'Sem categoria'}</td></tr>)}</tbody></table></div>}
+        <div className={visualizacao === 'cartoes' ? 'space-y-2' : 'hidden'}>
           {transacoesFiltradas.map((transacao) => (
             <Card key={transacao.id} className={`overflow-hidden bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 transition-all group hover:shadow-lg ${transacao.paga ? 'opacity-60 grayscale-[0.5]' : ''}`}>
               <div className="p-4 flex flex-wrap items-center gap-3 sm:flex-nowrap sm:gap-4">
@@ -386,6 +391,7 @@ export default function TransacoesPage() {
             </Card>
           ))}
         </div>
+        </>
       )}
 
       <NovaTransacaoModal
