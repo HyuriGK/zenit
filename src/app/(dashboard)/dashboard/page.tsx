@@ -14,6 +14,17 @@ const sugestoes = [
   { titulo: 'Plano de hoje', descricao: 'Defina seu próximo passo', texto: 'O que preciso fazer hoje?', icone: ListTodo },
 ];
 
+function RespostaFormatada({ texto }: { texto: string }) {
+  const destacar = (trecho: string) => trecho.split(/(\*\*[^*]+\*\*)/g).map((parte, index) =>
+    parte.startsWith('**') && parte.endsWith('**') ? <strong key={index} className="font-semibold text-zinc-100">{parte.slice(2, -2)}</strong> : parte
+  );
+
+  return <div className="space-y-2">{texto.split('\n').filter(Boolean).map((linha, index) => {
+    const item = linha.replace(/^-\s*/, '');
+    return linha.startsWith('- ') ? <div key={index} className="flex gap-2"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300" /><span>{destacar(item)}</span></div> : <p key={index}>{destacar(linha)}</p>;
+  })}</div>;
+}
+
 export default function DashboardPage() {
   const tCommon = useTranslations('common');
   const { data: session, status } = useSession();
@@ -84,7 +95,7 @@ export default function DashboardPage() {
         ) : (
           <div className="flex-1 space-y-6 overflow-y-auto pb-8 pt-2">
             <div className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200"><Bot className="h-5 w-5" /></div><div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-zinc-800 bg-zinc-900/70 px-4 py-3 text-sm leading-relaxed text-zinc-300">Estou pronto para ajudar com sua rotina, metas e registros.</div></div>
-            {mensagens.map((mensagem) => mensagem.papel === 'usuario' ? <div key={mensagem.id} className="flex justify-end"><div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-cyan-500 to-blue-600 px-4 py-3 text-sm leading-relaxed text-white shadow-lg shadow-cyan-950/30">{mensagem.texto}</div></div> : <div key={mensagem.id} className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200"><Bot className="h-5 w-5" /></div><div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-zinc-800 bg-zinc-900/70 px-4 py-3 text-sm leading-relaxed text-zinc-300">{mensagem.texto}</div></div>)}
+            {mensagens.map((mensagem) => mensagem.papel === 'usuario' ? <div key={mensagem.id} className="flex justify-end"><div className="max-w-[85%] rounded-2xl rounded-tr-sm bg-gradient-to-br from-cyan-500 to-blue-600 px-4 py-3 text-sm leading-relaxed text-white shadow-lg shadow-cyan-950/30">{mensagem.texto}</div></div> : <div key={mensagem.id} className="flex items-start gap-3"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-200"><Bot className="h-5 w-5" /></div><div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-zinc-800 bg-zinc-900/70 px-4 py-3 text-sm leading-relaxed text-zinc-300"><RespostaFormatada texto={mensagem.texto} /></div></div>)}
             {enviando && <div className="flex items-center gap-3 text-sm text-zinc-500"><Bot className="h-5 w-5 animate-pulse text-cyan-300" />Azimov está pensando...</div>}
           </div>
         )}
