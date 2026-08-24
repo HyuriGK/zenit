@@ -77,15 +77,21 @@ export default function TransacoesPage() {
       titulo.className = 'border-b border-zinc-800 px-4 py-3 text-left';
       titulo.textContent = 'Categoria';
       cabecalho.appendChild(titulo);
-      tabela?.querySelectorAll('tbody tr').forEach((linha, indice) => {
+    }
+    tabela?.querySelectorAll('tbody tr').forEach((linha, indice) => {
+        const categoriaAtual = transacoesFiltradas[indice]?.categoria?.nome || 'Sem categoria';
+        const ultimaCelula = linha.lastElementChild as HTMLTableCellElement | null;
+        if (linha.children.length === 8) {
         const celula = document.createElement('td');
         celula.className = 'border-b border-zinc-800 px-4 py-3 text-zinc-300';
-        celula.textContent = transacoesFiltradas[indice]?.categoria?.nome || 'Sem categoria';
+        celula.textContent = categoriaAtual;
         linha.children[6]?.classList.remove('text-cyan-300');
         linha.children[6]?.classList.add('text-zinc-300');
         linha.appendChild(celula);
+        } else if (ultimaCelula) {
+          ultimaCelula.textContent = categoriaAtual;
+        }
       });
-    }
     tabela?.querySelectorAll('tbody tr').forEach((linha, indice) => {
       const transacao = transacoesFiltradas[indice];
       if (!transacao || transacao.isParcela) return;
