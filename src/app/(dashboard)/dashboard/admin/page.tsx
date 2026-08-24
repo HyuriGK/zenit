@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useSession } from '@/lib/auth-mock';
 import { isAdminEmail } from '@/lib/admin';
-import { AlertCircle, FileClock, Laptop, RefreshCw, ShieldCheck, Ticket, Users } from 'lucide-react';
+import { AlertCircle, FileClock, Laptop, RefreshCw, ShieldCheck, Ticket, Users, UserPlus, KeyRound, ListTodo, Database, LockKeyhole, Megaphone, GitBranch, Headphones } from 'lucide-react';
 
 type Log = {
   id: string;
@@ -27,6 +27,7 @@ export default function AdminPage() {
   const router = useRouter();
   const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mostrarLogs, setMostrarLogs] = useState(false);
 
   const carregarLogs = useCallback(async () => {
     setLoading(true);
@@ -44,8 +45,7 @@ export default function AdminPage() {
   }, [router, session?.user?.email, status]);
 
   useEffect(() => {
-    if (status === 'authenticated' && isAdminEmail(session?.user?.email)) void carregarLogs();
-  }, [carregarLogs, session?.user?.email, status]);
+  }, [session?.user?.email, status]);
 
   if (status === 'loading' || !isAdminEmail(session?.user?.email)) return null;
 
@@ -58,19 +58,27 @@ export default function AdminPage() {
         </header>
 
         <section className="pt-6">
-          <div className="mb-7 grid gap-4 md:grid-cols-2">
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Gestão de acesso</p>
+          <div className="mb-7 grid gap-4 lg:grid-cols-3">
+            <button type="button" className="text-left rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5 opacity-70"><div className="flex items-center gap-4"><div className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-500/10 text-emerald-300"><UserPlus className="h-5 w-5" /></div><div><h2 className="font-bold text-white">Criar usuário</h2><p className="mt-1 text-sm text-zinc-500">Em breve, cadastre uma nova conta.</p></div></div></button>
             <Link href="/dashboard/admin/usuarios" className="group rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5 transition-colors hover:border-blue-400/35 hover:bg-zinc-900/60">
               <div className="flex items-center gap-4"><div className="flex h-11 w-11 items-center justify-center rounded-xl border border-blue-400/25 bg-blue-500/10 text-blue-300"><Users className="h-5 w-5" /></div><div><h2 className="font-bold text-white">Usuários</h2><p className="mt-1 text-sm text-zinc-500">Consulte contas, roles e a última atividade.</p></div></div>
             </Link>
-            <a href="#logs" className="group rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5 transition-colors hover:border-emerald-400/35 hover:bg-zinc-900/60">
-              <div className="flex items-center gap-4"><div className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-500/10 text-emerald-300"><FileClock className="h-5 w-5" /></div><div><h2 className="font-bold text-white">Logs do sistema</h2><p className="mt-1 text-sm text-zinc-500">Audite acessos de todos os usuários.</p></div></div>
-            </a>
+            <button type="button" className="text-left rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5 opacity-70"><div className="flex items-center gap-4"><div className="flex h-11 w-11 items-center justify-center rounded-xl border border-amber-400/25 bg-amber-500/10 text-amber-300"><KeyRound className="h-5 w-5" /></div><div><h2 className="font-bold text-white">Permissões por role</h2><p className="mt-1 text-sm text-zinc-500">Em breve, controle acessos por perfil.</p></div></div></button>
           </div>
-          <div className="mb-4 flex items-center justify-between gap-4">
+          <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500">Monitoramento</p>
+          <div className="mb-7 grid gap-4 lg:grid-cols-3">
+            <button type="button" onClick={() => { setMostrarLogs(true); void carregarLogs(); }} className="group text-left rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5 transition-colors hover:border-emerald-400/35 hover:bg-zinc-900/60">
+              <div className="flex items-center gap-4"><div className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-500/10 text-emerald-300"><FileClock className="h-5 w-5" /></div><div><h2 className="font-bold text-white">Logs do sistema</h2><p className="mt-1 text-sm text-zinc-500">Audite acessos de todos os usuários.</p></div></div>
+            </button>
+            <button type="button" className="text-left rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5 opacity-70"><div className="flex items-center gap-4"><div className="flex h-11 w-11 items-center justify-center rounded-xl border border-amber-400/25 bg-amber-500/10 text-amber-300"><ListTodo className="h-5 w-5" /></div><div><h2 className="font-bold text-white">Central de tarefas</h2><p className="mt-1 text-sm text-zinc-500">Em breve, pendências do sistema.</p></div></div></button>
+            <button type="button" className="text-left rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5 opacity-70"><div className="flex items-center gap-4"><div className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-400/25 bg-emerald-500/10 text-emerald-300"><Database className="h-5 w-5" /></div><div><h2 className="font-bold text-white">Status do servidor</h2><p className="mt-1 text-sm text-zinc-500">Em breve, dados de operação.</p></div></div></button>
+          </div>
+          {mostrarLogs && <div className="mb-4 flex items-center justify-between gap-4">
             <div id="logs" className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-zinc-400"><ShieldCheck className="h-4 w-4 text-amber-400" /> Logs do sistema</div>
             <button type="button" onClick={() => void carregarLogs()} className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-300 transition-colors hover:bg-zinc-800"><RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />Atualizar</button>
-          </div>
-          <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/30">
+          </div>}
+          {mostrarLogs && <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/30">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[850px] text-left text-sm">
                 <thead className="border-b border-zinc-800 bg-zinc-900/70 text-[10px] font-bold uppercase tracking-[0.16em] text-zinc-500"><tr><th className="px-5 py-4">Data/hora</th><th className="px-5 py-4">Usuário</th><th className="px-5 py-4">Dispositivo</th><th className="px-5 py-4">Ação</th><th className="px-5 py-4">Tela</th><th className="px-5 py-4">Detalhes</th></tr></thead>
@@ -80,7 +88,7 @@ export default function AdminPage() {
                 </tbody>
               </table>
             </div>
-          </div>
+          </div>}
         </section>
       </div>
     </main>
