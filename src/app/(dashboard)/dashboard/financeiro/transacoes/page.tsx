@@ -118,6 +118,20 @@ export default function TransacoesPage() {
   useEffect(() => setSomaSelecionada(celulasSelecionadas.reduce((total, celula) => total + celula.valor, 0)), [celulasSelecionadas]);
 
   useEffect(() => {
+    if (visualizacao !== 'planilha-selecao') return;
+    const tabela = document.querySelector('.overflow-x-auto table');
+    if (!tabela) return;
+    tabela.querySelectorAll('tbody td').forEach((celula) => celula.classList.remove('bg-cyan-400/15', 'ring-1', 'ring-inset', 'ring-cyan-300'));
+    celulasSelecionadas.forEach(({ chave }) => {
+      const ultimoSeparador = chave.lastIndexOf('-');
+      const id = chave.slice(0, ultimoSeparador);
+      const coluna = Number(chave.slice(ultimoSeparador + 1));
+      const indice = transacoesFiltradas.findIndex((transacao) => transacao.id === id);
+      tabela.querySelectorAll('tbody tr')[indice]?.children[coluna]?.classList.add('bg-cyan-400/15', 'ring-1', 'ring-inset', 'ring-cyan-300');
+    });
+  }, [celulasSelecionadas, transacoesFiltradas, visualizacao]);
+
+  useEffect(() => {
     setSomaSelecionada(transacoesFiltradas.filter((t) => linhasSelecionadas.includes(t.id)).reduce((total, t) => total + t.valor, 0));
   }, [linhasSelecionadas, transacoesRaw, categoriasRaw, contasRaw, cartoesRaw, filtroTipo, busca, dataReferencia]);
 
