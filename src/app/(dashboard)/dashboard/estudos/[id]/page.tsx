@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -65,6 +65,7 @@ export default function CursoDetalhePage() {
   const [moduloSelecionado, setModuloSelecionado] = useState<Modulo | null>(null);
   const [paginaSelecionada, setPaginaSelecionada] = useState<Pagina | null>(null);
   const [loading, setLoading] = useState(true);
+  const requisicaoAtual = useRef(0);
 
   const [modalModuloAberto, setModalModuloAberto] = useState(false);
   const [modalPaginaAberto, setModalPaginaAberto] = useState(false);
@@ -100,6 +101,7 @@ export default function CursoDetalhePage() {
   const [excluindoCurso, setExcluindoCurso] = useState(false);
 
   const carregarDados = useCallback(async () => {
+    const idRequisicao = ++requisicaoAtual.current;
     try {
       const [resCursos, resModulos, resAnots] = await Promise.all([
         fetch('/api/estudos'),
@@ -111,6 +113,9 @@ export default function CursoDetalhePage() {
         const jsonCursos = await resCursos.json();
         const jsonModulos = await resModulos.json();
         const jsonAnots = await resAnots.json();
+
+        // Ignore a resposta caso uma navegação ou atualização mais recente já tenha começado.
+        if (idRequisicao !== requisicaoAtual.current) return;
 
         const cursoFound = jsonCursos.data.find((c: any) => c.id === cursoId);
         if (!cursoFound) {
@@ -146,34 +151,38 @@ export default function CursoDetalhePage() {
           modulos: modulosComPaginas
         } as Curso);
 
-        if (moduloSelecionado) {
-          const moduloAtualizado = modulosComPaginas.find((m: any) => m.id === moduloSelecionado.id);
-          if (moduloAtualizado) {
-            setModuloSelecionado(moduloAtualizado);
-          }
-        }
+        // Mantém a seleção mais recente. Não use valores capturados pela requisição,
+        // pois uma resposta atrasada poderia restaurar visualmente uma seleção antiga.
+        setModuloSelecionado((moduloAtual) => {
+          if (!moduloAtual) return null;
+          return modulosComPaginas.find((modulo: Modulo) => modulo.id === moduloAtual.id) ?? null;
+        });
 
-        if (paginaSelecionada) {
-          const paginaAtualizada = anots.find((a: any) => a.id === paginaSelecionada.id);
-          if (paginaAtualizada) {
-            setPaginaSelecionada({
-              id: paginaAtualizada.id,
-              titulo: paginaAtualizada.titulo,
-              conteudo: paginaAtualizada.conteudo,
-              ordem: 0
-            });
-          }
-        }
+        setPaginaSelecionada((paginaAtual) => {
+          if (!paginaAtual) return null;
+          const paginaAtualizada = anots.find((pagina: any) => pagina.id === paginaAtual.id);
+          return paginaAtualizada
+            ? {
+                id: paginaAtualizada.id,
+                titulo: paginaAtualizada.titulo,
+                conteudo: paginaAtualizada.conteudo,
+                ordem: 0,
+              }
+            : null;
+        });
 
       }
     } catch (err) {
       console.error(err);
     } finally {
-      setLoading(false);
+      if (idRequisicao === requisicaoAtual.current) {
+        setLoading(false);
+      }
     }
-  }, [cursoId, moduloSelecionado?.id, paginaSelecionada?.id]);
+  }, [cursoId]);
 
   useEffect(() => {
+    setLoading(true);
     carregarDados();
   }, [carregarDados]);
 
@@ -235,7 +244,7 @@ export default function CursoDetalhePage() {
     }
   };
 
-  const carregarModulo = async (moduloId: string) => {
+  const carregarModulo = (moduloId: string) => {
     if (curso) {
       const mod = curso.modulos.find(m => m.id === moduloId);
       if (mod) {
@@ -245,7 +254,7 @@ export default function CursoDetalhePage() {
     }
   };
 
-  const carregarPagina = async (paginaId: string) => {
+  const carregarPagina = (paginaId: string) => {
     if (curso && moduloSelecionado) {
       const p = moduloSelecionado.paginas?.find(p => p.id === paginaId);
       if (p) {
@@ -297,6 +306,8 @@ export default function CursoDetalhePage() {
 
   // Função para navegar com verificação de alterações não salvas
   const handleSelectModulo = (moduloId: string) => {
+    if (moduloSelecionado?.id === moduloId) return;
+
     if (isPaginaEdicaoDirty) {
       setNavegacaoPendente({ tipo: 'modulo', id: moduloId });
       setModalConfirmarSaidaEdicao(true);
@@ -306,6 +317,8 @@ export default function CursoDetalhePage() {
   };
 
   const handleSelectPagina = (paginaId: string) => {
+    if (paginaSelecionada?.id === paginaId) return;
+
     if (isPaginaEdicaoDirty) {
       setNavegacaoPendente({ tipo: 'pagina', id: paginaId });
       setModalConfirmarSaidaEdicao(true);
