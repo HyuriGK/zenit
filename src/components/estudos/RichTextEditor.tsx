@@ -34,11 +34,14 @@ const DOMPURIFY_CONFIG = {
   ALLOWED_TAGS: [
     'p', 'br', 'strong', 'b', 'em', 'i', 'u', 's', 'strike',
     'h1', 'h2', 'h3', 'ul', 'ol', 'li', 'blockquote', 'code', 'pre',
-    'img', 'a', 'span', 'div', 'mark'
+    'img', 'a', 'span', 'div', 'mark', 'hr', 'sub', 'sup',
+    'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
+    'figure', 'figcaption', 'details', 'summary'
   ],
   ALLOWED_ATTR: [
     'href', 'src', 'alt', 'class', 'style', 'target', 'rel',
-    'data-width', 'data-height', 'data-align', 'width', 'height'
+    'data-width', 'data-height', 'data-align', 'width', 'height',
+    'colspan', 'rowspan', 'scope', 'open'
   ],
   FORBID_TAGS: ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button'],
   FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur'],

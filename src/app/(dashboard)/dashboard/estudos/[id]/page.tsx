@@ -28,6 +28,7 @@ import RichTextEditor from '@/components/estudos/RichTextEditor';
 import { PomodoroTimer } from '@/components/PomodoroTimer';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
 
 interface Modulo {
   id: string;
@@ -378,17 +379,30 @@ export default function CursoDetalhePage() {
         })
       });
 
-      if (res.ok) {
-        carregarDados();
+      const resposta = await res.json().catch(() => null);
+      if (!res.ok || !resposta?.data) {
+        throw new Error(resposta?.error || 'Não foi possível salvar a página. Tente novamente.');
       }
 
+      // Use exatamente a versão que o banco confirmou ter salvo. Assim o editor
+      // nunca marca conteúdo local como salvo quando a requisição falhar.
+      const paginaSalva = resposta.data as Pagina;
+      setPaginaSelecionada({
+        id: paginaSalva.id,
+        titulo: paginaSalva.titulo,
+        conteudo: paginaSalva.conteudo,
+        ordem: paginaSelecionada.ordem,
+      });
       setConteudoOriginalPagina({
-        titulo: paginaSelecionada.titulo,
-        conteudo: paginaSelecionada.conteudo,
+        titulo: paginaSalva.titulo,
+        conteudo: paginaSalva.conteudo,
       });
       setEditandoPagina(false);
+      toast.success('Página salva com sucesso.');
+      await carregarDados();
     } catch (error) {
       console.error('Erro ao salvar página:', error);
+      toast.error(error instanceof Error ? error.message : 'Não foi possível salvar a página.');
     } finally {
       setSalvandoPagina(false);
     }
