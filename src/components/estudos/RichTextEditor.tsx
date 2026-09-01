@@ -10,6 +10,7 @@ import Highlight from '@tiptap/extension-highlight';
 import { Extension } from '@tiptap/core';
 import { ResizableImage } from './ResizableImage';
 import DOMPurify from 'dompurify';
+import { upload } from '@vercel/blob/client';
 import {
   Bold,
   Italic,
@@ -179,24 +180,27 @@ export default function RichTextEditor({ content, onChange, placeholder }: RichT
             const file = item.getAsFile();
             if (!file) continue;
 
-            // Converter imagem para base64
-            const reader = new FileReader();
-            reader.onload = (e) => {
-              const base64 = e.target?.result as string;
-
-              // Inserir imagem no editor usando resizableImage
-              const node = view.state.schema.nodes.resizableImage;
-              if (node) {
-                view.dispatch(
-                  view.state.tr.replaceSelectionWith(
-                    node.create({
-                      src: base64,
-                    })
-                  )
+            void (async () => {
+              try {
+                const extension = file.type.split('/')[1] || 'png';
+                const blob = await upload(
+                  `anotacoes/${crypto.randomUUID()}/${crypto.randomUUID()}.${extension}`,
+                  file,
+                  {
+                    access: 'public',
+                    handleUploadUrl: '/api/estudos/anotacoes/imagens/upload',
+                    multipart: file.size > 4 * 1024 * 1024,
+                  },
                 );
+                const node = view.state.schema.nodes.resizableImage;
+                if (node) {
+                  view.dispatch(view.state.tr.replaceSelectionWith(node.create({ src: blob.url })));
+                }
+              } catch (error) {
+                console.error('Erro ao enviar imagem:', error);
+                window.alert('Não foi possível enviar a imagem. Tente novamente.');
               }
-            };
-            reader.readAsDataURL(file);
+            })();
 
             return true;
           }

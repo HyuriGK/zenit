@@ -29,6 +29,7 @@ import { PomodoroTimer } from '@/components/PomodoroTimer';
 import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { upload } from '@vercel/blob/client';
 
 interface Modulo {
   id: string;
@@ -54,6 +55,29 @@ interface Curso {
   descricao?: string;
   cor: string;
   modulos: Modulo[];
+}
+
+async function migrarImagensIncorporadas(conteudo: string) {
+  if (!conteudo.includes('data:image/')) return conteudo;
+
+  const documentHtml = new DOMParser().parseFromString(conteudo, 'text/html');
+  const imagens = Array.from(documentHtml.querySelectorAll('img[src^="data:image/"]'));
+
+  for (const [indice, imagem] of imagens.entries()) {
+    const origem = imagem.getAttribute('src');
+    if (!origem) continue;
+
+    const arquivo = await (await fetch(origem)).blob();
+    const extensao = arquivo.type.split('/')[1] || 'png';
+    const resultado = await upload(`anotacoes/legadas/${crypto.randomUUID()}-${indice}.${extensao}`, arquivo, {
+      access: 'public',
+      handleUploadUrl: '/api/estudos/anotacoes/imagens/upload',
+      multipart: arquivo.size > 4 * 1024 * 1024,
+    });
+    imagem.setAttribute('src', resultado.url);
+  }
+
+  return documentHtml.body.innerHTML;
 }
 
 export default function CursoDetalhePage() {
@@ -369,13 +393,16 @@ export default function CursoDetalhePage() {
 
     setSalvandoPagina(true);
     try {
+      // Anotações antigas podem conter imagens em base64, o que excede o
+      // limite de corpo da plataforma. Migre-as antes de mandar o JSON.
+      const conteudo = await migrarImagensIncorporadas(paginaSelecionada.conteudo);
       const res = await fetch('/api/estudos/anotacoes', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: paginaSelecionada.id,
           titulo: paginaSelecionada.titulo,
-          conteudo: paginaSelecionada.conteudo
+          conteudo
         })
       });
 
