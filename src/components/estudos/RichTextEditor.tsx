@@ -182,6 +182,7 @@ export default function RichTextEditor({ content, onChange, placeholder }: RichT
 
             void (async () => {
               try {
+                if (!navigator.onLine) throw new Error('offline');
                 const extension = file.type.split('/')[1] || 'png';
                 const blob = await upload(
                   `anotacoes/${crypto.randomUUID()}/${crypto.randomUUID()}.${extension}`,
@@ -198,7 +199,14 @@ export default function RichTextEditor({ content, onChange, placeholder }: RichT
                 }
               } catch (error) {
                 console.error('Erro ao enviar imagem:', error);
-                window.alert('Não foi possível enviar a imagem. Tente novamente.');
+                const reader = new FileReader();
+                reader.onload = () => {
+                  const node = view.state.schema.nodes.resizableImage;
+                  if (node && typeof reader.result === 'string') {
+                    view.dispatch(view.state.tr.replaceSelectionWith(node.create({ src: reader.result })));
+                  }
+                };
+                reader.readAsDataURL(file);
               }
             })();
 

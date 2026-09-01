@@ -30,6 +30,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import { upload } from '@vercel/blob/client';
+import { db } from '@/lib/dexie';
 
 interface Modulo {
   id: string;
@@ -125,6 +126,40 @@ export default function CursoDetalhePage() {
   const [excluindoPagina, setExcluindoPagina] = useState(false);
   const [excluindoCurso, setExcluindoCurso] = useState(false);
 
+  const salvarLocalmente = useCallback(async (pagina: Pagina) => {
+    await db.anotacoesPendentes.put({
+      id: pagina.id,
+      cursoId,
+      titulo: pagina.titulo,
+      conteudo: pagina.conteudo,
+      updatedAt: new Date(),
+    });
+    const cache = await db.estudosOfflineCache.get(cursoId);
+    if (cache?.curso) {
+      const cursoEmCache = cache.curso as Curso;
+      await db.estudosOfflineCache.put({
+        ...cache,
+        curso: {
+          ...cursoEmCache,
+          modulos: cursoEmCache.modulos.map((modulo) => ({
+            ...modulo,
+            paginas: modulo.paginas?.map((item) => item.id === pagina.id ? pagina : item),
+          })),
+        },
+        updatedAt: new Date(),
+      });
+    }
+    setCurso((atual) => atual ? {
+      ...atual,
+      modulos: atual.modulos.map((modulo) => ({
+        ...modulo,
+        paginas: modulo.paginas?.map((item) => item.id === pagina.id ? pagina : item),
+      })),
+    } : atual);
+    setConteudoOriginalPagina({ titulo: pagina.titulo, conteudo: pagina.conteudo });
+    setEditandoPagina(false);
+  }, [cursoId]);
+
   const carregarDados = useCallback(async () => {
     const idRequisicao = ++requisicaoAtual.current;
     try {
@@ -196,9 +231,25 @@ export default function CursoDetalhePage() {
             : null;
         });
 
+        await db.estudosOfflineCache.put({
+          id: cursoId,
+          curso: {
+            id: cursoFound.id, nome: cursoFound.nome, descricao: cursoFound.descricao,
+            cor: cursoFound.cor, modulos: modulosComPaginas,
+          },
+          modulos: mods,
+          anotacoes: anots,
+          updatedAt: new Date(),
+        });
+
       }
     } catch (err) {
       console.error(err);
+      const cache = await db.estudosOfflineCache.get(cursoId);
+      if (cache?.curso) {
+        setCurso(cache.curso as Curso);
+        toast.info('Modo offline: usando a última versão salva neste dispositivo.');
+      }
     } finally {
       if (idRequisicao === requisicaoAtual.current) {
         setLoading(false);
@@ -210,6 +261,31 @@ export default function CursoDetalhePage() {
     setLoading(true);
     carregarDados();
   }, [carregarDados]);
+
+  const sincronizarPendentes = useCallback(async () => {
+    if (!navigator.onLine) return;
+    const pendentes = await db.anotacoesPendentes.where('cursoId').equals(cursoId).sortBy('updatedAt');
+    if (!pendentes.length) return;
+
+    for (const pendente of pendentes) {
+      const conteudo = await migrarImagensIncorporadas(pendente.conteudo);
+      const resposta = await fetch('/api/estudos/anotacoes', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: pendente.id, titulo: pendente.titulo, conteudo }),
+      });
+      if (!resposta.ok) throw new Error('Não foi possível sincronizar a anotação.');
+      await db.anotacoesPendentes.delete(pendente.id);
+    }
+    toast.success('Anotações offline sincronizadas.');
+    await carregarDados();
+  }, [carregarDados, cursoId]);
+
+  useEffect(() => {
+    const aoReconectar = () => { void sincronizarPendentes(); };
+    window.addEventListener('online', aoReconectar);
+    void sincronizarPendentes();
+    return () => window.removeEventListener('online', aoReconectar);
+  }, [sincronizarPendentes]);
 
   const criarModulo = async () => {
     if (criandoModulo) return;
@@ -391,6 +467,12 @@ export default function CursoDetalhePage() {
   const salvarPagina = async () => {
     if (!paginaSelecionada || salvandoPagina) return;
 
+    if (!navigator.onLine) {
+      await salvarLocalmente(paginaSelecionada);
+      toast.info('Sem internet: anotação guardada neste dispositivo e será sincronizada ao reconectar.');
+      return;
+    }
+
     setSalvandoPagina(true);
     try {
       // Anotações antigas podem conter imagens em base64, o que excede o
@@ -429,7 +511,8 @@ export default function CursoDetalhePage() {
       await carregarDados();
     } catch (error) {
       console.error('Erro ao salvar página:', error);
-      toast.error(error instanceof Error ? error.message : 'Não foi possível salvar a página.');
+      await salvarLocalmente(paginaSelecionada);
+      toast.info('Não foi possível enviar agora; a anotação foi guardada neste dispositivo.');
     } finally {
       setSalvandoPagina(false);
     }

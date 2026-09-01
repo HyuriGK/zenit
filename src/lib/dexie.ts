@@ -286,6 +286,23 @@ export interface Anotacao {
     dataAtualizacao: Date;
 }
 
+/** Cache e fila durável do planner para edições feitas sem conexão. */
+export interface EstudoOfflineCache {
+    id: string;
+    curso: unknown;
+    modulos: unknown[];
+    anotacoes: unknown[];
+    updatedAt: Date;
+}
+
+export interface AnotacaoPendente {
+    id: string;
+    cursoId: string;
+    titulo: string;
+    conteudo: string;
+    updatedAt: Date;
+}
+
 export interface AtivoInvestimento {
     id: string;
     nome: string; // Ex: AAPL34, BTC, Tesouro Direto
@@ -319,6 +336,8 @@ export class ZenitDB extends Dexie {
     cursos!: Table<Curso, string>;
     modulos!: Table<Modulo, string>;
     anotacoes!: Table<Anotacao, string>;
+    estudosOfflineCache!: Table<EstudoOfflineCache, string>;
+    anotacoesPendentes!: Table<AnotacaoPendente, string>;
     ativosInvestimento!: Table<AtivoInvestimento, string>;
 
     constructor() {
@@ -347,6 +366,18 @@ export class ZenitDB extends Dexie {
             modulos: 'id, cursoId, ordem',
             anotacoes: 'id, moduloId, cursoId, dataCriacao',
             ativosInvestimento: 'id, tipo, nome'
+        });
+        this.version(7).stores({
+            users: 'id', compromissos: 'id, data, recorrenciaGrupoId', atividades: 'id, createdAt',
+            contasBancarias: 'id, ativa', cartoes: 'id, ativo', categorias: 'id, tipo, nome',
+            transacoes: 'id, data, tipo, categoriaId, contaBancariaId, grupoParcelaId, descricao, paga',
+            objetivosFinanceiros: 'id, status', viagens: 'id, status, dataInicio', destinosViagem: 'id, viagemId',
+            despesasViagem: 'id, viagemId, data, categoria', atividadesViagem: 'id, viagemId, data',
+            hospedagensViagem: 'id, viagemId, checkIn', transportesViagem: 'id, viagemId, dataHora',
+            habitos: null, registrosHabitos: null, categoriasHabito: null, midias: null, citacoes: null,
+            cursos: 'id', modulos: 'id, cursoId, ordem', anotacoes: 'id, moduloId, cursoId, dataCriacao',
+            ativosInvestimento: 'id, tipo, nome', estudosOfflineCache: 'id, updatedAt',
+            anotacoesPendentes: 'id, cursoId, updatedAt'
         });
     }
 }
