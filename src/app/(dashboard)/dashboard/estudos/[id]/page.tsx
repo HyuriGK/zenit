@@ -92,6 +92,7 @@ export default function CursoDetalhePage() {
   const [paginaSelecionada, setPaginaSelecionada] = useState<Pagina | null>(null);
   const [loading, setLoading] = useState(true);
   const requisicaoAtual = useRef(0);
+  const sincronizacaoEmAndamento = useRef(false);
 
   const [modalModuloAberto, setModalModuloAberto] = useState(false);
   const [modalPaginaAberto, setModalPaginaAberto] = useState(false);
@@ -263,22 +264,38 @@ export default function CursoDetalhePage() {
   }, [carregarDados]);
 
   const sincronizarPendentes = useCallback(async () => {
-    if (!navigator.onLine) return;
+    if (!navigator.onLine || sincronizacaoEmAndamento.current) return;
+    sincronizacaoEmAndamento.current = true;
     const pendentes = await db.anotacoesPendentes.where('cursoId').equals(cursoId).sortBy('updatedAt');
-    if (!pendentes.length) return;
+    try {
+      for (const pendente of pendentes) {
+        const conteudo = await migrarImagensIncorporadas(pendente.conteudo);
+        const resposta = await fetch('/api/estudos/anotacoes', {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: pendente.id, titulo: pendente.titulo, conteudo }),
+        });
+        if (!resposta.ok) throw new Error('Não foi possível sincronizar a anotação.');
 
-    for (const pendente of pendentes) {
-      const conteudo = await migrarImagensIncorporadas(pendente.conteudo);
-      const resposta = await fetch('/api/estudos/anotacoes', {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: pendente.id, titulo: pendente.titulo, conteudo }),
-      });
-      if (!resposta.ok) throw new Error('Não foi possível sincronizar a anotação.');
-      await db.anotacoesPendentes.delete(pendente.id);
+        // Não apaga uma edição feita enquanto este envio estava em andamento.
+        const versaoAtual = await db.anotacoesPendentes.get(pendente.id);
+        if (versaoAtual?.updatedAt.getTime() === pendente.updatedAt.getTime()) {
+          await db.anotacoesPendentes.delete(pendente.id);
+        }
+      }
+      if (pendentes.length) {
+        toast.success('Anotações offline sincronizadas.');
+        await carregarDados();
+      }
+    } finally {
+      sincronizacaoEmAndamento.current = false;
     }
-    toast.success('Anotações offline sincronizadas.');
-    await carregarDados();
   }, [carregarDados, cursoId]);
+
+  const aguardarSincronizacao = useCallback(async () => {
+    while (sincronizacaoEmAndamento.current) {
+      await new Promise<void>((resolve) => window.setTimeout(resolve, 50));
+    }
+  }, []);
 
   useEffect(() => {
     const aoReconectar = () => { void sincronizarPendentes(); };
@@ -475,6 +492,10 @@ export default function CursoDetalhePage() {
 
     setSalvandoPagina(true);
     try {
+      // Espera qualquer versão offline anterior terminar antes de enviar esta
+      // versão mais nova. Isso impede uma resposta atrasada de sobrescrevê-la.
+      await aguardarSincronizacao();
+      await sincronizarPendentes();
       // Anotações antigas podem conter imagens em base64, o que excede o
       // limite de corpo da plataforma. Migre-as antes de mandar o JSON.
       const conteudo = await migrarImagensIncorporadas(paginaSelecionada.conteudo);
@@ -506,6 +527,7 @@ export default function CursoDetalhePage() {
         titulo: paginaSalva.titulo,
         conteudo: paginaSalva.conteudo,
       });
+      await db.anotacoesPendentes.delete(paginaSalva.id);
       setEditandoPagina(false);
       toast.success('Página salva com sucesso.');
       await carregarDados();
