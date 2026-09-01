@@ -22,6 +22,8 @@ import {
   Maximize2,
   Minimize2,
   Loader2,
+  WifiOff,
+  CloudUpload,
 } from 'lucide-react';
 import { LoadingScreen } from '@/components/ui/LoadingScreen';
 import RichTextEditor from '@/components/estudos/RichTextEditor';
@@ -91,6 +93,8 @@ export default function CursoDetalhePage() {
   const [moduloSelecionado, setModuloSelecionado] = useState<Modulo | null>(null);
   const [paginaSelecionada, setPaginaSelecionada] = useState<Pagina | null>(null);
   const [loading, setLoading] = useState(true);
+  const [estaOnline, setEstaOnline] = useState(true);
+  const [pendenciasOffline, setPendenciasOffline] = useState(0);
   const requisicaoAtual = useRef(0);
   const sincronizacaoEmAndamento = useRef(false);
 
@@ -127,6 +131,10 @@ export default function CursoDetalhePage() {
   const [excluindoPagina, setExcluindoPagina] = useState(false);
   const [excluindoCurso, setExcluindoCurso] = useState(false);
 
+  const atualizarPendenciasOffline = useCallback(async () => {
+    setPendenciasOffline(await db.anotacoesPendentes.where('cursoId').equals(cursoId).count());
+  }, [cursoId]);
+
   const salvarLocalmente = useCallback(async (pagina: Pagina) => {
     await db.anotacoesPendentes.put({
       id: pagina.id,
@@ -159,7 +167,8 @@ export default function CursoDetalhePage() {
     } : atual);
     setConteudoOriginalPagina({ titulo: pagina.titulo, conteudo: pagina.conteudo });
     setEditandoPagina(false);
-  }, [cursoId]);
+    await atualizarPendenciasOffline();
+  }, [atualizarPendenciasOffline, cursoId]);
 
   const carregarDados = useCallback(async () => {
     const idRequisicao = ++requisicaoAtual.current;
@@ -288,8 +297,9 @@ export default function CursoDetalhePage() {
       }
     } finally {
       sincronizacaoEmAndamento.current = false;
+      await atualizarPendenciasOffline();
     }
-  }, [carregarDados, cursoId]);
+  }, [atualizarPendenciasOffline, carregarDados, cursoId]);
 
   const aguardarSincronizacao = useCallback(async () => {
     while (sincronizacaoEmAndamento.current) {
@@ -298,11 +308,21 @@ export default function CursoDetalhePage() {
   }, []);
 
   useEffect(() => {
-    const aoReconectar = () => { void sincronizarPendentes(); };
+    const aoReconectar = () => {
+      setEstaOnline(true);
+      void sincronizarPendentes();
+    };
+    const aoDesconectar = () => setEstaOnline(false);
+    setEstaOnline(navigator.onLine);
+    void atualizarPendenciasOffline();
     window.addEventListener('online', aoReconectar);
-    void sincronizarPendentes();
-    return () => window.removeEventListener('online', aoReconectar);
-  }, [sincronizarPendentes]);
+    window.addEventListener('offline', aoDesconectar);
+    if (navigator.onLine) void sincronizarPendentes();
+    return () => {
+      window.removeEventListener('online', aoReconectar);
+      window.removeEventListener('offline', aoDesconectar);
+    };
+  }, [atualizarPendenciasOffline, sincronizarPendentes]);
 
   const criarModulo = async () => {
     if (criandoModulo) return;
@@ -486,7 +506,7 @@ export default function CursoDetalhePage() {
 
     if (!navigator.onLine) {
       await salvarLocalmente(paginaSelecionada);
-      toast.info('Sem internet: anotação guardada neste dispositivo e será sincronizada ao reconectar.');
+      toast.warning('Salvo no modo offline. Esta anotação será sincronizada automaticamente quando a internet voltar.');
       return;
     }
 
@@ -534,7 +554,7 @@ export default function CursoDetalhePage() {
     } catch (error) {
       console.error('Erro ao salvar página:', error);
       await salvarLocalmente(paginaSelecionada);
-      toast.info('Não foi possível enviar agora; a anotação foi guardada neste dispositivo.');
+      toast.warning('Salvo no modo offline. Esta anotação será sincronizada automaticamente quando a internet voltar.');
     } finally {
       setSalvandoPagina(false);
     }
@@ -642,6 +662,23 @@ export default function CursoDetalhePage() {
 
   return (
     <div className="h-full min-h-0 flex flex-col overflow-hidden bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950">
+      {(!estaOnline || pendenciasOffline > 0) && (
+        <div className={`shrink-0 px-4 py-3 border-b flex items-center gap-3 text-sm ${
+          !estaOnline
+            ? 'bg-amber-500/15 border-amber-500/30 text-amber-100'
+            : 'bg-blue-500/15 border-blue-500/30 text-blue-100'
+        }`}>
+          {!estaOnline ? <WifiOff className="w-5 h-5 shrink-0 text-amber-300" /> : <CloudUpload className="w-5 h-5 shrink-0 text-blue-300" />}
+          <div>
+            <p className="font-semibold">{!estaOnline ? 'Você está no modo offline' : 'Sincronizando anotações salvas offline'}</p>
+            <p className="text-xs opacity-85">
+              {!estaOnline
+                ? 'As alterações salvas ficam protegidas neste dispositivo e serão enviadas automaticamente na próxima conexão.'
+                : `${pendenciasOffline} anotação(ões) aguardando envio para sua conta.`}
+            </p>
+          </div>
+        </div>
+      )}
       {/* Header com gradiente */}
       <div className="relative shrink-0 border-b border-zinc-800/50 backdrop-blur-xl bg-zinc-900/80 overflow-x-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-green-500/5 via-transparent to-blue-500/5" />
