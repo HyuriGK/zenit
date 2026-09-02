@@ -40,6 +40,14 @@ function computeDefaultDateStr(dataReferencia?: Date): string {
   return formatLocalDate(today);
 }
 
+// A descrição exibida de uma parcela inclui o seu número. Ao editar uma série,
+// esse sufixo não pode ser copiado para os demais registros.
+function formatarDescricaoDaParcela(descricao: string, numero?: number, total?: number): string {
+  if (!numero || !total) return descricao;
+  const descricaoBase = descricao.replace(/\s*\(?\d+\s*\/\s*\d+\)?\s*$/, '').trim();
+  return `${descricaoBase} (${numero}/${total})`;
+}
+
 interface NovaTransacaoModalProps {
   aberto: boolean;
   onFechar: () => void;
@@ -114,6 +122,9 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
 
       if (transacaoParaEditar) {
         // EDIT
+        const descricaoAtualizada = transacaoParaEditar.isParcela
+          ? formatarDescricaoDaParcela(descricao, transacaoParaEditar.parcelaNumero, transacaoParaEditar.parcelaTotais)
+          : descricao;
         const balanceAdjust = (() => {
           const oldConta = transacaoParaEditar.contaBancariaId;
           const newConta = contaBancariaId;
@@ -163,7 +174,7 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            descricao, valor: valorNumerico,
+            descricao: descricaoAtualizada, valor: valorNumerico,
             data,
             tipo, observacoes: observacoes || null,
             categoriaId: categoriaId || null,
@@ -183,7 +194,10 @@ export default function NovaTransacaoModal({ aberto, onFechar, onSucesso, transa
             parseDataString(t.data).getTime() > tData
           );
           for (const t of proximas) {
-            const updates: any = { categoriaId: categoriaId || null, valor: valorNumerico, descricao, observacoes: observacoes || null, contaBancariaId };
+            const descricaoDaTransacao = t.isParcela
+              ? formatarDescricaoDaParcela(descricao, t.parcelaNumero, t.parcelaTotais)
+              : descricao;
+            const updates: any = { categoriaId: categoriaId || null, valor: valorNumerico, descricao: descricaoDaTransacao, observacoes: observacoes || null, contaBancariaId };
             const dtT = parseDataString(t.data);
             updates.data = formatLocalDate(new Date(dtT.getFullYear(), dtT.getMonth(), day));
             await fetch(`/api/financeiro/transacoes/${t.id}`, {
