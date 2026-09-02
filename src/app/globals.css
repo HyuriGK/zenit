@@ -294,6 +294,16 @@ html {
   background: #3f3f46;
 }
 
+/* Mantém a rolagem disponível, mas sem exibir a barra. */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
 /* Scrollbar para Modais com cantos arredondados */
 .modal-scrollbar::-webkit-scrollbar {
   width: 8px;
