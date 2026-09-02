@@ -350,7 +350,7 @@ export default function TransacoesPage() {
         <Card className="relative overflow-hidden bg-zinc-900/50 border-zinc-800 hover:border-amber-500/40 transition-all">
           <div className="relative p-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-zinc-400">Restante a pagar</span>
+              <span className="text-sm text-zinc-400">Fluxo de caixa</span>
               <div className="p-2 bg-amber-500/10 rounded-lg"><Wallet className="w-5 h-5 text-amber-400" /></div>
             </div>
             <div className={`text-3xl font-bold ${restanteAPagar >= 0 ? 'text-amber-400' : 'text-red-400'}`}>{formatarMoeda(restanteAPagar)}</div>
