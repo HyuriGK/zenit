@@ -28,7 +28,6 @@ interface DashboardData {
     receitas: number;
     despesas: number;
     saldo: number;
-    restanteAPagar: number;
     despesasFixas: number;
     despesasVariaveis: number;
     sobra: number;
@@ -153,7 +152,7 @@ export default function FinanceiroDashboardPage() {
       return d >= inicioMesAnterior && d <= fimMesAnterior;
     });
 
-    let receitas = 0, despesas = 0, despesasPendentes = 0, despesasFixas = 0, despesasVariaveis = 0, gastoCartao = 0;
+    let receitas = 0, despesas = 0, despesasFixas = 0, despesasVariaveis = 0, gastoCartao = 0;
     let receitasAnterior = 0, despesasAnterior = 0;
     const gastosPorCatMap: Record<string, number> = {};
     const receitasPorCatMap: Record<string, number> = {};
@@ -165,7 +164,6 @@ export default function FinanceiroDashboardPage() {
         if (t.categoriaId) receitasPorCatMap[t.categoriaId] = (receitasPorCatMap[t.categoriaId] || 0) + valor;
       } else {
         despesas += valor;
-        if (!t.paga) despesasPendentes += valor;
         if (t.isFixa) despesasFixas += valor;
         else despesasVariaveis += valor;
         if (t.cartaoId) gastoCartao += valor;
@@ -223,16 +221,7 @@ export default function FinanceiroDashboardPage() {
 
     return {
       mes: format(hoje, 'MMMM yyyy', { locale: ptBR }),
-      resumoMensal: {
-        receitas,
-        despesas,
-        saldo: receitas - despesas,
-        restanteAPagar: receitas - despesasPendentes,
-        despesasFixas,
-        despesasVariaveis,
-        sobra: receitas - despesasFixas,
-        gastoCartao,
-      },
+      resumoMensal: { receitas, despesas, saldo: receitas - despesas, despesasFixas, despesasVariaveis, sobra: receitas - despesasFixas, gastoCartao },
       gastosPorCategoria: parseCategorias(gastosPorCatMap, despesas),
       receitasPorCategoria: parseCategorias(receitasPorCatMap, receitas),
       comparativo: {
@@ -269,7 +258,7 @@ export default function FinanceiroDashboardPage() {
         }
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card className="border border-zinc-800/50">
           <CardContent className="p-6">
             <div className="flex items-center gap-2 mb-2">
@@ -297,19 +286,6 @@ export default function FinanceiroDashboardPage() {
               <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Saldo Mensal</span>
             </div>
             <div className="text-3xl font-bold text-white leading-none">{formatarMoeda(dashboard.resumoMensal.saldo)}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-zinc-800/50">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-2">
-              <CreditCard className="w-4 h-4 text-amber-500/50" />
-              <span className="text-[10px] uppercase tracking-[0.2em] font-bold text-zinc-500">Restante a pagar</span>
-            </div>
-            <div className={`text-3xl font-bold leading-none ${dashboard.resumoMensal.restanteAPagar >= 0 ? 'text-amber-400' : 'text-red-400'}`}>
-              {formatarMoeda(dashboard.resumoMensal.restanteAPagar)}
-            </div>
-            <p className="text-xs text-zinc-500 mt-1">Receitas - despesas pendentes</p>
           </CardContent>
         </Card>
       </div>

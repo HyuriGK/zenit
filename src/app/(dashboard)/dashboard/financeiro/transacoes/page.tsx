@@ -267,6 +267,10 @@ export default function TransacoesPage() {
   const totalReceitas = transacoes.filter(t => t.tipo === 'RECEITA').reduce((acc, t) => acc + t.valor, 0);
   const totalDespesas = transacoes.filter(t => t.tipo === 'DESPESA').reduce((acc, t) => acc + t.valor, 0);
   const saldo = totalReceitas - totalDespesas;
+  const despesasPendentes = transacoes
+    .filter(t => t.tipo === 'DESPESA' && !t.paga)
+    .reduce((acc, t) => acc + t.valor, 0);
+  const restanteAPagar = totalReceitas - despesasPendentes;
 
   const getDiasStatus = (dataTransacao: Date) => {
     const hoje = startOfDay(new Date());
@@ -309,7 +313,7 @@ export default function TransacoesPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <Card className="relative overflow-hidden bg-zinc-900/50 border-zinc-800 hover:border-green-500/40 transition-all">
           <div className="relative p-6">
             <div className="flex items-center justify-between mb-2">
@@ -340,6 +344,17 @@ export default function TransacoesPage() {
             </div>
             <div className={`text-3xl font-bold ${saldo >= 0 ? 'text-green-400' : 'text-red-400'}`}>{formatarMoeda(saldo)}</div>
             <p className="text-xs text-zinc-500 mt-1">Receitas - Despesas</p>
+          </div>
+        </Card>
+
+        <Card className="relative overflow-hidden bg-zinc-900/50 border-zinc-800 hover:border-amber-500/40 transition-all">
+          <div className="relative p-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-zinc-400">Restante a pagar</span>
+              <div className="p-2 bg-amber-500/10 rounded-lg"><Wallet className="w-5 h-5 text-amber-400" /></div>
+            </div>
+            <div className={`text-3xl font-bold ${restanteAPagar >= 0 ? 'text-amber-400' : 'text-red-400'}`}>{formatarMoeda(restanteAPagar)}</div>
+            <p className="text-xs text-zinc-500 mt-1">Receitas - despesas pendentes</p>
           </div>
         </Card>
       </div>
